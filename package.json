@@ -1,0 +1,40 @@
+{
+  "name": "musicserver-backend",
+  "version": "1.0.0",
+  "description": "The monolith for the musicserver backend",
+  "main": "dist/index.js",
+  "scripts": {
+    "compile": "rm -rf ./dist && ./node_modules/.bin/tsc -p tsconfig.json",
+    "test": "npm run compile && ./jasmine.js",
+    "start": "npm run compile && node dist/lib/index.js",
+    "dev": "node ./node_modules/nodemon/bin/nodemon.js --config nodemon.json",
+    "test-nodemon": "node ./node_modules/nodemon/bin/nodemon.js --config nodemon.test.json"
+  },
+  "keywords": [],
+  "author": "Stefan Läufle",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/fs-extra": "^5.0.2",
+    "@types/jasmine": "^2.8.6",
+    "@types/node": "^10.0.3",
+    "@types/promise.prototype.finally": "^2.0.2",
+    "@types/uuid": "^3.4.3",
+    "@types/winston": "^2.3.9",
+    "jasmine": "^3.1.0",
+    "jasmine-console-reporter": "^3.0.0",
+    "nodemon": "^1.17.3",
+    "ts-node": "^6.0.2",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.8.0",
+    "typescript": "^2.8.3"
+  },
+  "dependencies": {
+    "fs-extra": "^6.0.0",
+    "inversify": "^4.13.0",
+    "promise.prototype.finally": "^3.1.0",
+    "reflect-metadata": "^0.1.12",
+    "uuid": "^3.2.1",
+    "winston": "^2.4.2",
+    "winston-daily-rotate-file": "^3.1.3"
+  }
+}

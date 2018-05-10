@@ -1,0 +1,10 @@
+{
+  "LOGGER": {
+    "LEVEL": "debug",
+    "DIRECTORY": ".",
+    "FILENAME": "musicserver",
+    "SINGLE_FILE": false,
+    "ROTATION_FILE": false,
+    "CONSOLE": true
+  }
+}
