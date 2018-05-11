@@ -20,7 +20,7 @@ export class Logger implements ILogger {
   private keyRotationFile = 'LOGGER.ROTATION_FILE';
 
 
-  private logLevel = 'warning';
+  private logLevel = 'warn';
   private logDirectory = '.';
   private filename = 'musicserver';
 
