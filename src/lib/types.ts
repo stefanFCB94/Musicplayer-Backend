@@ -4,4 +4,5 @@ export const TYPES = {
   ConfigServiceProvider: Symbol.for('IConfigServiceProvider'),
   Logger: Symbol.for('ILogger'),
   UUIDGenerator: Symbol.for('IUUIDGenerator'),
+  DatabaseService: Symbol.for('IDatabaseService'),
 };

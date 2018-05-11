@@ -8,22 +8,27 @@ import { ILogger } from './interfaces/ILogger';
 import { Logger } from './services/Logger';
 import { IUUIDGenerator } from './interfaces/IUUIDGenerator';
 import { UUIDGenerator } from './services/UUIDGenerator';
+import { IDatabaseService } from './interfaces/IDatabaseService';
+import { DatabaseService } from './db/DatabaseService';
 
 
 const container = new Container();
 
 
 container.bind<IChecksumCalculator>(TYPES.ChecksumCalculator)
-  .to(ChecksumCalculator);
+  .to(ChecksumCalculator).inSingletonScope();
 
 container.bind<IConfigService>(TYPES.ConfigService)
-  .to(ConfigService);
+  .to(ConfigService).inSingletonScope();
 
 container.bind<ILogger>(TYPES.Logger)
-  .to(Logger);
+  .to(Logger).inSingletonScope();
 
 container.bind<IUUIDGenerator>(TYPES.UUIDGenerator)
-  .to(UUIDGenerator);
+  .to(UUIDGenerator).inSingletonScope();
+
+container.bind<IDatabaseService>(TYPES.DatabaseService)
+  .to(DatabaseService).inSingletonScope();
 
 
 
