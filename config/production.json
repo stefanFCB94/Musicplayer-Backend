@@ -6,5 +6,16 @@
     "SINGLE_FILE": false,
     "ROTATION_FILE": false,
     "CONSOLE": true
+  },
+  "DATABASE": {
+    "TYPE": "mysql",
+    "HOST": "localhost",
+    "PORT": 3306,
+    "USERNAME": "musicserver",
+    "PASSWORD": "music1!",
+    "DATABASE": "musicserver"
+  },
+  "SECURITA": {
+    "SALT_ROUNDS": 10
   }
 }

@@ -10,6 +10,10 @@ import { IUUIDGenerator } from './interfaces/IUUIDGenerator';
 import { UUIDGenerator } from './services/UUIDGenerator';
 import { IDatabaseService } from './interfaces/IDatabaseService';
 import { DatabaseService } from './db/DatabaseService';
+import { ILocalUserDAO } from './interfaces/ILocalUserDAO';
+import { LocalUserDAO } from './db/dao/LocalUserDAO';
+import { IPasswordHasher } from './interfaces/IPasswordHasher';
+import { PasswordHasher } from './services/PaswordHasher';
 
 
 const container = new Container();
@@ -27,9 +31,16 @@ container.bind<ILogger>(TYPES.Logger)
 container.bind<IUUIDGenerator>(TYPES.UUIDGenerator)
   .to(UUIDGenerator).inSingletonScope();
 
+container.bind<IPasswordHasher>(TYPES.PaswordHasher)
+  .to(PasswordHasher).inSingletonScope();
+
 container.bind<IDatabaseService>(TYPES.DatabaseService)
   .to(DatabaseService).inSingletonScope();
 
+
+// Database DAOs
+container.bind<ILocalUserDAO>(TYPES.LocalUserDAO)
+  .to(LocalUserDAO).inSingletonScope();
 
 
 // Providers

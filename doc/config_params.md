@@ -44,3 +44,26 @@ LOGGER.FILENAME | musicserver | The name of the log file.<br /> The log file wil
 LOGGER.SINGLE_FILE | false | If true a log file will be stored in the logger directory and all logs will be stored in these file
 LOGGER.CONSOLE | true | If true all the logs will be printed on the console
 LOGGER.ROTATION_FILE | true | If true in the logger directory will be stored a log file, which will be rotated every day. So in the directory will be a log file for every day.
+
+## Parameter for the database connection
+
+All parameters of the database are required.
+Without each of the parameters the musicserver will not start.
+
+Parameter | Default value | Description
+--- | --- | ---
+DATABASE.TYPE | | The type of the database you want to connect to.<br /> Allowed values:<br /><ul><li>mysql</li><li>pg</li><li>mssql</li></ul>
+DATABASE.HOST | | The host address of the database you want to connect to
+DATABASE.PORT | | The port, on which the database connector is listening on
+DATABASE.USERNAME | | The user, with which the database connection should be established. The user needs full rights on the database / the schema, including the right to create and drop tables
+DATABASE.PASSWORD | | The password, which should be used to connect to the database
+DATABASE.DATABASE | | The name of the schema, the databse, in which the information of the musicserver should be stored. In the best case that should be a emtpy database, where only the defined user has access on
+
+## Security parameters
+
+The following parameters can be used to configure the security level of the application.
+The parameters are optional and are configured with a default value to achieve a moderate security level.
+
+Paramter | Default value | Description
+--- | --- | ---
+SECURITY.SALT_ROUNDS | 10 | The number of rounds, which are used to generate a salt for the hashing of the passwords
