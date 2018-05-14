@@ -7,17 +7,4 @@
  * 
  * @extends Error
  */
-export class UserAlreadyExistsError extends Error {
-
-  /**
-   * @public
-   * @author Stefan Läufle
-   * 
-   * Creates the error instance
-   * 
-   * @param {string} message The message of the error
-   */
-  constructor(message?: string) {
-    super(message);
-  }
-}
+export class UserAlreadyExistsError extends Error {}
