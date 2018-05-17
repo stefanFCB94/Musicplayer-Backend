@@ -10,15 +10,18 @@ const uuidGenerator = container.get<IUUIDGenerator>(TYPES.UUIDGenerator);
 const id = uuidGenerator.generateV4();
 
 const localUser = new LocalUser();
-localUser.id = id;
+localUser.id = '60ed87a8-46fa-41a4-9a16-54fbee642813';
 localUser.mail = 'stefan.laeufle@gmail.com';
 localUser.lastname = 'Läufle';
 localUser.firstname = 'Stefan';
 localUser.password = 'abc';
 
 const dao = container.get<ILocalUserDAO>(TYPES.LocalUserDAO);
-dao.createUser(localUser)
-  .then(u => console.log(u))
-  .catch((err) => {
+dao.saveOrUpdateUser(localUser)
+  .then((u) => {
+    console.log(u);
     process.exit(0);
+  })
+  .catch((err) => {
+    process.exit(255);
   });
