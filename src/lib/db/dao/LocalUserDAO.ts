@@ -232,12 +232,6 @@ export class LocalUserDAO implements ILocalUserDAO {
     this.checkParameterOutOfBounds(user);
     this.checkUnsupportedParameterValue(user);
 
-
-    // Set default paramters
-    this.logger.log('Set default values', 'debug');
-    user.createdBy = user.createdBy || user.id;
-    user.updatedBy = user.updatedBy || user.id;
-
     try {
       const savedUser = await this.localUserRespository.save(user);
       this.logger.log('User saved to the database', 'debug');
