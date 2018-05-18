@@ -2,6 +2,7 @@ import { LocalUser } from '../db/models/LocalUser';
 
 export interface ILocalUserDAO {
   saveOrUpdateUser(user: LocalUser): Promise<LocalUser>;
+  searchForUsers(where: { [field: string]: any}, orderCol?: string, orderDirection?: string, skip?: number, maxItems?: number) : Promise<LocalUser[]>;
   getUsers(orderCol?: string, orderDirection?: string, skip?: number, maxItems?: number): Promise<LocalUser[]>;
   getUserById(id: string): Promise<LocalUser>;
   getUserByMail(mail: string): Promise<LocalUser>;

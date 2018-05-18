@@ -271,10 +271,48 @@ export class LocalUserDAO implements ILocalUserDAO {
    * @param {number} skip The number of items that should be skipped
    * @param {string} maxItems The maximal number of items that should be returned
    * 
+   * @returns {Promise<LocalUser[]>}  The found users
+   * 
    * @throws {ServiceNotInitializedError} If the database service is not initialized
    * @throws {Error} Unsupported error
    */
-  public async getUsers(orderCol = 'id', orderDirection = 'ASC', skip?: number, maxItems?: number): Promise<LocalUser[]> {
+  public async getUsers(orderCol: string = 'id', orderDirection: string = 'ASC', skip?: number, maxItems?: number): Promise<LocalUser[]> {
+    return this.searchForUsers(null, orderCol, orderDirection, skip, maxItems);
+  }
+
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Search the database for users, that match given
+   * criteria, passed in as paramter to the method.
+   * 
+   * The parameter for the filter criteria should be
+   * passed in as, that the field, which should be queryied,
+   * should given as key and the query value as value for
+   * that key.
+   * 
+   * The result can be sorted and passed with pagination
+   * parameters.
+   * 
+   * @param {Object} where The filter criterias
+   * @param {string} orderCol The name of the column to sort for
+   * @param {string} orderDirection The order direction (ASC or DESC)
+   * @param {number} skip The number of items, that should be skipped
+   * @param {number} maxItems The number of items, that should be returned
+   * 
+   * @returns {Promise<LocalUser[]>} The found users
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error} 
+   */
+  public async searchForUsers(
+    where: { [field: string]: any }, 
+    orderCol: string = 'id', 
+    orderDirection: string = 'ASC', 
+    skip?: number, 
+    maxItems?: number,
+  ): Promise<LocalUser[]> {
     try { 
       await this.initRepository();
     } catch (err) {
@@ -283,12 +321,14 @@ export class LocalUserDAO implements ILocalUserDAO {
       throw error;
     }
 
-    this.logger.log('Start query to get local users from the databse', 'debug');
+    this.logger.log('Start query for local users from the databse', 'debug');
+    this.logger.log('Filter parameter: ' + where.toString(), 'debug');
     this.logger.log(`Skip paramter: ${skip}`, 'debug');
     this.logger.log(`Max items paramter: ${maxItems}`, 'debug');
 
     try {
       const options: FindManyOptions<LocalUser> = {
+        where,
         skip,
         take: maxItems,
         order: { [orderCol]: orderDirection },
@@ -296,7 +336,7 @@ export class LocalUserDAO implements ILocalUserDAO {
       const users = await this.localUserRespository.find(options);
       
       this.logger.log('Query for users finished', 'debug');
-      this.logger.log(`Selected user: ${users.length}`, 'debug');
+      this.logger.log(`Selected users: ${users.length}`, 'debug');
 
       return users;
     } catch (err) {
