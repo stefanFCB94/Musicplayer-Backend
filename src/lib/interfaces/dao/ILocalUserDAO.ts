@@ -1,4 +1,4 @@
-import { LocalUser } from '../db/models/LocalUser';
+import { LocalUser } from '../../db/models/LocalUser';
 
 export interface ILocalUserDAO {
   saveOrUpdateUser(user: LocalUser): Promise<LocalUser>;

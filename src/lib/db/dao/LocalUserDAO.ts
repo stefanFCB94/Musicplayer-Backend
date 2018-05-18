@@ -1,16 +1,14 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
-import { IDatabaseService } from '../../interfaces/IDatabaseService';
-import { ILogger } from '../../interfaces/ILogger';
+import { IDatabaseService } from '../../interfaces/db/IDatabaseService';
+import { ILogger } from '../../interfaces/services/ILogger';
 import { Repository, FindManyOptions } from 'typeorm';
 import { LocalUser } from '../models/LocalUser';
-import { ILocalUserDAO } from '../../interfaces/ILocalUserDAO';
-import { IUUIDGenerator } from '../../interfaces/IUUIDGenerator';
-import { IPasswordHasher } from '../../interfaces/IPasswordHasher';
-import { UserAlreadyExistsError } from '../../error/UserAlreadyExistsError';
-import { RequiredParameterNotSet } from '../../error/RequiredParameterNotSetError';
-import { ParameterOutOfBoundsError } from '../../error/ParameterOutOfBoundsError';
-import { UnsupportedParamterValueError } from '../../error/UnsupportedParamterValueError';
+import { ILocalUserDAO } from '../../interfaces/dao/ILocalUserDAO';
+import { UserAlreadyExistsError } from '../../error/db/UserAlreadyExistsError';
+import { RequiredParameterNotSet } from '../../error/db/RequiredParameterNotSetError';
+import { ParameterOutOfBoundsError } from '../../error/db/ParameterOutOfBoundsError';
+import { UnsupportedParamterValueError } from '../../error/db/UnsupportedParamterValueError';
 import { ServiceNotInitializedError } from '../../error/ServiceNotInitalizedError';
 
 /**
@@ -55,7 +53,7 @@ export class LocalUserDAO implements ILocalUserDAO {
    * 
    * @returns {Proimse<Repository<LocalUser>>} The initialized repository
    * 
-   * @throws {Error} If a capital error occurs until initalizing the repository
+   * @throws {ServiceNotInitializedError} If a capital error occurs until initalizing the repository
    */
   private async initRepository(): Promise<Repository<LocalUser>> {
     if (this.localUserRespository) { return this.localUserRespository; }
@@ -68,9 +66,11 @@ export class LocalUserDAO implements ILocalUserDAO {
 
       this.logger.log('LocalUser repository initialized', 'debug');
     } catch (err) {
-
-      this.logger.log('Repository cannot be initialized. Database connection could not be retrieved', 'debug');
-      return Promise.reject(err);
+      this.logger.log('Repository cannot be initialized. Database connection could not be retrieved', 'error');
+      this.logger.log(err.stack, 'error');
+      
+      const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
+      throw error;
     }
   }
 
@@ -224,14 +224,7 @@ export class LocalUserDAO implements ILocalUserDAO {
    * @throws {ServiceNotInitializedError}
    */
   public async saveOrUpdateUser(user: LocalUser): Promise<LocalUser> {
-    try { 
-      await this.initRepository();
-    } catch (err) {
-      const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
-      this.logger.log(error.stack, 'error');
-      throw error;
-    }
-
+    await this.initRepository();
 
     // Check paramter values
     this.logger.log('Start checking for paramter errors', 'debug');
@@ -313,14 +306,8 @@ export class LocalUserDAO implements ILocalUserDAO {
     skip?: number, 
     maxItems?: number,
   ): Promise<LocalUser[]> {
-    try { 
-      await this.initRepository();
-    } catch (err) {
-      const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
-      this.logger.log(error.stack, 'error');
-      throw error;
-    }
-
+    await this.initRepository();
+    
     this.logger.log('Start query for local users from the databse', 'debug');
     this.logger.log('Filter parameter: ' + where.toString(), 'debug');
     this.logger.log(`Skip paramter: ${skip}`, 'debug');
@@ -362,14 +349,8 @@ export class LocalUserDAO implements ILocalUserDAO {
    * @throws {Error}
    */
   public async getUserById(id: string): Promise<LocalUser> {
-    try { 
-      await this.initRepository();
-    } catch (err) {
-      const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
-      this.logger.log(error.stack, 'error');
-      throw error;
-    }
-
+    await this.initRepository();
+    
     this.logger.log('Start searching for a user by its id', 'debug');
     this.logger.log(`User with ID '${id}' should be searched`, 'debug');
 
@@ -407,14 +388,8 @@ export class LocalUserDAO implements ILocalUserDAO {
    * @throws {Error} 
    */
   public async getUserByMail(mail: string): Promise<LocalUser> {
-    try { 
-      await this.initRepository();
-    } catch (err) {
-      const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
-      this.logger.log(error.stack, 'error');
-      throw error;
-    }
-
+    await this.initRepository();
+    
     this.logger.log('Start searching for a user by mail address', 'debug');
     this.logger.log(`User with mail '${mail}' should be searched`, 'debug');
 
@@ -453,14 +428,8 @@ export class LocalUserDAO implements ILocalUserDAO {
    * @throws {Error} 
    */
   public async deleteUser(user: LocalUser): Promise<LocalUser> {
-    try { 
-      await this.initRepository();
-    } catch (err) {
-      const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
-      this.logger.log(error.stack, 'error');
-      throw error;
-    }
-
+    await this.initRepository();
+    
     this.logger.log('Start deleting user', 'debug');
     
     try {

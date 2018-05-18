@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import * as uuid from 'uuid';
-import { IUUIDGenerator } from '../interfaces/IUUIDGenerator';
-import { ILogger } from '../interfaces/ILogger';
+import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
+import { ILogger } from '../interfaces/services/ILogger';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
 

@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify';
-import { IPasswordHasher } from '../interfaces/IPasswordHasher';
+import { IPasswordHasher } from '../interfaces/services/IPasswordHasher';
 import { TYPES } from '../types';
-import { ILogger } from '../interfaces/ILogger';
+import { ILogger } from '../interfaces/services/ILogger';
 import * as bcrypt from 'bcrypt';
-import { IConfigServiceProvider, IConfigService } from '../interfaces/IConfigService';
+import { IConfigServiceProvider, IConfigService } from '../interfaces/services/IConfigService';
 
 
 /**

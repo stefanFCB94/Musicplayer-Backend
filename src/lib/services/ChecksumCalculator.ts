@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import * as fs from 'fs-extra';
 import * as crypto from 'crypto';
 import { injectable, inject } from 'inversify';
-import { IChecksumCalculator } from '../interfaces/IChecksumCalculator';
-import { ILogger } from '../interfaces/ILogger';
+import { IChecksumCalculator } from '../interfaces/services/IChecksumCalculator';
+import { ILogger } from '../interfaces/services/ILogger';
 import { TYPES } from '../types';
 
 /**
@@ -66,7 +66,7 @@ export class ChecksumCalculator implements IChecksumCalculator {
    * 
    * @throws {Error} If a error occurs by calculated the checksum
    */
-  async getMD5Checksum(file: Buffer|string) {
+  async getMD5Checksum(file: Buffer|string): Promise<string> {
     this.logger.log('Start calculating MD5 checksum', 'debug');
     
     try {

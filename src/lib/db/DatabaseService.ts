@@ -1,10 +1,11 @@
 import { Connection, createConnection } from 'typeorm';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
-import { ILogger } from '../interfaces/ILogger';
-import { IConfigService, IConfigServiceProvider } from '../interfaces/IConfigService';
-import { IDatabaseService } from '../interfaces/IDatabaseService';
-import { InsufficientConfigParameterError } from '../error/InsufficientConfigParameterError';
+import { ILogger } from '../interfaces/services/ILogger';
+import { IConfigService, IConfigServiceProvider } from '../interfaces/services/IConfigService';
+import { IDatabaseService } from '../interfaces/db/IDatabaseService';
+import { InsufficientConfigParameterError } from '../error/config/InsufficientConfigParameterError';
+import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
 
 /**
  * @class
@@ -58,9 +59,17 @@ export class DatabaseService implements IDatabaseService {
   private async initConfigService(): Promise<void> {
     if (this.configService) { return; }
 
-    this.configService = await this.configProvider();
-    this.logger.log('Config-Service initialized for database service', 'debug');
-    return;
+    try {
+      this.configService = await this.configProvider();
+      this.logger.log('Config-Service initialized for database service', 'debug');
+      return;
+    } catch (err) {
+      this.logger.log('Config-Service could not be intitalized', 'debug');
+      
+      const error = new ServiceNotInitializedError('IConfigService', 'Serivce could not be intialized');
+      this.logger.log(error.stack, 'error');
+      throw error;
+    }
   }
 
 

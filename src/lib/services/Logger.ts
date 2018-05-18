@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
-import { ILogger } from '../interfaces/ILogger';
-import { IConfigService, IConfigServiceProvider } from '../interfaces/IConfigService';
+import { ILogger } from '../interfaces/services/ILogger';
+import { IConfigService, IConfigServiceProvider } from '../interfaces/services/IConfigService';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
 

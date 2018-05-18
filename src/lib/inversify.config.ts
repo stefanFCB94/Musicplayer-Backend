@@ -1,18 +1,26 @@
 import { Container } from 'inversify';
-import { IChecksumCalculator } from './interfaces/IChecksumCalculator';
+
 import { TYPES } from './types';
+
+import { IChecksumCalculator } from './interfaces/services/IChecksumCalculator';
 import { ChecksumCalculator } from './services/ChecksumCalculator';
-import { IConfigService, IConfigServiceProvider } from './interfaces/IConfigService';
+
+import { IConfigService, IConfigServiceProvider } from './interfaces/services/IConfigService';
 import { ConfigService } from './services/ConfigService';
-import { ILogger } from './interfaces/ILogger';
+
+import { ILogger } from './interfaces/services/ILogger';
 import { Logger } from './services/Logger';
-import { IUUIDGenerator } from './interfaces/IUUIDGenerator';
+
+import { IUUIDGenerator } from './interfaces/services/IUUIDGenerator';
 import { UUIDGenerator } from './services/UUIDGenerator';
-import { IDatabaseService } from './interfaces/IDatabaseService';
+
+import { IDatabaseService } from './interfaces/db/IDatabaseService';
 import { DatabaseService } from './db/DatabaseService';
-import { ILocalUserDAO } from './interfaces/ILocalUserDAO';
+
+import { ILocalUserDAO } from './interfaces/dao/ILocalUserDAO';
 import { LocalUserDAO } from './db/dao/LocalUserDAO';
-import { IPasswordHasher } from './interfaces/IPasswordHasher';
+
+import { IPasswordHasher } from './interfaces/services/IPasswordHasher';
 import { PasswordHasher } from './services/PaswordHasher';
 
 

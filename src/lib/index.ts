@@ -1,10 +1,10 @@
 import { container } from './inversify.config';
-import { IUUIDGenerator } from './interfaces/IUUIDGenerator';
+import { IUUIDGenerator } from './interfaces/services/IUUIDGenerator';
 import { TYPES } from './types';
-import { IDatabaseService } from './interfaces/IDatabaseService';
+import { IDatabaseService } from './interfaces/db/IDatabaseService';
 import { LocalUser } from './db/models/LocalUser';
-import { ILocalUserDAO } from './interfaces/ILocalUserDAO';
-import { UserAlreadyExistsError } from './error/UserAlreadyExistsError';
+import { ILocalUserDAO } from './interfaces/dao/ILocalUserDAO';
+import { UserAlreadyExistsError } from './error/db/UserAlreadyExistsError';
 
 const uuidGenerator = container.get<IUUIDGenerator>(TYPES.UUIDGenerator);
 const id = uuidGenerator.generateV4();
