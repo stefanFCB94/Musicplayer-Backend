@@ -4,6 +4,7 @@ import { TYPES } from '../types';
 import { ILogger } from '../interfaces/services/ILogger';
 import * as bcrypt from 'bcrypt';
 import { IConfigServiceProvider, IConfigService } from '../interfaces/services/IConfigService';
+import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
 
 
 /**
@@ -25,6 +26,8 @@ import { IConfigServiceProvider, IConfigService } from '../interfaces/services/I
 
 @injectable()
 export class PasswordHasher implements IPasswordHasher {
+
+  private serviceInitialized = false;
 
   private configService: IConfigService;
   private saltRounds = 10;
@@ -50,7 +53,7 @@ export class PasswordHasher implements IPasswordHasher {
    * 
    * @returns {Promise<void>} Returns, when the service is fully initialized
    * 
-   * @throws {Error} If the service could not be established correct
+   * @throws {ServiceNotInitializedError} If the service could not be established correct
    */
   private async initConfigService(): Promise<void> {
     if (this.configService) { return Promise.resolve(); }
@@ -67,8 +70,41 @@ export class PasswordHasher implements IPasswordHasher {
       return Promise.resolve();
     } catch (err) {
       this.logger.log('Configuration service could not be initialized', 'debug');
-      return Promise.reject(err);
+      
+      const error = new ServiceNotInitializedError('IConfigService', 'Config service could not be initialized');
+      this.logger.log(error.stack, 'error');
+
+      throw error;
     }
+  }
+
+  /**
+   * @private
+   * @author Stefan Läufle
+   * 
+   * Initialize the password hasher.
+   * 
+   * By the initialization of the service all the global configuration keys are
+   * read from the config service after the service is initalized.
+   * 
+   * The possible config parameter are read from the config service and set to
+   * instance for the next rounds
+   * 
+   * @returns {Promise<void>} Returns, when the service is fully initialized
+   * 
+   * @throws {ServiceNotInitializedError} If the config service could not be initialized
+   */
+  private async init(): Promise<void> {
+    if (this.serviceInitialized) { return; }
+
+    await this.initConfigService();
+
+    const saltRounds = this.configService.get(this.roundsKey);
+    if (saltRounds && typeof saltRounds === 'number') {
+      this.saltRounds = saltRounds;
+    }
+
+    this.serviceInitialized = true;
   }
 
   
@@ -92,7 +128,7 @@ export class PasswordHasher implements IPasswordHasher {
   async hash(pw: string): Promise<string> {
     this.logger.log('Start hashing password', 'debug');
 
-    await this.initConfigService();
+    await this.init();
     let rounds = this.saltRounds;
 
     if (this.configService.isSet(this.roundsKey)) {
