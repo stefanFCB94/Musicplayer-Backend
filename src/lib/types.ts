@@ -4,7 +4,7 @@ export const TYPES = {
   ConfigServiceProvider: Symbol.for('IConfigServiceProvider'),
   Logger: Symbol.for('ILogger'),
   UUIDGenerator: Symbol.for('IUUIDGenerator'),
-  PaswordHasher: Symbol.for('IPasswordHasher'),
+  PasswordHasher: Symbol.for('IPasswordHasher'),
   JWTGenerator: Symbol.for('IJWTGenerator'),
   AuthentificationService: Symbol.for('IAuthentificationService'),
   DatabaseService: Symbol.for('IDatabaseService'),

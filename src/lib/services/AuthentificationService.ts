@@ -26,7 +26,7 @@ export class AuthentificationService {
 
   constructor(
     @inject(TYPES.Logger) private logger: ILogger,
-    @inject(TYPES.PaswordHasher) private passwordHasher: IPasswordHasher,
+    @inject(TYPES.PasswordHasher) private passwordHasher: IPasswordHasher,
     @inject(TYPES.UUIDGenerator) private uuidGenerator: IUUIDGenerator,
     @inject(TYPES.LocalUserDAO) private localUserDAO: ILocalUserDAO,
     @inject(TYPES.JWTGenerator) private jwtGenerator: IJWTGenerator,

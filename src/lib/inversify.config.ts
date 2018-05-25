@@ -45,7 +45,7 @@ container.bind<ILogger>(TYPES.Logger)
 container.bind<IUUIDGenerator>(TYPES.UUIDGenerator)
   .to(UUIDGenerator).inSingletonScope();
 
-container.bind<IPasswordHasher>(TYPES.PaswordHasher)
+container.bind<IPasswordHasher>(TYPES.PasswordHasher)
   .to(PasswordHasher).inSingletonScope();
 
 container.bind<IDatabaseService>(TYPES.DatabaseService)
