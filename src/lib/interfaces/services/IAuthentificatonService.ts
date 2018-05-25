@@ -6,6 +6,7 @@ export interface IAuthentificationService {
   isLoggedIn(jwt: string): Promise<string>;
   renewJWT(jwt: string): Promise<string>;
   signup(data: SignupValues): Promise<SignupReturn>;
+  resetPassword(userId: string, oldPw: string, newPw: string): Promise<void>;
 }
 
 

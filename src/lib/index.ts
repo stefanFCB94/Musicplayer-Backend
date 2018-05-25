@@ -6,6 +6,7 @@ import { LocalUser } from './db/models/LocalUser';
 import { ILocalUserDAO } from './interfaces/dao/ILocalUserDAO';
 import { IAuthentificationService } from './interfaces/services/IAuthentificatonService';
 import { IPasswordHasher } from './interfaces/services/IPasswordHasher';
+import { IJWTGenerator } from './interfaces/services/IJWTGenerator';
 
 
 async function start() {
@@ -23,6 +24,12 @@ async function start() {
   try {
     const temp = await authService.isLoggedIn(jwt);
     console.log(temp);
+  } catch (err) {}
+
+  try {
+    const jwtGenerator = container.get<IJWTGenerator>(TYPES.JWTGenerator);
+    const data = await jwtGenerator.verifyJWT(jwt);
+    const reset = await authService.resetPassword(data.userId, 'def', 'abc');
   } catch (err) {}
 
   process.exit(0);

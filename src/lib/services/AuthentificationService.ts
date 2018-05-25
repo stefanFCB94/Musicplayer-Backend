@@ -14,6 +14,7 @@ import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator'
 import { LocalUser } from '../db/models/LocalUser';
 import { SignupValues, SignupReturn } from '../interfaces/services/IAuthentificatonService';
 import { UserAlreadyExistsError } from '../error/auth/UserAlreadyExistsError';
+import { ADDRGETNETWORKPARAMS } from 'dns';
 
 
 @injectable()
@@ -408,5 +409,112 @@ export class AuthentificationService {
     }
 
     return newJWT;
+  }
+
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Set a new password for a user account.
+   * 
+   * Password for a user account could be saved, if the
+   * user put in the password, which is actual set for
+   * the user account and a new password.
+   * 
+   * For security reasons, the passed in password must
+   * match the actual setted password for the user
+   * account.
+   * 
+   * @param {string} userId The ID of the user
+   * @param {string} oldPw The actual setted password (not hashed)
+   * @param {string} newPw The new password (not hashed)
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {UnsupportedParamterValueError}
+   * @throws {ServiceNotInitializedError}
+   * @throws {RequestParameterNotSetError}
+   * @throws {PasswordNotMatchError}
+   * @throws {Error}
+  
+   */
+  public async resetPassword(userId: string, oldPw: string, newPw: string): Promise<void> {
+    if (!userId || typeof userId !== 'string') {
+      const error = new RequestParameterNotSetError('userId', 'The user id was not passed to the function');
+      this.logger.log(error.stack, 'error');
+
+      throw error;
+    }
+
+    if (!oldPw || typeof oldPw !== 'string') {
+      const error = new RequestParameterNotSetError('oldPw', 'The old password was not passed to the function');
+      this.logger.log(error.stack, 'error');
+
+      throw error;
+    }
+
+    if (!newPw || typeof newPw !== 'string') {
+      const error = new RequestParameterNotSetError('newPw', 'The new password was not passed to the function');
+      this.logger.log(error.stack, 'error');
+
+      throw error;
+    }
+
+    let user: LocalUser;
+    try {
+      this.logger.log('Try to get the user from the database', 'debug');
+      user = await this.localUserDAO.getUserById(userId);
+    } catch (err) {
+      this.logger.log('User could not be located in the database', 'debug');
+      throw err;
+    }
+
+    if (!user) {
+      const error = new UserNotExistsError(null, 'The user not exists');
+      this.logger.log(error.stack, 'warn');
+
+      throw error;
+    }
+
+    let result: boolean;
+    try {
+      this.logger.log('Check if old password matches the one in the database', 'debug');
+      result = await this.passwordHasher.compare(oldPw, user.password);
+    } catch (err) {
+      this.logger.log('Password could not be compared', 'debug');
+      throw err;
+    }
+      
+    if (!result) {
+      const error = new PasswordNotMatchError('The old password not matches the saved one');
+      this.logger.log(error.stack, 'warn');
+
+      throw error;
+    }
+
+    let newPwHash: string;
+    try {
+      this.logger.log('Start hashing the new password', 'debug');
+      newPwHash = await this.passwordHasher.hash(newPw);
+    } catch (err) {
+      this.logger.log('New password could not be hashed', 'debug');
+      throw err;
+    }
+    
+
+    try {
+      this.logger.log('Update the user information', 'debug');
+      user.password = newPwHash;
+
+      await this.localUserDAO.saveOrUpdateUser(user);
+    } catch (err) {
+      this.logger.log('User could not be updated', 'debug');
+      throw err;
+    }
+
+    this.logger.log('Password successfully updated', 'debug');
   }
 }
