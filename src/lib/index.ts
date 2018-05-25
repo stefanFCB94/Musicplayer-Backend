@@ -4,24 +4,28 @@ import { TYPES } from './types';
 import { IDatabaseService } from './interfaces/db/IDatabaseService';
 import { LocalUser } from './db/models/LocalUser';
 import { ILocalUserDAO } from './interfaces/dao/ILocalUserDAO';
-import { UserAlreadyExistsError } from './error/db/UserAlreadyExistsError';
+import { IAuthentificationService } from './interfaces/services/IAuthentificatonService';
+import { IPasswordHasher } from './interfaces/services/IPasswordHasher';
 
-const uuidGenerator = container.get<IUUIDGenerator>(TYPES.UUIDGenerator);
-const id = uuidGenerator.generateV4();
 
-const localUser = new LocalUser();
-localUser.id = '60ed87a8-46fa-41a4-9a16-54fbee642813';
-localUser.mail = 'stefan.laeufle@gmail.com';
-localUser.lastname = 'Läufle';
-localUser.firstname = 'Stefan';
-localUser.password = 'abc';
+async function start() {
+  const authService = container.get<IAuthentificationService>(TYPES.AuthentificationService);
+  
+  let jwt;
+  try {
+    const data = await authService.signup({ mail: 'stefan.laeufle@gmail.com', password: 'def', lastname: 'test', firstname: 't' });
+    console.log(data);
 
-const dao = container.get<ILocalUserDAO>(TYPES.LocalUserDAO);
-dao.saveOrUpdateUser(localUser)
-  .then((u) => {
-    console.log(u);
-    process.exit(0);
-  })
-  .catch((err) => {
-    process.exit(255);
-  });
+    jwt = data.jwt;
+  } catch (err) {}
+
+
+  try {
+    const temp = await authService.isLoggedIn(jwt);
+    console.log(temp);
+  } catch (err) {}
+
+  process.exit(0);
+}
+
+start();

@@ -15,7 +15,7 @@
     "PASSWORD": "music1!",
     "DATABASE": "musicserver"
   },
-  "SECURITA": {
+  "SECURITY": {
     "SALT_ROUNDS": 10
   }
 }

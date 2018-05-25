@@ -23,6 +23,12 @@ import { LocalUserDAO } from './db/dao/LocalUserDAO';
 import { IPasswordHasher } from './interfaces/services/IPasswordHasher';
 import { PasswordHasher } from './services/PaswordHasher';
 
+import { IJWTGenerator } from './interfaces/services/IJWTGenerator';
+import { JWTGenerator } from './services/JWTGenerator';
+
+import { IAuthentificationService } from './interfaces/services/IAuthentificatonService';
+import { AuthentificationService } from './services/AuthentificationService';
+
 
 const container = new Container();
 
@@ -44,6 +50,12 @@ container.bind<IPasswordHasher>(TYPES.PaswordHasher)
 
 container.bind<IDatabaseService>(TYPES.DatabaseService)
   .to(DatabaseService).inSingletonScope();
+
+container.bind<IJWTGenerator>(TYPES.JWTGenerator)
+  .to(JWTGenerator).inSingletonScope();
+
+container.bind<IAuthentificationService>(TYPES.AuthentificationService)
+  .to(AuthentificationService).inSingletonScope();
 
 
 // Database DAOs

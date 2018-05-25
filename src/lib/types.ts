@@ -5,6 +5,8 @@ export const TYPES = {
   Logger: Symbol.for('ILogger'),
   UUIDGenerator: Symbol.for('IUUIDGenerator'),
   PaswordHasher: Symbol.for('IPasswordHasher'),
+  JWTGenerator: Symbol.for('IJWTGenerator'),
+  AuthentificationService: Symbol.for('IAuthentificationService'),
   DatabaseService: Symbol.for('IDatabaseService'),
 
   // Database DAO

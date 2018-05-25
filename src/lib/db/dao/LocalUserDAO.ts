@@ -5,7 +5,6 @@ import { ILogger } from '../../interfaces/services/ILogger';
 import { Repository, FindManyOptions } from 'typeorm';
 import { LocalUser } from '../models/LocalUser';
 import { ILocalUserDAO } from '../../interfaces/dao/ILocalUserDAO';
-import { UserAlreadyExistsError } from '../../error/db/UserAlreadyExistsError';
 import { RequiredParameterNotSet } from '../../error/db/RequiredParameterNotSetError';
 import { ParameterOutOfBoundsError } from '../../error/db/ParameterOutOfBoundsError';
 import { UnsupportedParamterValueError } from '../../error/db/UnsupportedParamterValueError';
