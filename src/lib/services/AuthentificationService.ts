@@ -96,6 +96,37 @@ export class AuthentificationService {
   }
 
 
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Creates a new user account.
+   * 
+   * The method will create a new user account with the
+   * information passed in as parameter. The function will
+   * check if the user with the mail address already exists, and
+   * if alle neccassary information are passed in.
+   * 
+   * If the requirements are fullfilled it will create the
+   * user account by generating a new id for the user and
+   * by hashing theh passed in password.
+   * 
+   * If a error, which pretend the creation of the new user,
+   * occurs, the function will throw that error.
+   * 
+   * @param {SignupValues} data The neccassary information
+   * 
+   * @returns {SignupReturn} The created user and the jsonwebtoken
+   * 
+   * @throws {UserAlreadyExistsError}
+   * @throws {ServiceNotInitializedError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {UnsupportedParamterValueError}
+   * @throws {ServiceNotInitializedError}
+   * @throws {RequestParameterNotSetError}
+   * @throws {Error}
+   */
   public async signup(data: SignupValues): Promise<SignupReturn> {
     let id: string;
     let pw: string;
