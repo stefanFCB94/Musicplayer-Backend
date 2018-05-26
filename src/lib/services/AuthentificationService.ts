@@ -14,7 +14,6 @@ import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator'
 import { LocalUser } from '../db/models/LocalUser';
 import { SignupValues, SignupReturn } from '../interfaces/services/IAuthentificatonService';
 import { UserAlreadyExistsError } from '../error/auth/UserAlreadyExistsError';
-import { ADDRGETNETWORKPARAMS } from 'dns';
 
 
 @injectable()
