@@ -67,3 +67,12 @@ The parameters are optional and are configured with a default value to achieve a
 Paramter | Default value | Description
 --- | --- | ---
 SECURITY.SALT_ROUNDS | 10 | The number of rounds, which are used to generate a salt for the hashing of the passwords
+
+## Authentification paramters
+
+The following parameters can be used to configure the authentification service for your interests.
+The paramters are optional.
+
+Parameter | Default value | Description
+--- | --- | ---
+SIGNUP.POSSIBLE | false | A config paramter, which shows, if the self-signup for users is available. If false new users can only be created by the administartor of the application

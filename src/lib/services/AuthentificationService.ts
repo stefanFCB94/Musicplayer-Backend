@@ -21,6 +21,7 @@ export class AuthentificationService {
   
   private configService: IConfigService;
 
+  private signupPossibleDefault = false;
   private signupPossibleKey = 'SIGNUP.POSSIBLE';
 
   constructor(
@@ -91,8 +92,13 @@ export class AuthentificationService {
   public async isSignupAvailable(): Promise<boolean> {
     await this.initConfigService();
 
-    const available: boolean = this.configService.get(this.signupPossibleKey);
-    return available;
+    const available = this.configService.get(this.signupPossibleKey);
+
+    if (typeof available === 'boolean') {
+      return available;
+    }
+
+    return this.signupPossibleDefault;
   }
 
 
