@@ -1,38 +1,22 @@
-import { container } from './inversify.config';
-import { IUUIDGenerator } from './interfaces/services/IUUIDGenerator';
-import { TYPES } from './types';
-import { IDatabaseService } from './interfaces/db/IDatabaseService';
-import { LocalUser } from './db/models/LocalUser';
-import { ILocalUserDAO } from './interfaces/dao/ILocalUserDAO';
-import { IAuthentificationService } from './interfaces/services/IAuthentificatonService';
-import { IPasswordHasher } from './interfaces/services/IPasswordHasher';
-import { IJWTGenerator } from './interfaces/services/IJWTGenerator';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+
+import { importSchema } from 'graphql-import';
+import { resolvers } from './api/resolvers/resolvers';
+import { makeExecutableSchema } from 'graphql-tools';
+
+import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+
+const schemaTypes = importSchema(__dirname + '/api/schema/schema.graphql');
+const schema = makeExecutableSchema({ resolvers, typeDefs: schemaTypes });
+
+const GRAPHQL_PORT = 3000;
+const server = express();
+
+server.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+server.use('/graphiql',  graphiqlExpress({ endpointURL: '/graphql' }));
 
 
-async function start() {
-  const authService = container.get<IAuthentificationService>(TYPES.AuthentificationService);
-  
-  let jwt;
-  try {
-    const data = await authService.signup({ mail: 'stefan.laeufle@gmail.com', password: 'def', lastname: 'test', firstname: 't' });
-    console.log(data);
-
-    jwt = data.jwt;
-  } catch (err) {}
-
-
-  try {
-    const temp = await authService.isLoggedIn(jwt);
-    console.log(temp);
-  } catch (err) {}
-
-  try {
-    const jwtGenerator = container.get<IJWTGenerator>(TYPES.JWTGenerator);
-    const data = await jwtGenerator.verifyJWT(jwt);
-    const reset = await authService.resetPassword(data.userId, 'def', 'abc');
-  } catch (err) {}
-
-  process.exit(0);
-}
-
-start();
+server.listen(GRAPHQL_PORT, () => {
+  console.log('Server is now listening');
+});
