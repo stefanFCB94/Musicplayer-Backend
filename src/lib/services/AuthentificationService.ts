@@ -8,7 +8,7 @@ import { IConfigServiceProvider, IConfigService } from '../interfaces/services/I
 import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
 import { RequestParameterNotSetError } from '../error/request/RequestParameterNotSetError';
 import { UserNotExistsError } from '../error/auth/UserNotExistsError';
-import { PasswordNotMatchError } from '../error/auth/PaswordNotMatchError';
+import { PasswordNotMatchError } from '../error/auth/PasswordNotMatchError';
 import { UserNotLoginableError } from '../error/auth/UserNotLoginableError';
 import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
 import { LocalUser } from '../db/models/LocalUser';

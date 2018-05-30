@@ -8,6 +8,7 @@ export const TYPES = {
   JWTGenerator: Symbol.for('IJWTGenerator'),
   AuthentificationService: Symbol.for('IAuthentificationService'),
   DatabaseService: Symbol.for('IDatabaseService'),
+  LocalUserService: Symbol.for('ILocalUserService'),
 
   // Database DAO
   LocalUserDAO: Symbol.for('ILocalUserDAO'),
