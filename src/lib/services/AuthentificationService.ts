@@ -261,7 +261,7 @@ export class AuthentificationService {
     const user = await this.localUserDAO.getUserByMail(mail);
 
     if (!user) {
-      const error = new UserNotExistsError(mail, 'User not found');
+      const error = new UserNotExistsError(mail, null, 'User not found');
       this.logger.log(error.stack, 'warn');
 
       throw error;
@@ -392,7 +392,7 @@ export class AuthentificationService {
     }
 
     if (!user) {
-      const error = new UserNotExistsError(null, 'User does not exist anymore');
+      const error = new UserNotExistsError(null, userId, 'User does not exist anymore');
       this.logger.log(error.stack, 'warn');
 
       throw error;
@@ -478,7 +478,7 @@ export class AuthentificationService {
     }
 
     if (!user) {
-      const error = new UserNotExistsError(null, 'The user not exists');
+      const error = new UserNotExistsError(null, userId, 'The user not exists');
       this.logger.log(error.stack, 'warn');
 
       throw error;

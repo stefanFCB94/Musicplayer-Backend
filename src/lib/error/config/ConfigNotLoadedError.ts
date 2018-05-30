@@ -1,3 +1,5 @@
+import { BaseError } from '../BaseError';
+
 /**
  * @class
  * @author Stefan Läufle
@@ -6,7 +8,12 @@
  * is not loaded form the file into the service, but that would
  * be required
  * 
- * @extends Error
+ * @extends BaseError
  */
 
-export class ConfigNotLoadedError extends Error {}
+export class ConfigNotLoadedError extends BaseError {
+
+  constructor(msg?: string) {
+    super(500, msg);
+  }
+}

@@ -1,3 +1,5 @@
+import { BaseError } from './BaseError';
+
 /**
  * @class
  * @author Stefan Läufle
@@ -6,10 +8,10 @@
  * is not fully initialized for the required
  * operation.
  * 
- * @extends Error
+ * @extends BaseError
  */
 
-export class ServiceNotInitializedError extends Error {
+export class ServiceNotInitializedError extends BaseError {
 
   /**
    * @public
@@ -33,7 +35,7 @@ export class ServiceNotInitializedError extends Error {
    * @param {string} msg The error message (optional) 
    */
   constructor(service: string, msg?: string) {
-    super(msg);
+    super(500, msg);
 
     this.service = service;
   }

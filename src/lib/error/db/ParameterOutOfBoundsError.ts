@@ -1,3 +1,5 @@
+import { BaseError } from '../BaseError';
+
 /**
  * @class
  * @author Stefan Läufle
@@ -5,10 +7,10 @@
  * A custom error, which should be thrown if a parameter for
  * the parameter extends the length of the database field.
  * 
- * @extends Error
+ * @extends BaseError
  */
 
-export class ParameterOutOfBoundsError extends Error {
+export class ParameterOutOfBoundsError extends BaseError {
 
   /**
    * @public
@@ -31,7 +33,7 @@ export class ParameterOutOfBoundsError extends Error {
    * @param {string} msg The error message (optional)
    */
   constructor(parameter: string, msg?: string) {
-    super(msg);
+    super(400, msg);
     this.parameter = parameter;
   }
 }

@@ -107,30 +107,30 @@ export class DatabaseService implements IDatabaseService {
     let error: InsufficientConfigParameterError;
 
     if (!this.configService.isSet(this.typeKey)) {
-      error = new InsufficientConfigParameterError('No database type configured (DATABASE.TYPE)');
+      error = new InsufficientConfigParameterError(this.typeKey, 'No database type configured');
     }
 
     if (!this.configService.isSet(this.hostKey)) {
-      error = new InsufficientConfigParameterError('No database host configured (DATABASE.HOST)');
+      error = new InsufficientConfigParameterError(this.hostKey, 'No database host configured');
     }
 
     if (!this.configService.isSet(this.portKey)) {
-      error = new InsufficientConfigParameterError('No database port configured (DATABASE.PORT)');
+      error = new InsufficientConfigParameterError(this.portKey, 'No database port configured');
     }
 
     if (!this.configService.isSet(this.usernameKey)) {
       // tslint:disable-next-line:max-line-length
-      error = new InsufficientConfigParameterError('No username for database connection configured (DATABASE.USERNAME)');
+      error = new InsufficientConfigParameterError(this.usernameKey, 'No username for database connection configured');
     }
 
     if (!this.configService.isSet(this.passwordKey)) {
       // tslint:disable-next-line:max-line-length
-      error = new InsufficientConfigParameterError('No password for database connection configured (DATABASE.PASSWORD)');
+      error = new InsufficientConfigParameterError(this.passwordKey, 'No password for database connection configured');
     }
 
     if (!this.configService.isSet(this.databaseKey)) {
       // tslint:disable-next-line:max-line-length
-      error = new InsufficientConfigParameterError('No name for the target database configured (DATABASE.DATABASE)');
+      error = new InsufficientConfigParameterError(this.databaseKey, 'No name for the target database configured');
     }
 
     // If a error on the checks appeared, it will not be tried to establish

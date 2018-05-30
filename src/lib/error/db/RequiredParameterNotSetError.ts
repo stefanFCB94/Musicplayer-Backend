@@ -1,3 +1,5 @@
+import { BaseError } from '../BaseError';
+
 /**
  * @class
  * @author
@@ -7,10 +9,10 @@
  * The error contains a paramter, which should set to the name
  * of the required field, that is not defined.
  * 
- * @extends Error
+ * @extends BaseError
  */
 
-export class RequiredParameterNotSet extends Error {
+export class RequiredParameterNotSet extends BaseError {
 
   /**
    * @public
@@ -35,7 +37,7 @@ export class RequiredParameterNotSet extends Error {
    * @param {string} msg The error message (optional)
    */
   constructor(missedParameter: string, msg?: string) {
-    super(msg);
+    super(400, msg);
     this.parameter = missedParameter;
   }
 }

@@ -1,3 +1,5 @@
+import { BaseError } from '../BaseError';
+
 /**
  * @class
  * @author Stefan Läufle
@@ -7,10 +9,10 @@
  * a required paramter is not set, that error should be
  * created and thrown
  * 
- * @extends Error
+ * @extends BaseError
  */
 
-export class RequestParameterNotSetError extends Error {
+export class RequestParameterNotSetError extends BaseError {
   
   /**
    * @property
@@ -21,7 +23,7 @@ export class RequestParameterNotSetError extends Error {
   public parameter: string;
 
   constructor(parameter: string, msg?: string) {
-    super(msg);
+    super(400, msg);
 
     this.parameter = parameter;
   }

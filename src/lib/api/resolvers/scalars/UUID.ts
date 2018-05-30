@@ -1,4 +1,5 @@
 import { GraphQLScalarType, StringValueNode, Kind } from 'graphql';
+import { InvalidUUIDError } from '../../../error/request/InvalidUUIDError';
 
 
 function checkValue(value: string) {
@@ -6,7 +7,7 @@ function checkValue(value: string) {
     return value;
   }
 
-  throw new TypeError('UUID has wrong format'); 
+  throw new InvalidUUIDError(value, 'UUID has wrong format'); 
 }
 
 // tslint:disable-next-line:variable-name
@@ -20,6 +21,6 @@ export const ApiUUID = new GraphQLScalarType({
       return checkValue(ast.value);
     }
 
-    throw new TypeError('UUID has wrong format');
+    throw new InvalidUUIDError(ast.value, 'UUID has wrong format');
   },
 });

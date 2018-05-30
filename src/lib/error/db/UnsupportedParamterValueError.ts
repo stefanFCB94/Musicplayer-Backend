@@ -1,3 +1,5 @@
+import { BaseError } from '../BaseError';
+
 /**
  * @class
  * @author Stefan Läufle
@@ -5,10 +7,10 @@
  * A custom error, which shows, that a database value
  * tried to be set with a unsupported value
  * 
- * @extends Stefan Läufle
+ * @extends BaseError
  */
 
-export class UnsupportedParamterValueError extends Error {
+export class UnsupportedParamterValueError extends BaseError {
 
   /**
    * @public
@@ -43,7 +45,7 @@ export class UnsupportedParamterValueError extends Error {
    * @param {string} msg The error message (optional)
    */
   constructor(parameter: string, value: any, msg?: string) {
-    super(msg);
+    super(400, msg);
 
     this.parameter = parameter;
     this.value = value;
