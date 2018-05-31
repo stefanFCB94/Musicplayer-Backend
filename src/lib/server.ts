@@ -29,6 +29,7 @@ import { PrivateKeyNotAFileError } from './error/server/PrivateKeyNotAFileError'
 import { PrivateKeyNotFoundError } from './error/server/PrivateKeyNotFoundError';
 import { PrivateKeyNotReadableError } from './error/server/PrivateKeyNotReadableError';
 import { RequiredConfigParameterNotSetError } from './error/config/RequiredConfigParamterNotSetError';
+import { createApi } from './api/rest';
 
 
 @injectable()
@@ -47,6 +48,7 @@ export class Server extends BaseConfigService implements IServer {
   private graphqlEndpointKey = 'SERVER.GRAPHQL_ENDPOINT';
   private graphiqlEndpointKey = 'SERVER.GRAPHIQL_ENDPOINT';
   private graphiqlUseKey = 'SERVER.GRAPHIQL_ACTIVE';
+  private restBaseEndpointKey = 'SERVER.REST_ENDPOINT';
 
   private defaultHTTPPort = 3000;
   private defaultHTTPSPort = 3001;
@@ -54,6 +56,7 @@ export class Server extends BaseConfigService implements IServer {
   private defaultGraphqlEndpoint = '/graphql';
   private defaultGraphiqlEndpoint = '/graphiql';
   private defaultGraphiqlUse = true;
+  private defaultRestBaseEndpoint = '/rest';
 
   constructor(
     @inject(TYPES.Logger) logger: ILogger,
@@ -96,6 +99,11 @@ export class Server extends BaseConfigService implements IServer {
       graphiqlUse = this.defaultGraphiqlUse;
     }
 
+    let restBaseEndpoint = this.configService.get(this.restBaseEndpointKey);
+    if (!restBaseEndpoint) {
+      restBaseEndpoint = this.defaultRestBaseEndpoint;
+    }
+
     let cert: string;
     let key: string;
 
@@ -119,12 +127,12 @@ export class Server extends BaseConfigService implements IServer {
 
     this.app = express();
     this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(compression());
     this.app.use(helmet());
 
     this.initializeGraphQLApi(graphiqlUse, graphqlEndpoint, graphiqlEndpoint);
-
-    this.app.use('/', (req, res) => { res.json({ test: 'It is working' }); });
+    this.initalizeRestApi(restBaseEndpoint);
 
 
     try {
@@ -296,7 +304,7 @@ export class Server extends BaseConfigService implements IServer {
         const redirectApp = express();
         redirectApp.all('*', (req, res) => {
           const url = `https://${req.headers.host}:${httpsPort}${req.url}`;
-          res.redirect(url);
+          res.redirect(url, 307);
         });
 
         this.httpServer = http.createServer(redirectApp);
@@ -329,6 +337,15 @@ export class Server extends BaseConfigService implements IServer {
     }
 
     this.logger.log(`Graphiql is listening on URL: ${graphiqlEndpoint}`, 'debug');
+  }
+
+  private initalizeRestApi(endpoint: string) {
+    this.logger.log('Initalize REST api', 'debug');
+
+    const router = createApi();
+    this.app.use(endpoint, router);
+
+    this.logger.log('REST api completly initialized', 'debug');
   }
 
   
