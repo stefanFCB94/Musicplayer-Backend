@@ -42,37 +42,43 @@ Login a user and get the JSON web token for further requests.
 
 ## Error Response
 
+The following error response can occur, by using this route
+
+### RequestParamterNotSetError
 > **Condition** : If mail address is not transmitted 
 >
 > **Code** : `400 BAD REQUEST`
->
-> **Type** : `RequestParameterNotSetError`
+
+
+### RequestParameterNotSetError
 
 > **Condition** : If password is not transmitted
 >
 > **Code** : `400 BAD REQUEST`
->
-> **Type** : `RequestParameterNotSetError`
+
+
+### UserNotExistsError
 
 > **Condition** :  If the user with the transmitted mail address does not exist
 >
 > **Code** : `404 NOT FOUND`
->
-> **Type** : `UserNotExistsError`
+
+
+### PasswordNotMatchError
 
 > **Condition** : If the combination of mail and password does not match
 >
 > **Code** : `400 BAD REQUEST`
->
-> **Type** : `PasswordNotMatchError`
+
+
+### UserNotLoginableError
 
 > **Condition** : If the user is configured, that he cannot login to the application
 >
 > **Code** : `400 BAD REQUEST`
->
-> **Type** : `UserNotLoginableError`
 
-**Error content:**
+
+## Error content:
 ```json
 {
   "errors": [
