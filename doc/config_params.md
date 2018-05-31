@@ -50,6 +50,8 @@ SERVER.CERTIFICATE | - | Only required, if HTTPS is used for the api. Configurat
 SERVER.GRAPHQL_ENDPOINT | /graphql | The URL endpoint, where the graphql api is available
 SERVER.GRAPHIQL_ENDPOINT | /graphiql | Only required, if the graphiql endpoint is activated. Defineds the URL endpoint on which the graphical user interface for the graphql api is available
 SERVER.GRAPHIQL_ACTIVE | true | True or false, if the graphical user interface for the graphql endpoint should be activated
+SERVER.REST_ENDPOINT | /rest | The base url of the REST api of the musicserver
+
 
 ## Parameter for the logger
 
