@@ -1,4 +1,5 @@
 import { ILogger } from '../interfaces/services/ILogger';
+import { injectable } from 'inversify';
 
 /**
  * @class
@@ -8,6 +9,7 @@ import { ILogger } from '../interfaces/services/ILogger';
  * The service has a logger instance configured.
  */
 
+@injectable()
 export class BaseService {
 
   /**

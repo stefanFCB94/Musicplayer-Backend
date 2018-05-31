@@ -1,9 +1,14 @@
 import { Connection, createConnection } from 'typeorm';
+
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
-import { ILogger } from '../interfaces/services/ILogger';
-import { IConfigService, IConfigServiceProvider } from '../interfaces/services/IConfigService';
+
+import { BaseConfigService } from '../base/BaseConfigService';
 import { IDatabaseService } from '../interfaces/db/IDatabaseService';
+
+import { ILogger } from '../interfaces/services/ILogger';
+import { IConfigServiceProvider } from '../interfaces/services/IConfigService';
+
 import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
 import { RequiredConfigParameterNotSetError } from '../error/config/RequiredConfigParamterNotSetError';
 
@@ -21,12 +26,13 @@ import { RequiredConfigParameterNotSetError } from '../error/config/RequiredConf
  * 
  * @requires ILogger
  * @requires IConfigServiceProvider
+ * 
+ * @extends BaseConfigService
  */
 
 @injectable()
-export class DatabaseService implements IDatabaseService {
+export class DatabaseService extends BaseConfigService implements IDatabaseService {
 
-  private configService: IConfigService;
   private connection: Connection;
 
   private typeKey = 'DATABASE.TYPE';
@@ -37,39 +43,10 @@ export class DatabaseService implements IDatabaseService {
   private databaseKey = 'DATABASE.DATABASE';
 
   constructor(
-    @inject(TYPES.Logger) private logger: ILogger,
-    @inject(TYPES.ConfigServiceProvider) private configProvider: IConfigServiceProvider,
-  ) {}
-
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Method to initialize all the configuration service.
-   * Required to make sure, that all asynchronous task of the config service,
-   * are finished before it will be used.
-   * 
-   * All methods of the class, which uses the config service, should first
-   * call that method to make sure, the service is fully initialized.
-   * 
-   * @returns {Promise<void>} A resolved Promise, when the config service is
-   *                          fully initialized
-   */
-  private async initConfigService(): Promise<void> {
-    if (this.configService) { return; }
-
-    try {
-      this.configService = await this.configProvider();
-      this.logger.log('Config-Service initialized for database service', 'debug');
-      return;
-    } catch (err) {
-      this.logger.log('Config-Service could not be intitalized', 'debug');
-      
-      const error = new ServiceNotInitializedError('IConfigService', 'Serivce could not be intialized');
-      this.logger.log(error.stack, 'error');
-      throw error;
-    }
+    @inject(TYPES.Logger) logger: ILogger,
+    @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
+  ) {
+    super(logger, configProvider);
   }
 
 

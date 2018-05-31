@@ -1,9 +1,12 @@
-import 'reflect-metadata';
 import * as uuid from 'uuid';
-import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
-import { ILogger } from '../interfaces/services/ILogger';
+
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
+
+import { BaseService } from '../base/BaseService';
+import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
+
+import { ILogger } from '../interfaces/services/ILogger';
 
 
 /**
@@ -22,14 +25,18 @@ import { TYPES } from '../types';
  * 
  * @requires uuid
  * @requires ILogger
+ * 
+ * @extends BaseService
  */
 
 @injectable()
-export class UUIDGenerator implements IUUIDGenerator {
+export class UUIDGenerator extends BaseService implements IUUIDGenerator {
 
   constructor(
-    @inject(TYPES.Logger) private logger: ILogger,
-  ) {}
+    @inject(TYPES.Logger) logger: ILogger,
+  ) {
+    super(logger);
+  }
 
   
   /**

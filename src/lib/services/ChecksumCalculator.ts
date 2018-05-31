@@ -1,10 +1,13 @@
-import 'reflect-metadata';
 import * as fs from 'fs-extra';
 import * as crypto from 'crypto';
+
 import { injectable, inject } from 'inversify';
-import { IChecksumCalculator } from '../interfaces/services/IChecksumCalculator';
-import { ILogger } from '../interfaces/services/ILogger';
 import { TYPES } from '../types';
+
+import { BaseService } from '../base/BaseService';
+import { IChecksumCalculator } from '../interfaces/services/IChecksumCalculator';
+
+import { ILogger } from '../interfaces/services/ILogger';
 
 /**
  * @class
@@ -20,13 +23,18 @@ import { TYPES } from '../types';
  * @requires fs-extra
  * @requires crypto
  * @requires ILogger
+ * 
+ * @extends BaseService
  */
 
 @injectable()
-export class ChecksumCalculator implements IChecksumCalculator {
+export class ChecksumCalculator extends BaseService implements IChecksumCalculator {
 
-  @inject(TYPES.Logger)
-  private logger: ILogger;
+  constructor(
+    @inject(TYPES.Logger) logger: ILogger,
+  ) {
+    super(logger);
+  }
 
 
   /**

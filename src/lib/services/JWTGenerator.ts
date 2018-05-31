@@ -1,22 +1,36 @@
-import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
+import * as jsonwebtoken from 'jsonwebtoken';
+
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 
-import * as jsonwebtoken from 'jsonwebtoken';
+import { BaseConfigService } from '../base/BaseConfigService';
+import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
 
-import { IConfigServiceProvider, IConfigService } from '../interfaces/services/IConfigService';
+import { IConfigServiceProvider } from '../interfaces/services/IConfigService';
 import { LocalUser } from '../db/models/LocalUser';
 import { ILogger } from '../interfaces/services/ILogger';
+
 import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
 import { RequestParameterNotSetError } from '../error/request/RequestParameterNotSetError';
 
+/**
+ * @class
+ * @author Stefan Läufle
+ * 
+ * A singleton service to create, verify and parse
+ * JSON web tokens used for authentification.
+ * 
+ * The service should be used to create a JWT from
+ * as user object of the verify that a passed JWT
+ * is valid.
+ * 
+ * @extends BaseConfigService
+ */
 
 @injectable()
-export class JWTGenerator implements IJWTGenerator {
+export class JWTGenerator extends BaseConfigService implements IJWTGenerator {
 
   private serviceInitialized = false;
-
-  private configService: IConfigService;
 
   private algorithm: string = 'HS256';
   private expiresIn: string = '30d';
@@ -27,47 +41,12 @@ export class JWTGenerator implements IJWTGenerator {
   private secretPassphraseKey: string = 'SECURITY.JWT.SECRET';
 
   constructor(
-    @inject(TYPES.Logger) private logger: ILogger,
-    @inject(TYPES.ConfigServiceProvider) private configProvider: IConfigServiceProvider,
-  ) {}
-
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Initialize the config service for the jwt generator.
-   * 
-   * Step is required to make sure the configuration is completely loaded and parsed.
-   * All methods, which are using the configuration service, should call first this
-   * method, to make sure the required keys are loaded already.
-   * 
-   * @returns {Promise<void>} Returns, when the service is fully initialized
-   * 
-   * @throws {Error} If the service could not be established correct
-   */
-  private async initConfigService(): Promise<void> {
-    if (this.configService) { return; }
-
-    // ConfigService is not used before
-    // So make sure it is initalized and the config is loaded
-    this.logger.log('Start initialize the configuration service for the jwt generator', 'debug');
-
-    try {
-      this.configService = await this.configProvider();
-
-      // tslint:disable-next-line:max-line-length
-      this.logger.log('Finished to initialize the configuration service for jwt generator', 'debug');
-      return;
-    } catch (err) {
-      this.logger.log('Configuration service could not be initialized', 'debug');
-      
-      const error = new ServiceNotInitializedError('IConfigService', 'Config service could not be initalized');
-      this.logger.log(error.stack, 'error');
-
-      throw error;
-    }
+    @inject(TYPES.Logger) logger: ILogger,
+    @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
+  ) {
+    super(logger, configProvider);
   }
+
 
   /**
    * @private

@@ -1,10 +1,16 @@
+import { Repository, FindManyOptions } from 'typeorm';
+
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
+
+import { BaseService } from '../../base/BaseService';
+import { ILocalUserDAO } from '../../interfaces/dao/ILocalUserDAO';
+
+import { LocalUser } from '../models/LocalUser';
+
 import { IDatabaseService } from '../../interfaces/db/IDatabaseService';
 import { ILogger } from '../../interfaces/services/ILogger';
-import { Repository, FindManyOptions } from 'typeorm';
-import { LocalUser } from '../models/LocalUser';
-import { ILocalUserDAO } from '../../interfaces/dao/ILocalUserDAO';
+
 import { RequiredParameterNotSet } from '../../error/db/RequiredParameterNotSetError';
 import { ParameterOutOfBoundsError } from '../../error/db/ParameterOutOfBoundsError';
 import { UnsupportedParamterValueError } from '../../error/db/UnsupportedParamterValueError';
@@ -24,19 +30,25 @@ import { ServiceNotInitializedError } from '../../error/ServiceNotInitalizedErro
  * 
  * @requires ILogger
  * @requires IDatabaseService
- * @requires IUUIDGenerator
- * @requires IPasswordHasher
+ * 
+ * @extends BaseService
  */
 
 @injectable()
-export class LocalUserDAO implements ILocalUserDAO {
+export class LocalUserDAO extends BaseService implements ILocalUserDAO {
 
   private localUserRespository: Repository<LocalUser>;
 
+  protected database: IDatabaseService;
+
   constructor(
-    @inject(TYPES.Logger) private logger: ILogger,
-    @inject(TYPES.DatabaseService) private database: IDatabaseService,
-  ) {}
+    @inject(TYPES.Logger) logger: ILogger,
+    @inject(TYPES.DatabaseService) database: IDatabaseService,
+  ) {
+    super(logger);
+
+    this.database = database;
+  }
 
 
   /**

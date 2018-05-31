@@ -1,76 +1,52 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
+
+import { BaseConfigService } from '../base/BaseConfigService';
+import { IAuthentificationService,SignupValues, SignupReturn } from '../interfaces/services/IAuthentificatonService';
+
+import { LocalUser } from '../db/models/LocalUser';
+
 import { ILogger } from '../interfaces/services/ILogger';
 import { IPasswordHasher } from '../interfaces/services/IPasswordHasher';
 import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
 import { ILocalUserDAO } from '../interfaces/dao/ILocalUserDAO';
 import { IConfigServiceProvider, IConfigService } from '../interfaces/services/IConfigService';
+import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
+
 import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
 import { RequestParameterNotSetError } from '../error/request/RequestParameterNotSetError';
 import { UserNotExistsError } from '../error/auth/UserNotExistsError';
 import { PasswordNotMatchError } from '../error/auth/PasswordNotMatchError';
 import { UserNotLoginableError } from '../error/auth/UserNotLoginableError';
-import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
-import { LocalUser } from '../db/models/LocalUser';
-import { SignupValues, SignupReturn } from '../interfaces/services/IAuthentificatonService';
 import { UserAlreadyExistsError } from '../error/auth/UserAlreadyExistsError';
 
 
 @injectable()
-export class AuthentificationService {
+export class AuthentificationService extends BaseConfigService implements IAuthentificationService {
   
-  private configService: IConfigService;
+  protected passwordHasher: IPasswordHasher;
+  protected uuidGenerator: IUUIDGenerator;
+  protected localUserDAO: ILocalUserDAO;
+  protected jwtGenerator: IJWTGenerator;
 
   private signupPossibleDefault = false;
   private signupPossibleKey = 'SIGNUP.POSSIBLE';
 
   constructor(
-    @inject(TYPES.Logger) private logger: ILogger,
-    @inject(TYPES.PasswordHasher) private passwordHasher: IPasswordHasher,
-    @inject(TYPES.UUIDGenerator) private uuidGenerator: IUUIDGenerator,
-    @inject(TYPES.LocalUserDAO) private localUserDAO: ILocalUserDAO,
-    @inject(TYPES.JWTGenerator) private jwtGenerator: IJWTGenerator,
-    @inject(TYPES.ConfigService) private configProvider: IConfigServiceProvider,
-  ) {}
+    @inject(TYPES.Logger) logger: ILogger,
+    @inject(TYPES.PasswordHasher) passwordHasher: IPasswordHasher,
+    @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
+    @inject(TYPES.LocalUserDAO) localUserDAO: ILocalUserDAO,
+    @inject(TYPES.JWTGenerator) jwtGenerator: IJWTGenerator,
+    @inject(TYPES.ConfigService) configProvider: IConfigServiceProvider,
+  ) {
+    super(logger, configProvider);
 
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Initialize the config service for the authentification service.
-   * 
-   * Step is required to make sure the configuration is completely loaded and parsed.
-   * All methods, which are using the configuration service, should call first this
-   * method, to make sure the required keys are loaded already.
-   * 
-   * @returns {Promise<void>} Returns, when the service is fully initialized
-   * 
-   * @throws {Error} If the service could not be established correct
-   */
-  private async initConfigService(): Promise<void> {
-    if (this.configService) { return; }
-
-    // ConfigService is not used before
-    // So make sure it is initalized and the config is loaded
-    this.logger.log('Start initialize the configuration service for the authentification service', 'debug');
-
-    try {
-      this.configService = await this.configProvider();
-
-      // tslint:disable-next-line:max-line-length
-      this.logger.log('Finished to initialize the configuration service for authentification service', 'debug');
-      return;
-    } catch (err) {
-      this.logger.log('Configuration service could not be initialized', 'debug');
-      
-      const error = new ServiceNotInitializedError('IConfigService', 'Config service could not be initalized');
-      this.logger.log(error.stack, 'error');
-
-      throw error;
-    }
+    this.passwordHasher = passwordHasher;
+    this.uuidGenerator = uuidGenerator;
+    this.localUserDAO = localUserDAO;
+    this.jwtGenerator = jwtGenerator;
   }
-
 
   /**
    * @public

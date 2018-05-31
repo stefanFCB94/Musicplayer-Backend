@@ -1,10 +1,13 @@
-import { injectable, inject } from 'inversify';
-import { IPasswordHasher } from '../interfaces/services/IPasswordHasher';
-import { TYPES } from '../types';
-import { ILogger } from '../interfaces/services/ILogger';
 import * as bcrypt from 'bcrypt';
-import { IConfigServiceProvider, IConfigService } from '../interfaces/services/IConfigService';
-import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
+
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types';
+
+import { BaseConfigService } from '../base/BaseConfigService';
+import { IPasswordHasher } from '../interfaces/services/IPasswordHasher';
+
+import { ILogger } from '../interfaces/services/ILogger';
+import { IConfigServiceProvider } from '../interfaces/services/IConfigService';
 
 
 /**
@@ -22,60 +25,25 @@ import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
  * @requires bcrypt
  * @requires ILogger
  * @requires IConfigServiceProvider
+ * 
+ * @extends BaseConfigService
  */
 
 @injectable()
-export class PasswordHasher implements IPasswordHasher {
+export class PasswordHasher extends BaseConfigService implements IPasswordHasher {
 
   private serviceInitialized = false;
 
-  private configService: IConfigService;
   private saltRounds = 10;
 
   private roundsKey = 'SECURITY.SALT_ROUNDS';
 
 
   constructor(
-    @inject(TYPES.Logger) private logger: ILogger,
-    @inject(TYPES.ConfigServiceProvider) private configProvider: IConfigServiceProvider,
-  ) {}
-
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Initialize the config service for the password hasher.
-   * 
-   * Step is required to make sure the configuration is completely loaded and parsed.
-   * All methods, which are using the configuration service, should call first this
-   * method, to make sure the required keys are loaded already.
-   * 
-   * @returns {Promise<void>} Returns, when the service is fully initialized
-   * 
-   * @throws {ServiceNotInitializedError} If the service could not be established correct
-   */
-  private async initConfigService(): Promise<void> {
-    if (this.configService) { return Promise.resolve(); }
-
-    // ConfigService is not used before
-    // So make sure it is initalized and the config is loaded
-    this.logger.log('Start initialize the configuration service for the password hasher', 'debug');
-
-    try {
-      this.configService = await this.configProvider();
-
-      // tslint:disable-next-line:max-line-length
-      this.logger.log('Finished to initialize the configuration service for password hasher', 'debug');
-      return Promise.resolve();
-    } catch (err) {
-      this.logger.log('Configuration service could not be initialized', 'debug');
-      
-      const error = new ServiceNotInitializedError('IConfigService', 'Config service could not be initialized');
-      this.logger.log(error.stack, 'error');
-
-      throw error;
-    }
+    @inject(TYPES.Logger) logger: ILogger,
+    @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
+  ) {
+    super(logger, configProvider);
   }
 
   /**
