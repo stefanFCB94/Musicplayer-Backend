@@ -1,4 +1,6 @@
 export const TYPES = {
+  Server: Symbol.for('IServer'),
+
   ChecksumCalculator: Symbol.for('IChecksumCalculator'),
   ConfigService: Symbol.for('IConfigService'),
   ConfigServiceProvider: Symbol.for('IConfigServiceProvider'),

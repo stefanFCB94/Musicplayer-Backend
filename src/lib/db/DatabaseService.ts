@@ -4,8 +4,8 @@ import { TYPES } from '../types';
 import { ILogger } from '../interfaces/services/ILogger';
 import { IConfigService, IConfigServiceProvider } from '../interfaces/services/IConfigService';
 import { IDatabaseService } from '../interfaces/db/IDatabaseService';
-import { InsufficientConfigParameterError } from '../error/config/InsufficientConfigParameterError';
 import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
+import { RequiredConfigParameterNotSetError } from '../error/config/RequiredConfigParamterNotSetError';
 
 /**
  * @class
@@ -93,7 +93,7 @@ export class DatabaseService implements IDatabaseService {
    * @returns {Promise<Connection>} The opened connection to the database
    * 
    * @throws {Error} If the connection to the database could not be established
-   * @throws {InsufficientConfigParameterError} If not all parameter for the genration
+   * @throws {RequiredConfigParameterNotSetError} If not all parameter for the genration
    *            of a new database connection are configured in the config file
    */
   async getConnection(): Promise<Connection> {
@@ -104,33 +104,33 @@ export class DatabaseService implements IDatabaseService {
     // Initialize the config service if neccassary
     await this.initConfigService();
 
-    let error: InsufficientConfigParameterError;
+    let error: RequiredConfigParameterNotSetError;
 
     if (!this.configService.isSet(this.typeKey)) {
-      error = new InsufficientConfigParameterError(this.typeKey, 'No database type configured');
+      error = new RequiredConfigParameterNotSetError(this.typeKey, 'No database type configured');
     }
 
     if (!this.configService.isSet(this.hostKey)) {
-      error = new InsufficientConfigParameterError(this.hostKey, 'No database host configured');
+      error = new RequiredConfigParameterNotSetError(this.hostKey, 'No database host configured');
     }
 
     if (!this.configService.isSet(this.portKey)) {
-      error = new InsufficientConfigParameterError(this.portKey, 'No database port configured');
+      error = new RequiredConfigParameterNotSetError(this.portKey, 'No database port configured');
     }
 
     if (!this.configService.isSet(this.usernameKey)) {
       // tslint:disable-next-line:max-line-length
-      error = new InsufficientConfigParameterError(this.usernameKey, 'No username for database connection configured');
+      error = new RequiredConfigParameterNotSetError(this.usernameKey, 'No username for database connection configured');
     }
 
     if (!this.configService.isSet(this.passwordKey)) {
       // tslint:disable-next-line:max-line-length
-      error = new InsufficientConfigParameterError(this.passwordKey, 'No password for database connection configured');
+      error = new RequiredConfigParameterNotSetError(this.passwordKey, 'No password for database connection configured');
     }
 
     if (!this.configService.isSet(this.databaseKey)) {
       // tslint:disable-next-line:max-line-length
-      error = new InsufficientConfigParameterError(this.databaseKey, 'No name for the target database configured');
+      error = new RequiredConfigParameterNotSetError(this.databaseKey, 'No name for the target database configured');
     }
 
     // If a error on the checks appeared, it will not be tried to establish

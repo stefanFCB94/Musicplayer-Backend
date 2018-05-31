@@ -30,10 +30,14 @@ import { IAuthentificationService } from './interfaces/services/IAuthentificaton
 import { AuthentificationService } from './services/AuthentificationService';
 import { ILocalUserService } from './interfaces/services/ILocalUserService';
 import { LocalUserService } from './services/LocalUserService';
+import { IServer } from './interfaces/IServer';
+import { Server } from './server';
 
 
 const container = new Container();
 
+container.bind<IServer>(TYPES.Server)
+  .to(Server).inSingletonScope();
 
 container.bind<IChecksumCalculator>(TYPES.ChecksumCalculator)
   .to(ChecksumCalculator).inSingletonScope();

@@ -34,6 +34,23 @@ With that parameter you can set a manual path to the configuration. A config par
 
 In the following section are listed all available configuration parameter and a description of the each of these parameters.
 
+## Parameter for the server
+
+The following paramter defines configuration paramter to configure the server and its api. The configuration parameter are mostly optional, but should be read carfully, espacially the ports, on which the server should run on.
+
+Configuration parameters should match the conifguration for the clients of the server, espacially the ports and the graphql endpoint to get data from the api.
+
+Paramter | Default value | Description
+--- | --- | ---
+SERVER.HTTP_PORT | 3000 | The port on which the HTTP server would be available
+SERVER.HTTPS_PORT | 3001 | The port on which the HTTPS server would be available
+SERVER.HTTPS | false | True or false, if HTTPS should be used for th api
+SERVER.PRIVATE_KEY | - | Only required, if HTTPS is used for the api. Configuration paramter defines the path to the private key file, used for the SSL encryption
+SERVER.CERTIFICATE | - | Only required, if HTTPS is used for the api. Configuration paramter defines the path to the certificate used for the SSL encryption
+SERVER.GRAPHQL_ENDPOINT | /graphql | The URL endpoint, where the graphql api is available
+SERVER.GRAPHIQL_ENDPOINT | /graphiql | Only required, if the graphiql endpoint is activated. Defineds the URL endpoint on which the graphical user interface for the graphql api is available
+SERVER.GRAPHIQL_ACTIVE | true | True or false, if the graphical user interface for the graphql endpoint should be activated
+
 ## Parameter for the logger
 
 Parameter | Default value | Description
