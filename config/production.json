@@ -15,6 +15,9 @@
     "PASSWORD": "music1!",
     "DATABASE": "musicserver"
   },
+  "SIGNUP": {
+    "POSSIBLE": true
+  },
   "SECURITY": {
     "SALT_ROUNDS": 10
   },

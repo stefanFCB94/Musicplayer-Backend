@@ -35,4 +35,6 @@ In the following section are all available routes listed. Each of the routes ahs
 
 | Name | Method | Route | Description |
 | --- | --- | --- | --- |
-| [Login](./routes/login.md) | POST | /login | Try to login a user and get the JSON web token for further requests
+| [Login](./routes/login.md) | POST | /login | Try to login a user and get the JSON web token for further requests |
+| [Signup](./routes/signup.md) | POST | /signup | User self signup route |
+

@@ -38,7 +38,7 @@ export class AuthentificationService extends BaseConfigService implements IAuthe
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
     @inject(TYPES.LocalUserDAO) localUserDAO: ILocalUserDAO,
     @inject(TYPES.JWTGenerator) jwtGenerator: IJWTGenerator,
-    @inject(TYPES.ConfigService) configProvider: IConfigServiceProvider,
+    @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
   ) {
     super(logger, configProvider);
 
@@ -105,7 +105,6 @@ export class AuthentificationService extends BaseConfigService implements IAuthe
    * @throws {ParameterOutOfBoundsError}
    * @throws {RequiredParameterNotSet}
    * @throws {UnsupportedParamterValueError}
-   * @throws {ServiceNotInitializedError}
    * @throws {RequestParameterNotSetError}
    * @throws {Error}
    */

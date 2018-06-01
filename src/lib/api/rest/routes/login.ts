@@ -29,6 +29,6 @@ export async function loginRoute(req: express.Request, res: express.Response): P
     const jwt = await authService.login(req.body.mail, req.body.password);
     res.status(200).json(sendData({ jwt }));
   } catch (err) {
-    res.status(err.code).json(sendError(err));
+    res.status(err.code || 500).json(sendError(err));
   }
 }
