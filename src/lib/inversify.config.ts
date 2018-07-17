@@ -28,10 +28,17 @@ import { JWTGenerator } from './services/JWTGenerator';
 
 import { IAuthentificationService } from './interfaces/services/IAuthentificatonService';
 import { AuthentificationService } from './services/AuthentificationService';
+
 import { ILocalUserService } from './interfaces/services/ILocalUserService';
 import { LocalUserService } from './services/LocalUserService';
+
 import { IServer } from './interfaces/IServer';
 import { Server } from './server';
+
+import { IStorageService } from './interfaces/services/IStorageService';
+import { StorageService } from './services/StorageService';
+
+
 
 
 const container = new Container();
@@ -90,6 +97,8 @@ container.bind<IConfigServiceProvider>(TYPES.ConfigServiceProvider)
     };
   });
 
+container.bind<IStorageService>(TYPES.StorageService)
+  .to(StorageService).inSingletonScope();
 
 
 export { container };

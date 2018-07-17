@@ -27,5 +27,8 @@
     "HTTPS_PORT": 443,
     "PRIVATE_KEY": "./config/ssl/musicserver.key",
     "CERTIFICATE": "./config/ssl/musicserver.crt"
+  },
+  "STORAGE": {
+    "PATH": "C:\\Users\\stefan\\Documents\\Musicplayer\\Storage"
   }
 }

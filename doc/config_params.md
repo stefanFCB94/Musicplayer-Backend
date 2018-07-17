@@ -95,3 +95,15 @@ The paramters are optional.
 Parameter | Default value | Description
 --- | --- | ---
 SIGNUP.POSSIBLE | false | A config paramter, which shows, if the self-signup for users is available. If false new users can only be created by the administartor of the application
+
+## Storage parameters
+
+The following paramters are required, to save files to the filesystem, which is required by the application.
+
+In the storage various files, like covers or artist pictures will be saved.
+
+Select a empty directory, on which the process of the application server has write acces to. The rest of the file structure will be created automatically.
+
+Parameter | Default value | Description
+--- | --- | ---
+STORAGE.PATH | - | The absolute path on the filesystem, where the files of the application should be stored in
