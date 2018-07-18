@@ -15,4 +15,5 @@ export const TYPES = {
 
   // Database DAO
   LocalUserDAO: Symbol.for('ILocalUserDAO'),
+  StorageFileDAO: Symbol.for('IStorageFileDAO'),
 };

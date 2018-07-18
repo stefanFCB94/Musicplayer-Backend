@@ -38,6 +38,9 @@ import { Server } from './server';
 import { IStorageService } from './interfaces/services/IStorageService';
 import { StorageService } from './services/StorageService';
 
+import { IStorageFileDAO } from './interfaces/dao/IStorageFileDAO';
+import { StorageFileDAO } from './db/dao/StorageFileDAO';
+
 
 
 
@@ -77,6 +80,9 @@ container.bind<ILocalUserService>(TYPES.LocalUserService)
 // Database DAOs
 container.bind<ILocalUserDAO>(TYPES.LocalUserDAO)
   .to(LocalUserDAO).inSingletonScope();
+
+container.bind<IStorageFileDAO>(TYPES.StorageFileDAO)
+  .to(StorageFileDAO).inSingletonScope();
 
 
 // Providers
