@@ -107,3 +107,12 @@ Select a empty directory, on which the process of the application server has wri
 Parameter | Default value | Description
 --- | --- | ---
 STORAGE.PATH | - | The absolute path on the filesystem, where the files of the application should be stored in
+
+
+## Images parameters
+
+The following parameters can configure the handling of automatically created images in the application server.
+
+Parameter | Default value | Description
+--- | --- | ---
+IMAGES.FORMAT | JPEG | The format, in which the files should be saved. (Supported config values: 'JPEG', 'PNG')

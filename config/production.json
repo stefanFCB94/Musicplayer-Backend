@@ -30,5 +30,8 @@
   },
   "STORAGE": {
     "PATH": "C:\\Users\\stefan\\Documents\\Musicplayer\\Storage"
+  },
+  "IMAGES": {
+    "FORMAT": "PNG"
   }
 }

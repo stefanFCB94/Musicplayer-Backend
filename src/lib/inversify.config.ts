@@ -41,6 +41,9 @@ import { StorageService } from './services/StorageService';
 import { IStorageFileDAO } from './interfaces/dao/IStorageFileDAO';
 import { StorageFileDAO } from './db/dao/StorageFileDAO';
 
+import { IImageProcessingService } from './interfaces/services/IImageProcessingService';
+import { ImageProcessingService } from './services/ImageProcessingService';
+
 
 
 
@@ -75,6 +78,9 @@ container.bind<IAuthentificationService>(TYPES.AuthentificationService)
 
 container.bind<ILocalUserService>(TYPES.LocalUserService)
   .to(LocalUserService).inSingletonScope();
+
+container.bind<IImageProcessingService>(TYPES.ImageProcessingService)
+  .to(ImageProcessingService).inSingletonScope();
 
 
 // Database DAOs
