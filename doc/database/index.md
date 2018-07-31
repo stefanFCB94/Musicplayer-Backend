@@ -8,3 +8,4 @@ The following picture shows the database schema:
 
 * [Local_User](./local_user.md)
 * [Storage_File]('./storage_file.md)
+* [System Preferences]('./system_preferences.md)

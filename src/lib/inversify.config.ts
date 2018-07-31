@@ -44,6 +44,9 @@ import { StorageFileDAO } from './db/dao/StorageFileDAO';
 import { IImageProcessingService } from './interfaces/services/IImageProcessingService';
 import { ImageProcessingService } from './services/ImageProcessingService';
 
+import { ISystemPreferencesDAO } from './interfaces/dao/ISystemPreferencesDAO';
+import { SystemPreferencesDAO } from './db/dao/SystemPreferencesDAO';
+
 
 
 
@@ -89,6 +92,9 @@ container.bind<ILocalUserDAO>(TYPES.LocalUserDAO)
 
 container.bind<IStorageFileDAO>(TYPES.StorageFileDAO)
   .to(StorageFileDAO).inSingletonScope();
+
+container.bind<ISystemPreferencesDAO>(TYPES.SystemPreferencesDAO)
+  .to(SystemPreferencesDAO).inSingletonScope();
 
 
 // Providers
