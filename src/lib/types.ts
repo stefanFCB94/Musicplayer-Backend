@@ -13,6 +13,7 @@ export const TYPES = {
   LocalUserService: Symbol.for('ILocalUserService'),
   StorageService: Symbol.for('IStorageService'),
   ImageProcessingService: Symbol.for('IImageProcessingService'),
+  SystemPreferencesService: Symbol.for('ISystemPreferencesService'),
 
   // Database DAO
   LocalUserDAO: Symbol.for('ILocalUserDAO'),

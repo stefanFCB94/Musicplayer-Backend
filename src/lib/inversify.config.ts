@@ -47,6 +47,9 @@ import { ImageProcessingService } from './services/ImageProcessingService';
 import { ISystemPreferencesDAO } from './interfaces/dao/ISystemPreferencesDAO';
 import { SystemPreferencesDAO } from './db/dao/SystemPreferencesDAO';
 
+import { ISystemPreferencesService } from './interfaces/services/ISystemPreferencesService';
+import { SystemPreferencesService } from './services/SystemPreferencesService';
+
 
 
 
@@ -84,6 +87,9 @@ container.bind<ILocalUserService>(TYPES.LocalUserService)
 
 container.bind<IImageProcessingService>(TYPES.ImageProcessingService)
   .to(ImageProcessingService).inSingletonScope();
+
+container.bind<ISystemPreferencesService>(TYPES.SystemPreferencesService)
+  .to(SystemPreferencesService).inSingletonScope();
 
 
 // Database DAOs
