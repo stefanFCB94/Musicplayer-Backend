@@ -9,6 +9,7 @@ import { IImageProcessingService } from '../interfaces/services/IImageProcessing
 import { ImageProcessingError } from '../error/media/ImageProcessingError';
 import { BaseService } from '../base/BaseService';
 import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+import { UnsupportedImageFormatError } from '../error/media/UnsupportedImageFormatError';
 
 
 /**
@@ -26,8 +27,10 @@ export class ImageProcessingService extends BaseService implements IImageProcess
   private systemPreferences: ISystemPreferencesService;
 
   private formatKey = 'IMAGES.FORMAT';
-  private format: sharp.AvailableFormatInfo;
-  private formatDefault = sharp.format.jpeg;
+  private format: string;
+  private formatDefault = 'JPEG';
+
+  private supportedFormats = ['JPG', 'JPEG', 'PNG'];
 
   constructor(
     @inject(TYPES.Logger) logger: ILogger,
@@ -53,12 +56,12 @@ export class ImageProcessingService extends BaseService implements IImageProcess
    * @returns {sharp.AvailableFormatInfo} The responding sharp image format
    */
   private getSharpImageFormat(format: string): sharp.AvailableFormatInfo {
-    if (format.toUpperCase() === 'JPG' || format.toUpperCase() === 'JPEG') {
+    if (format === 'JPG' || format === 'JPEG') {
       this.logger.log('JPEG as image format', 'debug');
       return sharp.format.jpeg;
     }
 
-    if (format.toUpperCase() === 'PNG') {
+    if (format === 'PNG') {
       this.logger.log('PNG as image format', 'debug');
       return sharp.format.png;
     }
@@ -78,12 +81,12 @@ export class ImageProcessingService extends BaseService implements IImageProcess
    * Function get the image format from the system prefrences service
    * and if not set uses the configured default format.
    * 
-   * @returns {Promise<sharp.AvailableFormatInfo>} The image format
+   * @returns {Promise<string>} The image format
    * 
    * @throws {ServiceNotInitializedError}
    * @throws {Error}
    */
-  public async getFormat(): Promise<sharp.AvailableFormatInfo> {
+  public async getFormat(): Promise<string> {
     this.logger.log('Get format of the picture', 'debug');
 
     if (this.format) {
@@ -97,11 +100,9 @@ export class ImageProcessingService extends BaseService implements IImageProcess
     
     if (configFormat.length > 0) {
       this.logger.log('Default format is configured in the database', 'debug');
-
-      const format = configFormat[0];
-      this.format = this.getSharpImageFormat(format);
+      this.format = configFormat[0];
     } else {
-      this.logger.log('No format for images selected, so used default format', 'debug');
+      this.logger.log('No format for images selected, so default format is used', 'debug');
       this.format = this.formatDefault;
     }
 
@@ -124,15 +125,23 @@ export class ImageProcessingService extends BaseService implements IImageProcess
    * @throws {ServiceNotInitializedError}
    * @throws {ParameterOutOfBoundsError}
    * @throws {RequiredParameterNotSet}
+   * @throws {UnsupportedImageFormatError}
    * @throws {Error} 
    */
   public async setFormat(format: string): Promise<void> {
     this.logger.log(`Set the format of the image format to ${format}`, 'debug');
 
+    if (this.supportedFormats.indexOf(format) === -1) {
+      const error = new UnsupportedImageFormatError(format, `Image format "${format}" not supported`);
+      this.logger.log(error.stack, 'warn');
+
+      throw error;
+    }
+
     await this.systemPreferences.savePreference(this.formatKey, [format]);
     this.logger.log('Image format set to database', 'debug');
 
-    this.format = this.getSharpImageFormat(format);
+    this.format = format;
     this.logger.log('Image format set in the instance', 'debug');
   }
 
@@ -170,7 +179,7 @@ export class ImageProcessingService extends BaseService implements IImageProcess
         .ignoreAspectRatio()
         .background('white')
         .flatten()
-        .toFormat(format)
+        .toFormat(this.getSharpImageFormat(format))
         .toBuffer();
       
       this.logger.log('Resizing of image completed', 'debug');
