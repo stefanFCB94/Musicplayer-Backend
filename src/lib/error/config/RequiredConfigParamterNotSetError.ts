@@ -20,9 +20,9 @@ export class RequiredConfigParameterNotSetError extends BaseError {
    */
   private parameter: string;
 
-  constructor(paramter: string, msg?: string) {
+  constructor(parameter: string, msg?: string) {
     super(500, msg);
 
-    this.parameter = this.parameter;
+    this.parameter = parameter;
   }
 }
