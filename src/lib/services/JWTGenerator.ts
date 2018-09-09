@@ -3,10 +3,10 @@ import * as jsonwebtoken from 'jsonwebtoken';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 
-import { BaseConfigService } from '../base/BaseConfigService';
+import { BaseService } from '../base/BaseService';
 import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
+import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
 
-import { IConfigServiceProvider } from '../interfaces/services/IConfigService';
 import { LocalUser } from '../db/models/LocalUser';
 import { ILogger } from '../interfaces/services/ILogger';
 
@@ -24,27 +24,155 @@ import { RequestParameterNotSetError } from '../error/request/RequestParameterNo
  * as user object of the verify that a passed JWT
  * is valid.
  * 
- * @extends BaseConfigService
+ * Service should also be used, if the configuration values
+ * for, which are relevant for the genrating and verifiying
+ * of the JWTs, should be changed.
+ * 
+ * @extends BaseService
  */
 
 @injectable()
-export class JWTGenerator extends BaseConfigService implements IJWTGenerator {
+export class JWTGenerator extends BaseService implements IJWTGenerator {
+  
+  private systemPreferences: ISystemPreferencesService;
 
-  private serviceInitialized = false;
-
-  private algorithm: string = 'HS256';
-  private expiresIn: string = '30d';
-  private secretKey: string = '549r<*?G{PdUjLF~';
-
+  private algorithmDefault: string = 'HS256';
   private algorithmKey: string = 'SECURITY.JWT.ALGORITHM';
+  private algorithmValues: string[] = ['HS256'];
+
+  private expiresInDefault: string = '30d';
   private expiresInKey: string = 'SECURITY.JWT.EXPIRES';
+  
+  private secretKeyDefault: string = '549r<*?G{PdUjLF~';
   private secretPassphraseKey: string = 'SECURITY.JWT.SECRET';
+
 
   constructor(
     @inject(TYPES.Logger) logger: ILogger,
-    @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
+    @inject(TYPES.SystemPreferencesService) systemPreferences: ISystemPreferencesService,
   ) {
-    super(logger, configProvider);
+    super(logger);
+    this.systemPreferences = systemPreferences;
+
+    this.init();
+  }
+
+  /**
+   * @private
+   * @author Stefan Läufle
+   * 
+   * Initialize the service by setting the configuration parameters
+   * for using the system preference service. Function sets the allowed
+   * values, the check functions and the default value.
+   * 
+   * @returns {void}
+   */
+  private init(): void {
+    // Set allowed values for the specific system preferences
+    this.systemPreferences.setAllowedValues(this.algorithmKey, this.algorithmValues);
+
+    // Set check functions for specific system preferences
+    this.systemPreferences.setCheckFunction(this.expiresInKey, this.isExpiresInValueValid);
+
+    // Set default values for the specific system preferences
+    this.systemPreferences.setDefaultValue(this.algorithmKey, [this.algorithmDefault]);
+    this.systemPreferences.setDefaultValue(this.expiresInKey, [this.expiresInDefault]);
+    this.systemPreferences.setDefaultValue(this.secretPassphraseKey, [this.secretKeyDefault]);
+  }
+
+  /**
+   * @private
+   * @author Stefan Läufle
+   * 
+   * Function, to check, if a value has the correct format to be
+   * used as expired in value. The function has the format, that
+   * is used by the system preference service.
+   * 
+   * @param {any} value The value to check
+   * @returns {Promise<boolean>} The result of the check 
+   */
+  private isExpiresInValueValid(value: any): Promise<boolean> {
+    if (!value) {
+      return Promise.resolve(false);
+    }
+    
+    if (typeof value !== 'string') {
+      return Promise.resolve(false);
+    }
+
+    // Allowed format: 30d
+    if (!/^\d+d$/.test(value)) {
+      return Promise.reject(false);
+    }
+
+    return Promise.resolve(true);
+  }
+
+
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Set a new value for the algorithm, which is used to
+   * encrypt the JWT.
+   * 
+   * @param {string} algorithm The algorithm to use
+   * @returns {Promise<void>} 
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {InvalidConfigValueError}
+   * @throws {Error}
+   */
+  public async setAlgorithm(algorithm: string): Promise<void> {
+    await this.systemPreferences.savePreference(this.algorithmKey, [algorithm]);
+  }
+
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Set a new value for the configuration, how long a configured
+   * JWT should be valid.
+   * 
+   * Allowed format: 30d (Number of days)
+   * 
+   * @param {string} expiresIn The new configuration value
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {InvalidConfigValueError}
+   * @throws {Error}
+
+   */
+  public async setExpiresIn(expiresIn: string): Promise<void> {
+    await this.systemPreferences.savePreference(this.expiresInKey, [expiresIn]);
+  }
+
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Set a new value for the secret key configuration, which is used
+   * as secret key in the encryption of the JWT.
+   * 
+   * @param {string} secretKey The new secret key
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {InvalidConfigValueError}
+   * @throws {Error}
+ 
+   */
+  public async setSecretKey(secretKey: string): Promise<void> {
+    await this.systemPreferences.savePreference(this.secretPassphraseKey, [secretKey]);
   }
 
 
@@ -52,37 +180,66 @@ export class JWTGenerator extends BaseConfigService implements IJWTGenerator {
    * @private
    * @author Stefan Läufle
    * 
-   * Initialize the JWT generator and read all the
-   * required values from the config service.
+   * Get the current configuration value for the algorithm, with which
+   * the JWT should be encrypted.
    * 
-   * Read all the configuration keys from the config
-   * service and set these values in the jwt generator.
-   * If config values are not set, the default values
-   * be used.
+   * @returns {Promise<string>} The configuration value or null
    * 
-   * @returns {Promise<void>}
-   * 
-   * @throws {ServiceNotInitializedError}
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
    */
-  private async init(): Promise<void> {
-    if (this.serviceInitialized) { return; }
-
-    await this.initConfigService();
-
-    const algorithm = this.configService.get(this.algorithmKey);
-    if (algorithm && typeof algorithm === 'string') {
-      this.algorithm = algorithm;
+  private async getAlgorithm(): Promise<string> {
+    const algorithm = await this.systemPreferences.getPreferenceValues(this.algorithmKey);
+    
+    if (!algorithm || algorithm.length === 0) {
+      return null;
     }
 
-    const expires = this.configService.get(this.expiresInKey);
-    if (expires && typeof expires === 'string') {
-      this.expiresIn = expires;
+    return algorithm[0];
+  }
+
+  /**
+   * @private
+   * @author Stefan Läufle
+   * 
+   * Get the current configuration value, how long a JWT should
+   * be valid
+   * 
+   * @returns {Promise<string>} The current configuration value or null
+   * 
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
+   */
+  private async getExpiresIn(): Promise<string> {
+    const expiresIn = await this.systemPreferences.getPreferenceValues(this.expiresInKey);
+
+    if (!expiresIn || expiresIn.length === 0) {
+      return null;
     }
 
-    const secret = this.configService.get(this.secretPassphraseKey);
-    if (secret && typeof secret === 'string') {
-      this.secretKey = secret;
+    return expiresIn[0];
+  }
+
+  /**
+   * @private
+   * @author Stefan Läufle
+   * 
+   * Get the current configuration value for the secret key, with which the
+   * JWT should be encrypted
+   * 
+   * @returns {Promise<string} The configuration value or null
+   * 
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
+   */
+  private async getSecretKey(): Promise<string> {
+    const secretKey = await this.systemPreferences.getPreferenceValues(this.secretPassphraseKey);
+
+    if (!secretKey || secretKey.length === 0) {
+      return null;
     }
+
+    return secretKey[0];
   }
 
 
@@ -94,11 +251,11 @@ export class JWTGenerator extends BaseConfigService implements IJWTGenerator {
    * 
    * @param {LocalUser} user The local user data
    */
-  generateJWTPayload(user: LocalUser): JWTPayload {
+  private generateJWTPayload(user: LocalUser): JWTPayload {
     return {
       mail: user.mail,
       userId: user.id,
-    } as JWTPayload;
+    };
   }
 
   
@@ -118,23 +275,27 @@ export class JWTGenerator extends BaseConfigService implements IJWTGenerator {
    * @returns {Promise<string>} Returns the generated jwt
    * 
    * @throws {Error} If a error occurs by jwt generation
+   * @throws {ServiceNotInitalizedError} If system prefernce service not fully initialized
    * @throws {RequestParameterNotSetError} If user ist not given as parameter
    */
   async generateJWT(user: LocalUser): Promise<string> {
-    await this.init();
-
     if (!user || !user.mail || !user.id) {
       const error = new RequestParameterNotSetError('user', 'User msut be given to generate new jwt');
       this.logger.log(error.stack, 'error');
 
       throw error;
     }
-    
+
+    this.logger.log('Get the required parameters from the configuration', 'debug');
+    const secretKey = await this.getSecretKey();
+    const algorithm = await this.getAlgorithm();
+    const expiresIn = await this.getExpiresIn();
+
     return new Promise<string>((resolve, reject) => {
       const payload = this.generateJWTPayload(user);
 
       this.logger.log('Create jsonwebtoken', 'debug');
-      jsonwebtoken.sign(payload, this.secretKey, { algorithm: this.algorithm, expiresIn: this.expiresIn }, (err, jwt) => {
+      jsonwebtoken.sign(payload, secretKey, { algorithm, expiresIn }, (err, jwt) => {
         if (err) {
           this.logger.log(err.stack, 'error');
           throw err;
@@ -161,13 +322,17 @@ export class JWTGenerator extends BaseConfigService implements IJWTGenerator {
    * @throws {JsonWebTokenError}
    * @throws {NotBeforeError}
    * @throws {TokenExpiredError}
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
    */
   async verifyJWT(jwt: string): Promise<JWTPayload> {
-    await this.init();
+    this.logger.log('Get the required configuration parameter', 'debug');
+    const secretKey = await this.getSecretKey();
+    const algorithm = await this.getAlgorithm();
 
     this.logger.log('Start verifing jsonwebtoken', 'debug');
     return new Promise<JWTPayload>((resolve, reject) => {
-      jsonwebtoken.verify(jwt, this.secretKey, { algorithms: [this.algorithm] }, (err, payload: JWTPayload) => {
+      jsonwebtoken.verify(jwt, secretKey, { algorithms: [algorithm] }, (err, payload: JWTPayload) => {
         if (err) {
           this.logger.log('JWT is not valid', 'debug');
           this.logger.log(err.stack, 'warn');

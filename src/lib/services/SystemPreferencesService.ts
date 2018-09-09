@@ -114,7 +114,12 @@ export class SystemPreferencesService extends BaseService implements ISystemPref
       return true;
     }
 
-    const result = await this.config[preference].checkValueFn(value);
+    let result = false
+    try {
+      result = await this.config[preference].checkValueFn(value);
+    } catch (err) {
+      this.logger.log(err, 'warn');
+    }
 
     if (!result) {
       this.logger.log('Check failed, so value is not valid', 'debug');
