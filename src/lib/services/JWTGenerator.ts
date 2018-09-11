@@ -177,7 +177,7 @@ export class JWTGenerator extends BaseService implements IJWTGenerator {
 
 
   /**
-   * @private
+   * @public
    * @author Stefan Läufle
    * 
    * Get the current configuration value for the algorithm, with which
@@ -188,7 +188,7 @@ export class JWTGenerator extends BaseService implements IJWTGenerator {
    * @throws {ServiceNotInitalizedError}
    * @throws {Error}
    */
-  private async getAlgorithm(): Promise<string> {
+  public async getAlgorithm(): Promise<string> {
     const algorithm = await this.systemPreferences.getPreferenceValues(this.algorithmKey);
     
     if (!algorithm || algorithm.length === 0) {
@@ -199,7 +199,7 @@ export class JWTGenerator extends BaseService implements IJWTGenerator {
   }
 
   /**
-   * @private
+   * @public
    * @author Stefan Läufle
    * 
    * Get the current configuration value, how long a JWT should
@@ -210,7 +210,7 @@ export class JWTGenerator extends BaseService implements IJWTGenerator {
    * @throws {ServiceNotInitalizedError}
    * @throws {Error}
    */
-  private async getExpiresIn(): Promise<string> {
+  public async getExpiresIn(): Promise<string> {
     const expiresIn = await this.systemPreferences.getPreferenceValues(this.expiresInKey);
 
     if (!expiresIn || expiresIn.length === 0) {
@@ -221,7 +221,7 @@ export class JWTGenerator extends BaseService implements IJWTGenerator {
   }
 
   /**
-   * @private
+   * @public
    * @author Stefan Läufle
    * 
    * Get the current configuration value for the secret key, with which the
@@ -232,7 +232,7 @@ export class JWTGenerator extends BaseService implements IJWTGenerator {
    * @throws {ServiceNotInitalizedError}
    * @throws {Error}
    */
-  private async getSecretKey(): Promise<string> {
+  public async getSecretKey(): Promise<string> {
     const secretKey = await this.systemPreferences.getPreferenceValues(this.secretPassphraseKey);
 
     if (!secretKey || secretKey.length === 0) {

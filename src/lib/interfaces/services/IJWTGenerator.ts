@@ -7,6 +7,10 @@ export interface IJWTGenerator {
   setAlgorithm(alogrithm: string): Promise<void>;
   setExpiresIn(expiresIn: string): Promise<void>;
   setSecretKey(secretKey: string): Promise<void>;
+
+  getAlgorithm(): Promise<string>;
+  getExpiresIn(): Promise<string>;
+  getSecretKey(): Promise<string>;
 }
 
 export interface JWTPayload {
