@@ -6,7 +6,7 @@ import { TYPES } from '../types';
 import { ILogger } from '../interfaces/services/ILogger';
 import { IImageProcessingService } from '../interfaces/services/IImageProcessingService';
 
-import { BaseService } from '../base/BaseService';
+import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
 import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
 
 import { ImageProcessingError } from '../error/media/ImageProcessingError';
@@ -22,11 +22,9 @@ import { ImageProcessingError } from '../error/media/ImageProcessingError';
  * formats and sizes. Service can be used to convert cover or artist
  * images.
  * 
- * @extends BaseService
+ * @extends BaseSystemPreferenceService
  */
-export class ImageProcessingService extends BaseService implements IImageProcessingService {
-
-  private systemPreferences: ISystemPreferencesService;
+export class ImageProcessingService extends BaseSystemPreferenceService implements IImageProcessingService {
 
   private formatKey = 'IMAGES.FORMAT';
   private formatDefault = 'JPEG';
@@ -36,9 +34,7 @@ export class ImageProcessingService extends BaseService implements IImageProcess
     @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.SystemPreferencesService) prefrences: ISystemPreferencesService,
   ) {
-    super(logger);
-
-    this.systemPreferences = prefrences;
+    super(logger, prefrences);
   }
 
 
@@ -51,8 +47,8 @@ export class ImageProcessingService extends BaseService implements IImageProcess
    * preferences.
    */
   private init() {
-    this.systemPreferences.setAllowedValues(this.formatKey, this.formatAllowed);
-    this.systemPreferences.setDefaultValue(this.formatKey, [this.formatDefault]);
+    this.systemPreferenceService.setAllowedValues(this.formatKey, this.formatAllowed);
+    this.systemPreferenceService.setDefaultValue(this.formatKey, [this.formatDefault]);
   }
 
 
@@ -73,7 +69,7 @@ export class ImageProcessingService extends BaseService implements IImageProcess
    * @throws {Error}
    */
   public async getFormat(): Promise<string> {
-    const format = await this.systemPreferences.getPreferenceValues(this.formatKey);
+    const format = await this.systemPreferenceService.getPreferenceValues(this.formatKey);
 
     if (!format || format.length === 0) {
       return null;
@@ -101,7 +97,7 @@ export class ImageProcessingService extends BaseService implements IImageProcess
    * @throws {Error}
    */
   public async setFormat(format: string): Promise<void> {
-    await this.systemPreferences.savePreference(this.formatKey, [format]);
+    await this.systemPreferenceService.savePreference(this.formatKey, [format]);
   }
 
 
