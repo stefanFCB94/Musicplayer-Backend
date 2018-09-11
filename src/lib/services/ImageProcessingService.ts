@@ -6,10 +6,10 @@ import { TYPES } from '../types';
 import { ILogger } from '../interfaces/services/ILogger';
 import { IImageProcessingService } from '../interfaces/services/IImageProcessingService';
 
-import { ImageProcessingError } from '../error/media/ImageProcessingError';
 import { BaseService } from '../base/BaseService';
 import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
-import { UnsupportedImageFormatError } from '../error/media/UnsupportedImageFormatError';
+
+import { ImageProcessingError } from '../error/media/ImageProcessingError';
 
 
 /**
@@ -21,16 +21,16 @@ import { UnsupportedImageFormatError } from '../error/media/UnsupportedImageForm
  * The service offers basic functions to format a image to different
  * formats and sizes. Service can be used to convert cover or artist
  * images.
+ * 
+ * @extends BaseService
  */
 export class ImageProcessingService extends BaseService implements IImageProcessingService {
 
   private systemPreferences: ISystemPreferencesService;
 
   private formatKey = 'IMAGES.FORMAT';
-  private format: string;
   private formatDefault = 'JPEG';
-
-  private supportedFormats = ['JPG', 'JPEG', 'PNG'];
+  private formatAllowed = ['JPG', 'JPEG', 'PNG'];
 
   constructor(
     @inject(TYPES.Logger) logger: ILogger,
@@ -39,6 +39,69 @@ export class ImageProcessingService extends BaseService implements IImageProcess
     super(logger);
 
     this.systemPreferences = prefrences;
+  }
+
+
+  /**
+   * @private
+   * @author Stefan Läufle
+   * 
+   * Initalize the image processing service by setting the
+   * config values and the configuration for the system 
+   * preferences.
+   */
+  private init() {
+    this.systemPreferences.setAllowedValues(this.formatKey, this.formatAllowed);
+    this.systemPreferences.setDefaultValue(this.formatKey, [this.formatDefault]);
+  }
+
+
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Get the format, which should be used as target format
+   * in the coverting process for the images.
+   * 
+   * Function gets the value from the system preference 
+   * service through the setted default value or the database
+   * value.
+   * 
+   * @returns {Promise<string>} The format
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
+   */
+  public async getFormat(): Promise<string> {
+    const format = await this.systemPreferences.getPreferenceValues(this.formatKey);
+
+    if (!format || format.length === 0) {
+      return null;
+    }
+
+    return format[0];
+  }
+
+  /**
+   * @public
+   * @author Stefan Läufle
+   * 
+   * Set the format, to which pictures should be converted.
+   * Saves the setting to the database through the system
+   * preference service
+   * 
+   * @param {string} format The new format 
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {InvalidConfigValueError}
+   * @throws {Error}
+   */
+  public async setFormat(format: string): Promise<void> {
+    await this.systemPreferences.savePreference(this.formatKey, [format]);
   }
 
 
@@ -69,82 +132,6 @@ export class ImageProcessingService extends BaseService implements IImageProcess
     this.logger.log(`${format} is not supported as image format. JPEG is used as default format`, 'warn');
     return sharp.format.jpeg;
   }
-
-
-  /**
-   * @public
-   * @author Stefan Läufle
-   * 
-   * Get the image format, which should be used for the processing
-   * of images.
-   * 
-   * Function get the image format from the system prefrences service
-   * and if not set uses the configured default format.
-   * 
-   * @returns {Promise<string>} The image format
-   * 
-   * @throws {ServiceNotInitializedError}
-   * @throws {Error}
-   */
-  public async getFormat(): Promise<string> {
-    this.logger.log('Get format of the picture', 'debug');
-
-    if (this.format) {
-      this.logger.log('Format already requested from the database', 'debug');
-      return this.format;
-    }
-
-    this.logger.log('Get format from the database', 'debug');
-
-    const configFormat = await this.systemPreferences.getPreferenceValues(this.formatKey);
-    
-    if (configFormat.length > 0) {
-      this.logger.log('Default format is configured in the database', 'debug');
-      this.format = configFormat[0];
-    } else {
-      this.logger.log('No format for images selected, so default format is used', 'debug');
-      this.format = this.formatDefault;
-    }
-
-    return this.format;
-  }
-
-  /**
-   * @public
-   * @author Stefan Läufle
-   * 
-   * Set the format for the image format, which should be used by
-   * this servcie for processing images. Saves the configuration to
-   * the database through the system preferences service.
-   * 
-   * Also sets the image format in this instance.
-   * 
-   * @param {string} format The image foramt, which should be set
-   * @returns {Promise<void>}
-   * 
-   * @throws {ServiceNotInitializedError}
-   * @throws {ParameterOutOfBoundsError}
-   * @throws {RequiredParameterNotSet}
-   * @throws {UnsupportedImageFormatError}
-   * @throws {Error} 
-   */
-  public async setFormat(format: string): Promise<void> {
-    this.logger.log(`Set the format of the image format to ${format}`, 'debug');
-
-    if (this.supportedFormats.indexOf(format) === -1) {
-      const error = new UnsupportedImageFormatError(format, `Image format "${format}" not supported`);
-      this.logger.log(error.stack, 'warn');
-
-      throw error;
-    }
-
-    await this.systemPreferences.savePreference(this.formatKey, [format]);
-    this.logger.log('Image format set to database', 'debug');
-
-    this.format = format;
-    this.logger.log('Image format set in the instance', 'debug');
-  }
-
   
   /**
    * @public
