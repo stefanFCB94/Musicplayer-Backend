@@ -1,4 +1,4 @@
-import { BaseService } from '../base/BaseService';
+import { BaseConfigService } from '../base/BaseConfigService';
 
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
@@ -12,6 +12,8 @@ import { InvalidConfigValueError } from '../error/config/InvalidConfigValueError
 
 import { SystemPreferences } from '../db/models/SystemPreferences';
 import { SystemPreferencesConfiguration, SystemPreferencesConfigurations } from '../interfaces/models/SystemPreferencesConfiguration';
+import { IConfigServiceProvider } from '../interfaces/services/IConfigService';
+
 
 /**
  * @class
@@ -32,7 +34,7 @@ import { SystemPreferencesConfiguration, SystemPreferencesConfigurations } from 
 
 
 @injectable()
-export class SystemPreferencesService extends BaseService implements ISystemPreferencesService {
+export class SystemPreferencesService extends BaseConfigService implements ISystemPreferencesService {
 
   private preferenceDAO: ISystemPreferencesDAO;
   private uuidGenerator: IUUIDGenerator;
@@ -43,8 +45,9 @@ export class SystemPreferencesService extends BaseService implements ISystemPref
     @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.SystemPreferencesDAO) preferenceDAO: ISystemPreferencesDAO,
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
+    @inject(TYPES.ConfigServiceProvider) configServiceProvider: IConfigServiceProvider
   ) {
-    super(logger);
+    super(logger, configServiceProvider);
 
     this.preferenceDAO = preferenceDAO;
     this.uuidGenerator = uuidGenerator;
@@ -326,7 +329,28 @@ export class SystemPreferencesService extends BaseService implements ISystemPref
       return prefs.map(value =>  value.value);
     }
 
-    this.logger.log('System preference is not set in the database, so use default value if configured', 'debug');
+    this.logger.log('System preference is not set in the database, so check if defined in config file', 'debug');
+    await this.initConfigService();
+
+    if (this.configService.isSet(preference)) {
+      this.logger.log('System preference set in config file', 'debug');
+
+      let values = this.configService.get(preference);
+      if (!Array.isArray(values)) {
+        values = [values];
+      }
+
+      this.logger.log('Set values to the cache', 'debug');
+      if (!this.config[preference]) {
+        this.config[preference] = {};
+      }
+      this.config[preference].cachedValue = values;
+      
+      this.logger.log('Default value set to the config file value', 'debug');
+      return values;
+    }
+    
+
     if (this.config[preference] && typeof this.config[preference].default !== 'undefined') {
       this.logger.log('Default value is configure, so use this value for the system preference', 'debug');
       this.logger.log('For performance reasons, cache that value', 'debug');
