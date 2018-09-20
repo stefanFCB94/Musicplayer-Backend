@@ -1,7 +1,8 @@
 import { LocalUser } from '../../db/models/LocalUser';
 
 export interface IAuthentificationService {
-  isSignupAvailable(): Promise<boolean>;
+  getSignupAvailable(): Promise<boolean>;
+  setSignupAvailable(signupPossible: boolean): Promise<void>;
   login(mail: string, password: string): Promise<string>;
   isLoggedIn(jwt: string): Promise<string>;
   renewJWT(jwt: string): Promise<string>;

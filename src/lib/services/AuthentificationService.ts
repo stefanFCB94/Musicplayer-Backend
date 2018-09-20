@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
 
-import { BaseConfigService } from '../base/BaseConfigService';
+import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
 import { IAuthentificationService,SignupValues, SignupReturn } from '../interfaces/services/IAuthentificatonService';
 
 import { LocalUser } from '../db/models/LocalUser';
@@ -10,7 +10,7 @@ import { ILogger } from '../interfaces/services/ILogger';
 import { IPasswordHasher } from '../interfaces/services/IPasswordHasher';
 import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
 import { ILocalUserDAO } from '../interfaces/dao/ILocalUserDAO';
-import { IConfigServiceProvider, IConfigService } from '../interfaces/services/IConfigService';
+import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
 import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
 
 import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
@@ -21,15 +21,15 @@ import { UserNotLoginableError } from '../error/auth/UserNotLoginableError';
 import { UserAlreadyExistsError } from '../error/auth/UserAlreadyExistsError';
 
 
+
 @injectable()
-export class AuthentificationService extends BaseConfigService implements IAuthentificationService {
+export class AuthentificationService extends BaseSystemPreferenceService implements IAuthentificationService {
   
   protected passwordHasher: IPasswordHasher;
   protected uuidGenerator: IUUIDGenerator;
   protected localUserDAO: ILocalUserDAO;
   protected jwtGenerator: IJWTGenerator;
 
-  private signupPossibleDefault = false;
   private signupPossibleKey = 'SIGNUP.POSSIBLE';
 
   constructor(
@@ -38,14 +38,17 @@ export class AuthentificationService extends BaseConfigService implements IAuthe
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
     @inject(TYPES.LocalUserDAO) localUserDAO: ILocalUserDAO,
     @inject(TYPES.JWTGenerator) jwtGenerator: IJWTGenerator,
-    @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
+    @inject(TYPES.SystemPreferencesService) systemPrefernces: ISystemPreferencesService
   ) {
-    super(logger, configProvider);
+    super(logger, systemPrefernces);
 
     this.passwordHasher = passwordHasher;
     this.uuidGenerator = uuidGenerator;
     this.localUserDAO = localUserDAO;
     this.jwtGenerator = jwtGenerator;
+
+    this.systemPreferenceService.setAllowedValues(this.signupPossibleKey, [true, false]);
+    this.systemPreferenceService.setDefaultValue(this.signupPossibleKey, [false]);
   }
 
   /**
@@ -62,19 +65,39 @@ export class AuthentificationService extends BaseConfigService implements IAuthe
    * 
    * @returns {Promise<boolean>} Information if signup is available
    * 
-   * @throws {ServiceNotInitializedError} If the config service could not
-   *                                      be initialized
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
    */
-  public async isSignupAvailable(): Promise<boolean> {
-    await this.initConfigService();
+  public async getSignupAvailable(): Promise<boolean> {
+    const available = await this.systemPreferenceService.getPreferenceValues(this.signupPossibleKey);
 
-    const available = this.configService.get(this.signupPossibleKey);
-
-    if (typeof available === 'boolean') {
-      return available;
+    if (available || available.length > 0) {
+      return available[0];
     }
 
-    return this.signupPossibleDefault;
+    return null;
+  }
+
+  /**
+   * @public
+   * @async
+   * @author Stefan Läufle
+   * 
+   * Set, if user can sing up to the service by themselfs.
+   * Set value will be stored in the database to be saved for later.
+   * 
+   * @param {boolean} signupPossible If the self signup is available
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {InvalidConfigValueError}
+   * @throws {Error}
+   */
+  public async setSignupAvailable(signupPossible: boolean): Promise<void> {
+    await this.systemPreferenceService.savePreference(this.signupPossibleKey, [signupPossible]);
   }
 
 
