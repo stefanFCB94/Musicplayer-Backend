@@ -40,10 +40,9 @@ export class SystemPreferencesDAO extends BaseService implements ISystemPreferen
   private database: IDatabaseService;
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.DatabaseService) database: IDatabaseService,
   ) {
-    super(logger);
+    super();
 
     this.database = database;
   }
@@ -67,18 +66,19 @@ export class SystemPreferencesDAO extends BaseService implements ISystemPreferen
   private async initRepository(): Promise<Repository<SystemPreferences>> {
     if (this.prefRepository) { return this.prefRepository; }
 
-    this.logger.log('Initialize repository for the sysem preferences entity', 'debug');
+    this.logger.debug('Initialize repository for the sysem preferences entity');
 
     try {
       const connection = await this.database.getConnection();
       this.prefRepository = connection.getRepository(SystemPreferences);
 
-      this.logger.log('StorageFile repository initialized', 'debug');
+      this.logger.debug('StorageFile repository initialized');
     } catch (err) {
-      this.logger.log('Repository cannot be initialized. Database connection could not be retrieved', 'error');
-      this.logger.log(err.stack, 'error');
+      this.logger.error('Repository cannot be initialized. Database connection could not be retrieved');
+      this.logger.error(err);
       
       const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
+      this.logger.error(error);
       throw error;
     }
 
@@ -97,24 +97,26 @@ export class SystemPreferencesDAO extends BaseService implements ISystemPreferen
    * @param {SystemPreferences} preference The system preference to check for
    * 
    * @throws {RequiredParemterNotSet} 
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
    */
   private checkRequiredParameters(preference: SystemPreferences) {
     let error: RequiredParameterNotSet;
 
     if (!preference.id) {
-      this.logger.log('Required parameter ID not set in the system preference instance', 'debug');
+      this.logger.debug('Required parameter ID not set in the system preference instance');
       error = new RequiredParameterNotSet('id', 'ID not set in system preference value');
     }
 
     if (!preference.setting) {
-      this.logger.log('Required parameter SETTING not set in the system preference instance', 'debug');
+      this.logger.debug('Required parameter SETTING not set in the system preference instance');
       error = new RequiredParameterNotSet('setting', 'Setting not set in the system preference value');
     }
 
 
     if (error) {
-      this.logger.log('Not all required parameters set', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('Not all required parameters set');
+      this.logger.warn(error);
       throw error;
     }
   }
@@ -132,29 +134,31 @@ export class SystemPreferencesDAO extends BaseService implements ISystemPreferen
    * 
    * @param {SystemPreferences} preference The entity to check for
    * 
-   * @throws {ParameterOutOfBoundsError} 
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
    */
   private checkParameterOutOfBounds(preference: SystemPreferences) {
     let error: ParameterOutOfBoundsError;
 
     if (preference.id.length > 36) {
-      this.logger.log(`Parameter ID has a length of ${preference.id.length} and is out of bounds`, 'debug');
+      this.logger.debug(`Parameter ID has a length of ${preference.id.length} and is out of bounds`);
       error = new ParameterOutOfBoundsError('id', 'ID of system preference is out of bounds');
     }
 
     if (preference.setting.length > 255) {
-      this.logger.log(`Parameter SETTING has a length of ${preference.setting.length} and is out of bounds`, 'debug');
+      this.logger.debug(`Parameter SETTING has a length of ${preference.setting.length} and is out of bounds`);
       error = new ParameterOutOfBoundsError('setting', 'Parameter setting is out of bounds');
     }
 
     if (preference.value.length > 1024) {
-      this.logger.log(`Parameter VALUE has a length of ${preference.value.length} and is out of bounds`, 'debug');
+      this.logger.debug(`Parameter VALUE has a length of ${preference.value.length} and is out of bounds`);
       error = new ParameterOutOfBoundsError('value', 'Parameter value is out of bounds');
     }
 
     if (error) {
-      this.logger.log('At least one parameter is out of bounds', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('At least one parameter is out of bounds');
+      this.logger.warn(error);
       throw error;
     }
   }
@@ -183,46 +187,46 @@ export class SystemPreferencesDAO extends BaseService implements ISystemPreferen
     await this.initRepository();
 
     // Check paramter values
-    this.logger.log('Start checking for paramter errors', 'debug');
+    this.logger.debug('Start checking for paramter errors');
     preferences.forEach((pref) => {
       this.checkRequiredParameters(pref);
       this.checkParameterOutOfBounds(pref);
     });
 
-    this.logger.log('Open transaction, so that deletion and inserting is transaction save', 'debug');
+    this.logger.debug('Open transaction, so that deletion and inserting is transaction save');
     
     const connection = await this.database.getConnection();
     const queryRunner = connection.createQueryRunner();
 
 
     try {
-      this.logger.log('Connect with queryRunner to the database (if not established)', 'debug');
+      this.logger.debug('Connect with queryRunner to the database (if not established)');
       await queryRunner.connect();
 
 
-      this.logger.log('Save and delete should run under transaction, so start transaction now', 'debug');
+      this.logger.debug('Save and delete should run under transaction, so start transaction now');
       await queryRunner.startTransaction();
 
-      this.logger.log('Delete all existing system preferences with the same value', 'debug');
+      this.logger.debug('Delete all existing system preferences with the same value');
       const deleted = await queryRunner.manager.delete(SystemPreferences, { setting: preferences[0].setting });
-      this.logger.log(`Preferences deleted`, 'debug');
+      this.logger.debug(`Preferences deleted`);
 
 
-      this.logger.log('Current preferences deleted, now insert new values', 'debug');
+      this.logger.debug('Current preferences deleted, now insert new values');
       const saved = await queryRunner.manager.save(preferences);
-      this.logger.log('System preferences saved', 'debug');
+      this.logger.debug('System preferences saved');
 
 
-      this.logger.log('All preferences saved successfully to the database, so commit transaction', 'debug');
+      this.logger.debug('All preferences saved successfully to the database, so commit transaction');
       await queryRunner.commitTransaction();
-      this.logger.log('Transactions commited', 'debug');
+      this.logger.debug('Transactions commited');
 
       return saved;
     } catch (err) {
-      this.logger.log('Transaction occured, rollback all changes', 'debug');
+      this.logger.debug('Transaction occured, rollback all changes');
       queryRunner.rollbackTransaction();
 
-      this.logger.log(err.stack, 'error');
+      this.logger.error(err);
       throw err;
     }
   }
@@ -242,20 +246,20 @@ export class SystemPreferencesDAO extends BaseService implements ISystemPreferen
   async deletePreference(preference: string): Promise<SystemPreferences[]> {
     await this.initRepository();
 
-    this.logger.log(`Delete all setting with the settings key: ${preference}`, 'debug');
+    this.logger.debug(`Delete all setting with the settings key: ${preference}`);
     
     const prefs = await this.getPreferences(preference);
     
     if (prefs.length === 0) {
-      this.logger.log('No system preferences match the setting key, so no deletion neccassary', 'debug');
+      this.logger.debug('No system preferences match the setting key, so no deletion neccassary');
       return [];
     }
 
-    this.logger.log('Now try to delete preference values', 'debug');
+    this.logger.debug('Now try to delete preference values');
     const deleted = await this.prefRepository.remove(prefs);
 
-    this.logger.log('Preferences deleted from the database', 'debug');
-    this.logger.log(`Deleted instances: ${deleted.length}`, 'debug');
+    this.logger.debug('Preferences deleted from the database');
+    this.logger.debug(`Deleted instances: ${deleted.length}`);
     
     return deleted;
   }
@@ -275,10 +279,10 @@ export class SystemPreferencesDAO extends BaseService implements ISystemPreferen
   async getPreferences(preference: string): Promise<SystemPreferences[]> {
     await this.initRepository();
 
-    this.logger.log(`Get all preference values to the setting key ${preference}`, 'debug');
+    this.logger.debug(`Get all preference values to the setting key ${preference}`);
     const ret = await this.prefRepository.find({ where: { setting: preference } });
 
-    this.logger.log(`Found preferences: ${ret.length}`, 'debug');
+    this.logger.debug(`Found preferences: ${ret.length}`);
     return ret;
   }
   

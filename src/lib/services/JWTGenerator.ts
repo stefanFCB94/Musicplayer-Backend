@@ -46,10 +46,9 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
 
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.SystemPreferencesService) systemPreferences: ISystemPreferencesService,
   ) {
-    super(logger, systemPreferences);
+    super(systemPreferences);
 
     this.init();
   }
@@ -278,12 +277,12 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
   async generateJWT(user: LocalUser): Promise<string> {
     if (!user || !user.mail || !user.id) {
       const error = new RequestParameterNotSetError('user', 'User msut be given to generate new jwt');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
 
-    this.logger.log('Get the required parameters from the configuration', 'debug');
+    this.logger.debug('Get the required parameters to generate JWT from the configuration');
     const secretKey = await this.getSecretKey();
     const algorithm = await this.getAlgorithm();
     const expiresIn = await this.getExpiresIn();
@@ -291,14 +290,14 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
     return new Promise<string>((resolve, reject) => {
       const payload = this.generateJWTPayload(user);
 
-      this.logger.log('Create jsonwebtoken', 'debug');
+      this.logger.debug('Create new jsonwebtoken');
       jsonwebtoken.sign(payload, secretKey, { algorithm, expiresIn }, (err, jwt) => {
         if (err) {
-          this.logger.log(err.stack, 'error');
+          this.logger.error(err);
           throw err;
         }
 
-        this.logger.log(`Jwonwebtoken generated: ${jwt}`, 'debug');
+        this.logger.debug(`Jwonwebtoken generated: ${jwt}`);
         resolve(jwt);
       });
     });
@@ -323,20 +322,20 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
    * @throws {Error}
    */
   async verifyJWT(jwt: string): Promise<JWTPayload> {
-    this.logger.log('Get the required configuration parameter', 'debug');
+    this.logger.debug('Get the required configuration parameter to verify JWT');
     const secretKey = await this.getSecretKey();
     const algorithm = await this.getAlgorithm();
 
-    this.logger.log('Start verifing jsonwebtoken', 'debug');
+    this.logger.debug('Start verifing jsonwebtoken');
     return new Promise<JWTPayload>((resolve, reject) => {
       jsonwebtoken.verify(jwt, secretKey, { algorithms: [algorithm] }, (err, payload: JWTPayload) => {
         if (err) {
-          this.logger.log('JWT is not valid', 'debug');
-          this.logger.log(err.stack, 'warn');
+          this.logger.debug('JWT is not valid');
+          this.logger.warn(err);
           throw err;
         }
 
-        this.logger.log('Jsonwebtoken is valid', 'debug');
+        this.logger.debug('Jsonwebtoken is valid');
         resolve(payload);
       });
     });

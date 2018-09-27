@@ -40,10 +40,9 @@ export class PasswordHasher extends BaseConfigService implements IPasswordHasher
 
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
   ) {
-    super(logger, configProvider);
+    super(configProvider);
   }
 
   /**
@@ -92,25 +91,28 @@ export class PasswordHasher extends BaseConfigService implements IPasswordHasher
    * 
    * @param {string} pw The value, which should be hashed
    * @returns {Promise<string>} The hashed password
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
    */
   async hash(pw: string): Promise<string> {
-    this.logger.log('Start hashing password', 'debug');
+    this.logger.debug('Start hashing password');
 
     await this.init();
     let rounds = this.saltRounds;
 
     if (this.configService.isSet(this.roundsKey)) {
-      this.logger.log('Salt rounds will be extracted from the configuration file', 'debug');
+      this.logger.debug('Salt rounds will be extracted from the configuration file');
       rounds = this.configService.get(this.roundsKey);
     }
 
-    this.logger.log('Start generating salt', 'debug');
+    this.logger.debug('Start generating salt');
     const salt = await bcrypt.genSalt(rounds);
 
-    this.logger.log('Salt generated. Start hashing', 'debug');
+    this.logger.debug('Salt generated. Start hashing');
     const hash = await bcrypt.hash(pw, salt);
 
-    this.logger.log('Hash generated', 'debug');
+    this.logger.debug('Hash generated');
     return hash;
   }
 
@@ -128,12 +130,15 @@ export class PasswordHasher extends BaseConfigService implements IPasswordHasher
    * @param {string} hash The hash, which should be compared to the user input
    * 
    * @returns {Promise<boolean>} The result, if the value matches the hashed value
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
    */
   async compare(pw: string, hash: string): Promise<boolean> {
-    this.logger.log('Start comparing passwords', 'debug');
+    this.logger.debug('Start comparing passwords');
 
     const result = await bcrypt.compare(pw, hash);
-    this.logger.log(`Password comparing finished. Result: ${result}`, 'debug');
+    this.logger.debug(`Password comparing finished. Result: ${result}`);
 
     return result;
   }

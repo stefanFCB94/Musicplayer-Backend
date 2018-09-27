@@ -23,10 +23,9 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
   private database: IDatabaseService;
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.DatabaseService) database: IDatabaseService,
   ) {
-    super(logger);
+    super();
 
     this.database = database;
   }
@@ -50,18 +49,19 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
   private async initRepository(): Promise<Repository<StorageFile>> {
     if (this.fileRepository) { return this.fileRepository; }
 
-    this.logger.log('Initialize repository for the storage file entity', 'debug');
+    this.logger.debug('Initialize repository for the storage file entity');
 
     try {
       const connection = await this.database.getConnection();
       this.fileRepository = connection.getRepository(StorageFile);
 
-      this.logger.log('StorageFile repository initialized', 'debug');
+      this.logger.debug('StorageFile repository initialized');
     } catch (err) {
-      this.logger.log('Repository cannot be initialized. Database connection could not be retrieved', 'error');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('Repository cannot be initialized. Database connection could not be retrieved');
+      this.logger.error(err);
       
       const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
+      this.logger.error(error);
       throw error;
     }
 
@@ -81,34 +81,36 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
    * @param {StorageFile} file The entity, which should be checked
    * 
    * @throws {RequiredParameterNotSetError} If required parameter in entity is not set
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
    */
   private checkRequiredParameter(file: StorageFile) {
     let error: RequiredParameterNotSet;
 
     if (!file.id) {
-      this.logger.log('ID of storage file entity is not set', 'debug');
+      this.logger.debug('ID of storage file entity is not set');
       error = new RequiredParameterNotSet('id', 'ID for storage file is not set');
     }
 
     if (!file.path) {
-      this.logger.log('Path of the storage file is not set', 'debug');
+      this.logger.debug('Path of the storage file is not set');
       error = new RequiredParameterNotSet('path', 'Path of the storage file is not set');
     }
 
     if (!file.checksum) {
-      this.logger.log('MD5 checksum of storage file entity is not set', 'debug');
+      this.logger.debug('MD5 checksum of storage file entity is not set');
       error = new RequiredParameterNotSet('checksum', 'MD5 checksum of storage file ist not set');
     }
 
     if (!file.filesize) {
-      this.logger.log('Filesize of the storage file entity is not set', 'debug');
+      this.logger.debug('Filesize of the storage file entity is not set');
       error = new RequiredParameterNotSet('filesize', 'Filesize of the storage file is not set');
     }
 
 
     if (error) {
-      this.logger.log('Not all required parameter are set in the storage file entity', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('Not all required parameter are set in the storage file entity');
+      this.logger.warn(error);
       throw error;
     }
   }
@@ -127,28 +129,30 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
    * @param {StorageFile} file The storage file, which should be checked
    * 
    * @throws {ParameterOutOfBoundsError} If at least one parameter is out bounds
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
    */
   private checkParameterOutOfBound(file: StorageFile) {
     let error: ParameterOutOfBoundsError;
 
     if (file.id.length > 36) {
-      this.logger.log('ID is out of bounds for storage file', 'debug');
+      this.logger.debug('ID is out of bounds for storage file');
       error = new ParameterOutOfBoundsError('id', 'ID of storage file is out of bounds');
     }
 
     if (file.path.length > 1024) {
-      this.logger.log('Path of storage file is out of bounds', 'debug');
+      this.logger.debug('Path of storage file is out of bounds');
       error = new ParameterOutOfBoundsError('path', 'Path of storage file is out of bounds');
     }
 
     if (file.checksum.length > 32) {
-      this.logger.log('MD5 checksum of storage file is out of bounds', 'debug');
+      this.logger.debug('MD5 checksum of storage file is out of bounds');
       error = new ParameterOutOfBoundsError('checksum', 'MD5 checksum of storage file is out of bounds');
     }
 
     if (error) {
-      this.logger.log('At least one parameter of storage file is out of bounds', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('At least one parameter of storage file is out of bounds');
+      this.logger.warn(error);
       throw error;
     }
   }
@@ -171,22 +175,24 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
    * @param {StorageFile} file The entity, which should be checked
    * 
    * @throws {NotAUniqueValueError} If at least one value of entity has not a unique value. 
+   * @throws {ServiceNotInitalizedError}
+   * @throws {Error}
    */
   private async checkUniqueParameters(file: StorageFile) {
     await this.initRepository();
     
     let error: NotAUniqueValueError;
-    this.logger.log('Check for unique values', 'debug');
+    this.logger.debug('Check for unique values');
 
     const foundChecksumFile = await this.getFileByChecksum(file.checksum);
     if (foundChecksumFile && foundChecksumFile.id !== file.id) {
       error = new NotAUniqueValueError('checksum', file.checksum, 'File with checksum already exists');
-      this.logger.log(`File with checksum '${file.checksum}' alredy exists`, 'debug');
+      this.logger.debug(`File with checksum '${file.checksum}' alredy exists`);
     }
 
     if (error) {
-      this.logger.log('At least one unique parameter is not unique', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('At least one unique parameter is not unique');
+      this.logger.warn(error);
 
       throw error;
     }
@@ -224,19 +230,19 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
   public async saveOrUpdateFile(file: StorageFile): Promise<StorageFile> {
     await this.initRepository();
 
-    this.logger.log('Start checking parameters of storage file', 'debug');
+    this.logger.debug('Start checking parameters of storage file');
     this.checkRequiredParameter(file);
     this.checkParameterOutOfBound(file);
     await this.checkUniqueParameters(file);
 
     try {
       const savedFile = await this.fileRepository.save(file);
-      this.logger.log('StorageFile saved successfully saved to database', 'debug');
+      this.logger.debug('StorageFile saved successfully saved to database');
 
       return savedFile;
     } catch (err) {
-      this.logger.log(err.stack, 'error');
-      this.logger.log('Unsupported error by savind storage file to database', 'debug');
+      this.logger.error(err);
+      this.logger.debug('Unsupported error by savind storage file to database');
 
       throw err;
     }
@@ -274,7 +280,7 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
   ): Promise<StorageFile[]> {
     await this.initRepository();
 
-    this.logger.log('Start querying for storage files', 'debug');
+    this.logger.debug('Start querying for storage files');
 
     const options: FindManyOptions = {
       skip,
@@ -284,13 +290,13 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
 
     try {
       const ret = await this.fileRepository.find(options);
-      this.logger.log('Query for storage file finished', 'debug');
-      this.logger.log(`Found results: ${ret.length}`, 'debug');
+      this.logger.debug('Query for storage file finished');
+      this.logger.debug(`Found results: ${ret.length}`);
 
       return ret;
     } catch (err) {
-      this.logger.log('Unsupported error by querying the database for storage files', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('Unsupported error by querying the database for storage files');
+      this.logger.error(err);
 
       throw err;
     }
@@ -320,23 +326,23 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
   public async getFile(id: string): Promise<StorageFile> {
     await this.initRepository();
 
-    this.logger.log('Start querying for a specific storage file by id', 'debug');
-    this.logger.log(`Storage file with the id '${id}' should be searched`, 'debug');
+    this.logger.debug('Start querying for a specific storage file by id');
+    this.logger.debug(`Storage file with the id '${id}' should be searched`);
 
     try {
       const file = await this.fileRepository.findOne({ where: { id } });
-      this.logger.log('Querying for storage file finished', 'debug');
+      this.logger.debug('Querying for storage file finished');
 
       if (file) {
-        this.logger.log('Storage file was found in the database', 'debug');
+        this.logger.debug('Storage file was found in the database');
       } else {
-        this.logger.log('Storage file was not found in the database', 'debug');
+        this.logger.debug('Storage file was not found in the database');
       }
 
       return file;
     } catch (err) {
-      this.logger.log('Unsupported error during querying for storage file by id', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('Unsupported error during querying for storage file by id');
+      this.logger.error(err);
 
       throw err;
     }
@@ -366,23 +372,23 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
   public async getFileByChecksum(checksum: string): Promise<StorageFile> {
     await this.initRepository();
 
-    this.logger.log('Start querying for file by checksum', 'debug');
-    this.logger.log(`Try to get file by MD5 checksum '${checksum}`, 'debug');
+    this.logger.debug('Start querying for file by checksum');
+    this.logger.debug(`Try to get file by MD5 checksum '${checksum}`);
 
     try {
       const file = await this.fileRepository.findOne({ where: { checksum } });
 
-      this.logger.log('Querying for file by MD5 checksum finished', 'debug');
+      this.logger.debug('Querying for file by MD5 checksum finished');
       if (file) {
-        this.logger.log('Storage file was found by MD5 checksum', 'debug');
+        this.logger.debug('Storage file was found by MD5 checksum');
       } else {
-        this.logger.log('Storage file was not found by MD5 checksum', 'debug');
+        this.logger.debug('Storage file was not found by MD5 checksum');
       }
 
       return file;
     } catch (err) {
-      this.logger.log('A unsupported error by querying the database for storage file by MD5 checksum occured', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('A unsupported error by querying the database for storage file by MD5 checksum occured');
+      this.logger.error(err);
 
       throw err;
     }
@@ -414,22 +420,22 @@ export class StorageFileDAO extends BaseService implements IStorageFileDAO {
   public async deleteFile(file: StorageFile): Promise<StorageFile> {
     await this.initRepository();
 
-    this.logger.log('Start deleting storage file', 'debug');
+    this.logger.debug('Start deleting storage file');
 
     try {
       const deletedFile = await this.fileRepository.remove(file);
 
-      this.logger.log('Deletion of storage file finished', 'debug');
+      this.logger.debug('Deletion of storage file finished');
       if (deletedFile) {
-        this.logger.log('Storage file deleted from database', 'debug');
+        this.logger.debug('Storage file deleted from database');
       } else {
-        this.logger.log('Storage file was not found', 'debug');
+        this.logger.debug('Storage file was not found');
       }
 
       return deletedFile;
     } catch (err) {
-      this.logger.log('A unsupported error occured by deleting a storage file', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('A unsupported error occured by deleting a storage file');
+      this.logger.error(err);
 
       throw err;
     }

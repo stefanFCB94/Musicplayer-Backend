@@ -24,10 +24,9 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
 
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.SystemPreferencesService) systemPreferenceService: ISystemPreferencesService,
   ) {
-    super(logger, systemPreferenceService);
+    super(systemPreferenceService);
   }
 
   /**
@@ -53,11 +52,11 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
         return true;
       }
     } catch (err) {
-      this.logger.log(err.stack, 'error');
+      this.logger.error(err);
     }
 
     const error = new StorageNotExistsError(path, 'Path does not exists on the filesystem');
-    this.logger.log(error.stack, 'error');
+    this.logger.error(error);
     throw error;
   }
 
@@ -76,12 +75,18 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
    */
   private async isWritable(path: string): Promise<boolean> {
     if (process.platform !== 'win32') {
-      const hasWrite = await fs.access(path, fs.constants.W_OK);
-      if (!hasWrite) {
-        const error = new StorageNotWritableError(path, 'Path is not writable');
-        this.logger.log(error.stack, 'error');
-        throw error;
+      try {
+        const hasWrite = await fs.access(path, fs.constants.W_OK);
+        if (hasWrite) {
+          return true;
+        }
+      } catch (err) {
+        this.logger.error(err);
       }
+
+      const error = new StorageNotWritableError(path, 'Path is not writable');
+      this.logger.error(error);
+      throw error;
     }
 
     return true;
@@ -107,19 +112,21 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
    *                          Rejects with the appeared error 
    * 
    * @throws {StoragePathNotCreatableError}
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
    */
   private async createSubdir(path: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       mkdirp(path, (err) => {
         if (err) {
-          this.logger.log(err.stack, 'error');
+          this.logger.error(err);
 
           const error = new StoragePathNotCreatableError(path, 'Path not creatable');
-          this.logger.log(error.stack, 'error');
+          this.logger.error(error);
           throw error;
         }
 
-        this.logger.log(`Path '${path}' created`, 'debug');
+        this.logger.debug(`Path '${path}' created`);
         resolve();
       });
     });
@@ -169,7 +176,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
    * @throws {Error}
    */
   public async setBaseStorage(path: string, opts?: { moveContent?: boolean }): Promise<void> {
-    this.logger.log('Set the base storage for the server', 'debug');
+    this.logger.debug('Set the base storage for the server');
 
     // CHeck, if new storage path exists
     await this.existsStorage(path);
@@ -184,7 +191,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     // the service tries to move all contents from the old storage to
     // the new one
     if (oldPath && oldPath !== path && (!opts || typeof opts.moveContent === 'undefined' || opts.moveContent)) {
-      this.logger.log('Move all contents of the old storage to the new one', 'debug');
+      this.logger.debug(`Move all contents from '${oldPath}' to '${path}'`);
       const content = await fs.readdir(oldPath);
 
       content.forEach(async element => {
@@ -192,10 +199,10 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
         const target = path + '/' + element;
 
         await fs.move(source, target, { overwrite: true });
-        this.logger.log(`${element} moved to new storage`, 'debug');
+        this.logger.debug(`${element} moved to new storage`);
       });
 
-      this.logger.log('All content elements moved to new storage directory', 'debug');
+      this.logger.debug(`All content elements moved to new storage directory '${path}'`);
     }
   }
 
@@ -226,8 +233,8 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     const baseStorage = await this.getBaseStorage();
     if (!baseStorage) {
       const error = new RequiredConfigParameterNotSetError(this.baseStorageKey, 'Storage must be defined');
-      this.logger.log('File could not be saved. Storage not defined', 'error');
-      this.logger.log(error.stack, 'error');
+      this.logger.error('File could not be saved. Storage not defined');
+      this.logger.error(error);
 
       throw error;
     }
@@ -236,10 +243,10 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     const exists = await this.exists(path);
 
     if (!exists) {
-      this.logger.log('Path, where the file should be created not available, check if base storage exists', 'debug');
+      this.logger.debug('Path, where the file should be created not available, check if base storage exists');
       await this.existsStorage(baseStorage);
  
-      this.logger.log('Path has to be created', 'debug');
+      this.logger.debug('Path has to be created');
       await this.createSubdir(pathToSaveIn);
     }
 
@@ -247,15 +254,15 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     // throws StorageNotWritableError
     await this.isWritable(pathToSaveIn);
 
-    this.logger.log('Path exists and can be writen in. Now write file to filesystem', 'debug');
+    this.logger.debug('Path exists and can be writen in. Now write file to filesystem');
     const filepath = pathToSaveIn + '/' + filename;
     try {
       await fs.writeFile(filepath, file);
     } catch (err) {
-      this.logger.log(err.stack, 'error');
+      this.logger.error(err);
 
       const error = new StorageNotWritableError(filepath, 'File could not be saved in storage');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
       throw error;
     }
 
@@ -285,13 +292,13 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
    * @throws {Error}
    */
   public async deleteFile(path: string): Promise<void> {
-    this.logger.log('Check if file exists on the filesystem', 'debug');
+    this.logger.debug('Check if file exists on the filesystem');
     
     const baseStorage = await this.getBaseStorage();
     if (!baseStorage) {
       const error = new RequiredConfigParameterNotSetError(this.baseStorageKey, 'Storage must be defined to delete file');
-      this.logger.log('To delete file, the storage must be defined', 'error');
-      this.logger.log(error.stack, 'error');
+      this.logger.error('To delete file, the storage must be defined');
+      this.logger.error(error);
 
       throw error;
     }
@@ -303,24 +310,24 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     try {
       const exists = await fs.stat(file);
     } catch (err) {
-      this.logger.log('File to delete, does not exist on the filesystem', 'debug');
+      this.logger.debug('File to delete, does not exist on the filesystem');
 
       const error = new StorageFileNotExistingError(file, 'File not existsing');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
       throw error;
     }
 
 
     try {
-      this.logger.log(`Now try to delete the file ${file} from the storage`, 'debug');
+      this.logger.debug(`Now try to delete the file ${file} from the storage`);
       await fs.unlink(file);
     } catch (err) {
-      this.logger.log(err.stack, 'error');
+      this.logger.error(err);
       const error = new StorageFileNotDeletableError(file, 'File could not be deleted');
       throw error;
     }
 
-    this.logger.log(`${file} deleted from the file system`, 'debug');
+    this.logger.debug(`${file} deleted from the file system`);
   }
   
   /**
@@ -339,7 +346,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     const baseStorage = await this.getBaseStorage();
     if (!baseStorage) {
       const error = new RequiredConfigParameterNotSetError(this.baseStorageKey, 'Storage not defined');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
@@ -348,10 +355,10 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     
     try {
       await fs.stat(fullPath);
-      this.logger.log(`${fullPath} exists on the filesystem`, 'debug');
+      this.logger.debug(`${fullPath} exists on the filesystem`);
       return true;
     } catch (err) {
-      this.logger.log(`${fullPath} does not exist on the filesystem`, 'debug');
+      this.logger.debug(`${fullPath} does not exist on the filesystem`);
       return false;
     }
   }

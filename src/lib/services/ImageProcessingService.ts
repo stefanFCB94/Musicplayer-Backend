@@ -31,10 +31,9 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
   private formatAllowed = ['JPG', 'JPEG', 'PNG'];
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.SystemPreferencesService) prefrences: ISystemPreferencesService,
   ) {
-    super(logger, prefrences);
+    super(prefrences);
   }
 
 
@@ -113,19 +112,22 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
    * 
    * @param {string} format The string representation of the image format
    * @returns {sharp.AvailableFormatInfo} The responding sharp image format
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
    */
   private getSharpImageFormat(format: string): sharp.AvailableFormatInfo {
     if (format === 'JPG' || format === 'JPEG') {
-      this.logger.log('JPEG as image format', 'debug');
+      this.logger.debug('JPEG as image format');
       return sharp.format.jpeg;
     }
 
     if (format === 'PNG') {
-      this.logger.log('PNG as image format', 'debug');
+      this.logger.debug('PNG as image format');
       return sharp.format.png;
     }
 
-    this.logger.log(`${format} is not supported as image format. JPEG is used as default format`, 'warn');
+    this.logger.warn(`${format} is not supported as image format. JPEG is used as default format`);
     return sharp.format.jpeg;
   }
   
@@ -152,7 +154,7 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
    * @throws {Error} If a unsupported error on resizing of converting of the image happens
    */
   public async convert(image: Buffer, width: number, height: number): Promise<Buffer> {
-    this.logger.log(`Try to convert image to a size of ${width}x${height}`, 'debug');
+    this.logger.debug(`Try to convert image to a size of ${width}x${height}`);
 
     const format = await this.getFormat();
 
@@ -165,15 +167,14 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
         .toFormat(this.getSharpImageFormat(format))
         .toBuffer();
       
-      this.logger.log('Resizing of image completed', 'debug');
+      this.logger.debug('Resizing of image completed');
 
       return ret;
     } catch (err) {
-      this.logger.log('Error transforming image', 'error');
-      this.logger.log(err.stack, 'error');
+      this.logger.error(err);
 
       const error = new ImageProcessingError('Error by processing image');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
     
       throw error;
     }

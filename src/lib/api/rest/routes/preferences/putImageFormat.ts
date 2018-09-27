@@ -16,7 +16,7 @@ export async function putImageFormat(req: express.Request, res: express.Response
   try {
     if (!req.body || typeof req.body.format === 'undefined') {
       const error = new RequestParameterNotSetError('format', 'Format must be set');
-      logger.log(error.stack, 'warn');
+      logger.warn(error);
 
       throw error;
     }

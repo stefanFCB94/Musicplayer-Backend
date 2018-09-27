@@ -59,10 +59,9 @@ export class Server extends BaseConfigService implements IServer {
   private defaultRestBaseEndpoint = '/rest';
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.ConfigServiceProvider) configServiceProvider: IConfigServiceProvider,
   ) {
-    super(logger, configServiceProvider);
+    super(configServiceProvider);
   }
 
 
@@ -111,7 +110,7 @@ export class Server extends BaseConfigService implements IServer {
       cert = this.configService.get(this.certificateKey);
       if (!cert) {
         const error = new RequiredConfigParameterNotSetError(this.certificateKey, 'Path to certificate not set in configuration file');
-        this.logger.log(error.stack, 'error');
+        this.logger.error(error);
 
         throw error;
       }
@@ -119,7 +118,7 @@ export class Server extends BaseConfigService implements IServer {
       key = this.configService.get(this.privateKeyKey);
       if (!key) {
         const error = new RequiredConfigParameterNotSetError(this.privateKeyKey, 'Path to private key not set in configuration file');
-        this.logger.log(error.stack, 'error');
+        this.logger.error(error);
 
         throw error;
       }
@@ -148,12 +147,12 @@ export class Server extends BaseConfigService implements IServer {
 
   public async stop() {
     const stopHTTPS = () => new Promise<void>((resolve) => {
-      this.logger.log('Shutting down HTTPS server', 'debug');
+      this.logger.debug('Shutting down HTTPS server');
       this.httpsServer.close(() => resolve());
     });
 
     const stopHTTP = () => new Promise<void>((resolve) => {
-      this.logger.log('Shutting down HTTP server', 'debug');
+      this.logger.debug('Shutting down HTTP server');
       this.httpServer.close(() => resolve());
     });
 
@@ -162,18 +161,18 @@ export class Server extends BaseConfigService implements IServer {
       await stopHTTPS();
       this.httpsServer = null;
 
-      this.logger.log('HTTPS server was shut down', 'debug');
+      this.logger.debug('HTTPS server was shut down');
     }
 
     if (this.httpServer) {
       await stopHTTP();
       this.httpServer = null;
 
-      this.logger.log('HTTP server was shut down', 'debug');
+      this.logger.debug('HTTP server was shut down');
     }
 
     this.app = null;
-    this.logger.log('Server successfully shut down', 'info');
+    this.logger.info('Server successfully shut down');
   }
 
 
@@ -182,20 +181,20 @@ export class Server extends BaseConfigService implements IServer {
       const stats = await fs.stat(file);
       if (!stats.isFile()) {
         const error = new CertificateNotAFileError(file, 'Certificate is a directory and not a file');
-        this.logger.log(error.stack, 'error');
+        this.logger.error(error);
 
         throw error;
       }
     } catch (err) {
       if (err.code === 'ENOENT') {
         const error = new CertificateNotFoundError(file, 'Certificate not found');
-        this.logger.log(error.stack, 'error');
+        this.logger.error(error);
 
         throw error;
       }
 
-      this.logger.log('Unknown error occured, by stating the certificate file', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('Unknown error occured, by stating the certificate file');
+      this.logger.error(err);
       throw err;
     }
 
@@ -203,17 +202,17 @@ export class Server extends BaseConfigService implements IServer {
       const access = await fs.access(file, fs.constants.R_OK);
     } catch (err) {
       const error = new CertificateNotReadableError(file, 'No permission to read certificate file');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
 
-    this.logger.log('Certificate is found in the file system and can be read', 'debug');
-    this.logger.log('Start reading the certificate', 'debug');
+    this.logger.debug('Certificate is found in the file system and can be read');
+    this.logger.debug('Start reading the certificate');
 
     const data = await fs.readFile(file, 'utf8');
 
-    this.logger.log('Certificate file read successfully', 'debug');
+    this.logger.debug('Certificate file read successfully');
     return data;
   }
 
@@ -222,20 +221,20 @@ export class Server extends BaseConfigService implements IServer {
       const stats = await fs.stat(file);
       if (!stats.isFile()) {
         const error = new PrivateKeyNotAFileError(file, 'Private key is a directory and not a file');
-        this.logger.log(error.stack, 'error');
+        this.logger.error(error);
 
         throw error;
       }
     } catch (err) {
       if (err.code === 'ENOENT') {
         const error = new PrivateKeyNotFoundError(file, 'Private key not found');
-        this.logger.log(error.stack, 'error');
+        this.logger.error(error);
 
         throw error;
       }
 
-      this.logger.log('Unknown error occured, by stating the private key file', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('Unknown error occured, by stating the private key file');
+      this.logger.error(err);
       throw err;
     }
 
@@ -243,37 +242,37 @@ export class Server extends BaseConfigService implements IServer {
       const access = await fs.access(file, fs.constants.R_OK);
     } catch (err) {
       const error = new PrivateKeyNotReadableError(file, 'No permission to read certificate file');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
 
 
-    this.logger.log('Private key is found in the file system and can be read', 'debug');
-    this.logger.log('Start reading the private key', 'debug');
+    this.logger.debug('Private key is found in the file system and can be read');
+    this.logger.debug('Start reading the private key');
 
     const data = await fs.readFile(file, 'utf8');
 
-    this.logger.log('Private key read successfully', 'debug');
+    this.logger.debug('Private key read successfully');
     return data;
   }
 
 
 
   private async startHTTP(port: number) {
-    this.logger.log('Start http server', 'debug');
+    this.logger.debug('Start http server');
 
     if (this.httpServer) {
-      this.logger.log('HTTP server could not be started, because it is already running', 'debug');
+      this.logger.debug('HTTP server could not be started, because it is already running');
       return;
     }
 
     this.httpServer = http.createServer(this.app);
-    this.logger.log('HTTP server is created', 'debug');
+    this.logger.debug('HTTP server is created');
 
     return new Promise<void>((resolve, reject) => {
       this.httpServer.listen(port, () => {
-        this.logger.log(`Server is listening on port ${port}`, 'info');
+        this.logger.info(`Server is listening on port ${port}`);
         resolve();
       });
     });
@@ -290,16 +289,16 @@ export class Server extends BaseConfigService implements IServer {
       throw err;
     }
 
-    this.logger.log('Certificate and private key loaded', 'debug');
+    this.logger.debug('Certificate and private key loaded');
 
     const httpsOptions: https.ServerOptions = { key, cert };
 
     this.httpsServer = https.createServer(httpsOptions, this.app);
-    this.logger.log('HTTPS server created', 'debug');
+    this.logger.debug('HTTPS server created');
 
     return new Promise<void>((resolve, reject) => {
       this.httpsServer.listen(httpsPort, () => {
-        this.logger.log(`HTTPS server is listening on port ${httpsPort}`, 'info');
+        this.logger.info(`HTTPS server is listening on port ${httpsPort}`);
 
         const redirectApp = express();
         redirectApp.all('*', (req, res) => {
@@ -308,10 +307,10 @@ export class Server extends BaseConfigService implements IServer {
         });
 
         this.httpServer = http.createServer(redirectApp);
-        this.logger.log('HTTP server with redirect to https server created', 'debug');
+        this.logger.debug('HTTP server with redirect to https server created');
         
         this.httpServer.listen(httpPort, () => {
-          this.logger.log(`HTTP server is listening on port ${httpPort}`, 'info');
+          this.logger.info(`HTTP server is listening on port ${httpPort}`);
           resolve();
         });
       });
@@ -320,32 +319,32 @@ export class Server extends BaseConfigService implements IServer {
 
   
   private initializeGraphQLApi(useGraphiql: boolean, graphqlEndpoint: string, graphiqlEndpoint: string) {
-    this.logger.log('Start initializing graphql api', 'debug');
+    this.logger.debug('Start initializing graphql api');
 
     const schemaTypes = importSchema(__dirname + '/api/schema/schema.graphql');
-    this.logger.log('GraphQL schema successfully read', 'debug');
+    this.logger.debug('GraphQL schema successfully read');
 
     const schema = makeExecutableSchema({ resolvers, typeDefs: schemaTypes });
-    this.logger.log('Graphql schema created', 'debug');
+    this.logger.debug('Graphql schema created');
 
     this.app.use(graphqlEndpoint, graphqlExpress({ schema, formatError }));
-    this.logger.log(`Graphql is listening on URL: ${graphqlEndpoint}`, 'debug');
+    this.logger.debug(`Graphql is listening on URL: ${graphqlEndpoint}`);
 
     if (useGraphiql) {
       this.app.use(graphiqlEndpoint,  graphiqlExpress({ endpointURL: graphqlEndpoint }));
-      this.logger.log('Graphql fully initialized', 'debug');
+      this.logger.debug('Graphql fully initialized');
     }
 
-    this.logger.log(`Graphiql is listening on URL: ${graphiqlEndpoint}`, 'debug');
+    this.logger.debug(`Graphiql is listening on URL: ${graphiqlEndpoint}`);
   }
 
   private initalizeRestApi(endpoint: string) {
-    this.logger.log('Initalize REST api', 'debug');
+    this.logger.debug('Initalize REST api');
 
     const router = createApi();
     this.app.use(endpoint, router);
 
-    this.logger.log('REST api completly initialized', 'debug');
+    this.logger.debug('REST api completly initialized');
   }
 
   

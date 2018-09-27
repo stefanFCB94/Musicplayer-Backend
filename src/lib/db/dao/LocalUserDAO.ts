@@ -42,10 +42,9 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
   protected database: IDatabaseService;
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.DatabaseService) database: IDatabaseService,
   ) {
-    super(logger);
+    super();
 
     this.database = database;
   }
@@ -65,22 +64,24 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
    * @returns {Proimse<Repository<LocalUser>>} The initialized repository
    * 
    * @throws {ServiceNotInitializedError} If a capital error occurs until initalizing the repository
+   * @throws {Error}
    */
   private async initRepository(): Promise<Repository<LocalUser>> {
     if (this.localUserRespository) { return this.localUserRespository; }
 
-    this.logger.log('Initialize repository for the localUser entity', 'debug');
+    this.logger.debug('Initialize repository for the localUser entity');
 
     try {
       const connection = await this.database.getConnection();
       this.localUserRespository = connection.getRepository(LocalUser);
 
-      this.logger.log('LocalUser repository initialized', 'debug');
+      this.logger.debug('LocalUser repository initialized');
     } catch (err) {
-      this.logger.log('Repository cannot be initialized. Database connection could not be retrieved', 'error');
-      this.logger.log(err.stack, 'error');
+      this.logger.error('Repository cannot be initialized. Database connection could not be retrieved');
+      this.logger.error(err);
       
       const error  = new ServiceNotInitializedError('IDatabaseService', 'Database service not initialized');
+      this.logger.error(error);
       throw error;
     }
   }
@@ -101,28 +102,28 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
     let error: RequiredParameterNotSet;
 
     if (!user.id) {
-      this.logger.log('ID of local user is not set', 'debug');
+      this.logger.debug('ID of local user is not set');
       error = new RequiredParameterNotSet('id', 'ID for the user must be set');
     }
 
     if (!user.mail) {
-      this.logger.log('Mail address of local user is not set', 'debug');
+      this.logger.debug('Mail address of local user is not set');
       error = new RequiredParameterNotSet('mail', 'Mail address must be set');
     }
 
     if (!user.password) {
-      this.logger.log('Password of local user is not set', 'debug');
+      this.logger.debug('Password of local user is not set');
       error = new RequiredParameterNotSet('password', 'The password must be set');
     }
 
     if (!user.lastname) {
-      this.logger.log('Lastname of local user is not set', 'debug');
+      this.logger.debug('Lastname of local user is not set');
       error = new RequiredParameterNotSet('lastname', 'Lastname must be set');
     }
 
     if (error) {
-      this.logger.log('Not all required parameters set', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('Not all required parameters set');
+      this.logger.warn(error);
       throw error;
     }
   }
@@ -144,33 +145,33 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
 
     if (user.id.length > 36) {
       error = new ParameterOutOfBoundsError('id', 'ID out of bounds');
-      this.logger.log('ID is out of bounds for local user', 'debug');
+      this.logger.debug('ID is out of bounds for local user');
     }
 
     if (user.firstname && user.firstname.length > 64) {
       error = new ParameterOutOfBoundsError('firstname', 'Firstname out of bounds');
-      this.logger.log('Firstname is out of bound for local user', 'debug');
+      this.logger.debug('Firstname is out of bound for local user');
     }
 
     if (user.lastname.length > 64) {
       error = new ParameterOutOfBoundsError('lastname', 'Lastname out of bounds');
-      this.logger.log('Lastname is out of bounds', 'debug');
+      this.logger.debug('Lastname is out of bounds');
     }
 
     if (user.mail.length > 128) {
       error = new ParameterOutOfBoundsError('mail', 'Mail out of bounds');
-      this.logger.log('Mail address for local user is out of bounds', 'debug');
+      this.logger.debug('Mail address for local user is out of bounds');
     }
 
     if (user.password.length > 128) {
       error = new ParameterOutOfBoundsError('password', 'Password out of bounds');
-      this.logger.log('Password for local user is out of bounds', 'debug');
+      this.logger.debug('Password for local user is out of bounds');
     }
 
 
     if (error) {
-      this.logger.log('At least one parameter is out of bounds', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('At least one parameter is out of bounds');
+      this.logger.warn(error);
 
       throw error;
     }
@@ -194,13 +195,13 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
 
     if (user.loginPossible !== 0 && user.loginPossible !== 1) {
       error = new UnsupportedParamterValueError('loginPossible', user.loginPossible);
-      this.logger.log('Value for loginPossible of local user has a unsupported value', 'debug');
+      this.logger.debug('Value for loginPossible of local user has a unsupported value');
     }
 
 
     if (error) {
-      this.logger.log('At least one value of local user has unsupported value', 'debug');
-      this.logger.log(error.stack, 'warn');
+      this.logger.debug('At least one value of local user has unsupported value');
+      this.logger.warn(error);
 
       throw error;
     }
@@ -238,19 +239,19 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
     await this.initRepository();
 
     // Check paramter values
-    this.logger.log('Start checking for paramter errors', 'debug');
+    this.logger.debug('Start checking for paramter errors');
     this.checkRequiredParameters(user);
     this.checkParameterOutOfBounds(user);
     this.checkUnsupportedParameterValue(user);
 
     try {
       const savedUser = await this.localUserRespository.save(user);
-      this.logger.log('User saved to the database', 'debug');
+      this.logger.debug('User saved to the database');
 
       return savedUser;
     } catch (err) {
-      this.logger.log(err.stack, 'error');
-      this.logger.log('Unsupported error on saving local user to database', 'error');
+      this.logger.error(err);
+      this.logger.error('Unsupported error on saving local user to database');
 
       throw err;
     }
@@ -313,10 +314,10 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
   ): Promise<LocalUser[]> {
     await this.initRepository();
     
-    this.logger.log('Start query for local users from the databse', 'debug');
-    this.logger.log('Filter parameter: ' + where.toString(), 'debug');
-    this.logger.log(`Skip paramter: ${skip}`, 'debug');
-    this.logger.log(`Max items paramter: ${maxItems}`, 'debug');
+    this.logger.debug('Start query for local users from the databse');
+    this.logger.debug('Filter parameter: ' + where.toString(),);
+    this.logger.debug(`Skip paramter: ${skip}`,);
+    this.logger.debug(`Max items paramter: ${maxItems}`);
 
     try {
       const options: FindManyOptions<LocalUser> = {
@@ -327,13 +328,13 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
       };
       const users = await this.localUserRespository.find(options);
       
-      this.logger.log('Query for users finished', 'debug');
-      this.logger.log(`Selected users: ${users.length}`, 'debug');
+      this.logger.debug('Query for users finished');
+      this.logger.debug(`Selected users: ${users.length}`);
 
       return users;
     } catch (err) {
-      this.logger.log('Error by querying the database for local users', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('Error by querying the database for local users');
+      this.logger.error(err);
 
       throw err;
     }
@@ -356,23 +357,23 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
   public async getUserById(id: string): Promise<LocalUser> {
     await this.initRepository();
     
-    this.logger.log('Start searching for a user by its id', 'debug');
-    this.logger.log(`User with ID '${id}' should be searched`, 'debug');
+    this.logger.debug('Start searching for a user by its id');
+    this.logger.debug(`User with ID '${id}' should be searched`);
 
     try {
       const user = await this.localUserRespository.findOne({ where: { id } });
 
-      this.logger.log('Query for local user finished', 'debug');
+      this.logger.debug('Query for local user finished');
       if (user) {
-        this.logger.log('User has been found', 'debug');
+        this.logger.debug('User has been found');
       } else {
-        this.logger.log('User has not been found', 'debug');
+        this.logger.debug('User has not been found');
       }
 
       return user;
     } catch (err) {
-      this.logger.log('A error by searching for a user by id occured', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('A error by searching for a user by id occured');
+      this.logger.error(err);
 
       throw err;
     }
@@ -395,23 +396,23 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
   public async getUserByMail(mail: string): Promise<LocalUser> {
     await this.initRepository();
     
-    this.logger.log('Start searching for a user by mail address', 'debug');
-    this.logger.log(`User with mail '${mail}' should be searched`, 'debug');
+    this.logger.debug('Start searching for a user by mail address');
+    this.logger.debug(`User with mail '${mail}' should be searched`);
 
     try {
       const user = await this.localUserRespository.findOne({ where: { mail } });
 
-      this.logger.log('Query for local user finished', 'debug');
+      this.logger.debug('Query for local user finished');
       if (user) {
-        this.logger.log('User has been found', 'debug');
+        this.logger.debug('User has been found');
       } else {
-        this.logger.log('User has not been found', 'debug');
+        this.logger.debug('User has not been found');
       }
 
       return user;
     } catch (err) {
-      this.logger.log('A error by searching for a user by mail occured', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('A error by searching for a user by mail occured');
+      this.logger.error(err);
 
       throw err;
     }
@@ -435,22 +436,22 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
   public async deleteUser(user: LocalUser): Promise<LocalUser> {
     await this.initRepository();
     
-    this.logger.log('Start deleting user', 'debug');
+    this.logger.debug('Start deleting user');
     
     try {
       const deletedUser = await this.localUserRespository.remove(user);
 
-      this.logger.log('Deletion of user has finished', 'debug');
+      this.logger.debug('Deletion of user has finished');
       if (deletedUser) {
-        this.logger.log('Delete of user succesfully finished', 'debug');
+        this.logger.debug('Delete of user succesfully finished');
       } else {
-        this.logger.log('User could not delete, because user not found', 'debug');
+        this.logger.debug('User could not delete, because user not found');
       }
 
       return deletedUser;
     } catch (err) {
-      this.logger.log('Error by deleting user occured', 'debug');
-      this.logger.log(err.stack, 'error');
+      this.logger.debug('Error by deleting user occured');
+      this.logger.error(err);
 
       throw err;
     }

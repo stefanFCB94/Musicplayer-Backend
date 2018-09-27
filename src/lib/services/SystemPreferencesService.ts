@@ -42,12 +42,11 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
   private config: SystemPreferencesConfigurations = {};
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.SystemPreferencesDAO) preferenceDAO: ISystemPreferencesDAO,
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
     @inject(TYPES.ConfigServiceProvider) configServiceProvider: IConfigServiceProvider
   ) {
-    super(logger, configServiceProvider);
+    super(configServiceProvider);
 
     this.preferenceDAO = preferenceDAO;
     this.uuidGenerator = uuidGenerator;
@@ -73,22 +72,22 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
    * @throws InvalidConfigValueError
    */
   private isAllowedValue(preference: string, value: any): boolean {
-    this.logger.log(`Check if value is a valid value for the preference ${preference}`, 'debug');
+    this.logger.debug(`Check if value is a valid value for the preference ${preference}`);
 
     if (!this.config[preference] || !this.config[preference].allowedValues) {
-      this.logger.log('No allowed values configured, so preference is valid', 'debug');
+      this.logger.debug('No allowed values configured, so preference is valid');
       return true;
     }
 
     const index = this.config[preference].allowedValues.indexOf(value);
     if (index === -1) {
       const error = new InvalidConfigValueError(preference, value);
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
-    this.logger.log('Value is part of the allowed values, so it is valid', 'debug');
+    this.logger.debug('Value is part of the allowed values, so it is valid');
     return true;
   }
 
@@ -110,10 +109,10 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
    * @throws InvalidConfigValueError
    */
   private async checkConfigValue(preference: string, value: any): Promise<boolean> {
-    this.logger.log('Check if value is valid, through a configuration check function', 'debug');
+    this.logger.debug('Check if value is valid, through a configuration check function');
 
     if (!this.config[preference] || !this.config[preference].checkValueFn) {
-      this.logger.log('No function configured, so value is valid', 'debug');
+      this.logger.debug('No function configured, so value is valid');
       return true;
     }
 
@@ -121,18 +120,18 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
     try {
       result = await this.config[preference].checkValueFn(value);
     } catch (err) {
-      this.logger.log(err, 'warn');
+      this.logger.warn(err);
     }
 
     if (!result) {
-      this.logger.log('Check failed, so value is not valid', 'debug');
+      this.logger.debug('Check failed, so value is not valid');
 
       const error = new InvalidConfigValueError(preference, value);
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
       throw error;
     }
 
-    this.logger.log('Check passed, so value is valid', 'debug');
+    this.logger.debug('Check passed, so value is valid');
     return true;
   }
 
@@ -152,16 +151,16 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
    * @throws {Error}
    */
   private async getPreference(preference: string): Promise<SystemPreferences[]> {
-    this.logger.log('Get preferences', 'debug');
+    this.logger.debug(`Get preferences ${preference}`);
 
     const sp = await this.preferenceDAO.getPreferences(preference);
 
     if (sp.length > 0) {
-      this.logger.log('Set the system preference to the cache', 'debug');
+      this.logger.debug(`Set the system preference for key ${preference} to the cache`);
       const values = sp.map(value => value.value);
 
       if (!this.config[preference]) {
-        this.logger.log(`Create configuration for the key '${preference}`, 'debug');
+        this.logger.debug(`Create configuration for the key '${preference}`);
         this.config[preference] = {};
       }
 
@@ -191,8 +190,8 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
    * @throws {Error}
    */
   public async savePreference(preference: string, values: any[]): Promise<SystemPreferences[]> {
-    this.logger.log('Save the system preferences', 'debug');
-    this.logger.log(`Number of values to store for the preference '${preference}': ${values.length}`, 'debug');
+    this.logger.debug(`Save the system preferences ${preference}`);
+    this.logger.debug(`Number of values to store for the preference '${preference}': ${values.length}`);
 
     const toSet: SystemPreferences[] = [];
     for (let i = 0; i < values.length; i++) {
@@ -209,17 +208,17 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
       toSet.push(pref);
     }
 
-    this.logger.log('System preferences create, now store values in database', 'debug');
+    this.logger.debug(`System preferences ${preference} created, now store values in database`);
     const ret = await this.preferenceDAO.saveOrUpdatePreferences(toSet);
 
-    this.logger.log('System preferences saved to database, now set cached values', 'debug');
+    this.logger.debug(`System preferences ${preference} saved to database, now set cached values`);
     
     if (!this.config[preference]) {
       this.config[preference] = {};
     }
 
     this.config[preference].cachedValue = values;
-    this.logger.log('System preference cached in the service instance', 'debug');
+    this.logger.debug(`System preference ${preference} cached in the service instance`);
     
     return ret;
   }
@@ -239,14 +238,14 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
    * @throws {Error}
    */
   public async deletePreference(preference: string): Promise<SystemPreferences[]> {
-    this.logger.log('Delete prefrence from the database', 'debug');
+    this.logger.debug(`Delete preference ${preference} from the database`);
 
     const preferences = await this.preferenceDAO.deletePreference(preference);
-    this.logger.log('Prefernce deleted from database, now delete the cached values', 'debug');
+    this.logger.debug(`Preference ${preference} deleted from database, now delete the cached values`);
 
     if (this.config[preference]) {
       delete this.config[preference].cachedValue;
-      this.logger.log('Cached value deleted', 'debug');
+      this.logger.debug(`Cached value for ${preference} deleted`);
     }
 
     return preferences;
@@ -267,35 +266,34 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
    * @throws {Error}
    */
   public async isSet(preference: string): Promise<boolean> {
-    this.logger.log('Check, if a preference is already set', 'debug');
-    this.logger.log(`Check if values for the preference ${preference} is set`, 'debug');
+    this.logger.debug(`Check, if preference ${preference} is already set`);
 
     if (this.config[preference] && typeof this.config[preference].cachedValue !== 'undefined') {
-      this.logger.log(`Prefrence '${preference}' set in cache`, 'debug');
+      this.logger.debug(`Prefrence '${preference}' set in cache`);
       return true;
     }
 
-    this.logger.log('Check, if a default value is set', 'debug');
+    this.logger.debug(`Check, if a default value for the preference ${preference} is set`);
     if (this.config[preference] && typeof this.config[preference].default !== 'undefined') {
-      this.logger.log('Default value for the preference is set, so preference is viewed as set', 'debug');
+      this.logger.debug('Default value for the preference ${preference} is set, so preference is viewed as set');
       return true;
     }
 
     const prefs = await this.getPreference(preference);
     
     if (prefs && prefs.length > 0) {
-      this.logger.log('Preferece is set in database, but not in cache, so now cache value', 'debug');
+      this.logger.debug(`Preferece ${preference} is set in database, but not in cache, so now set cache value`);
       if (!this.config[preference]) {
         this.config[preference] = {};
       }
 
       this.config[preference].cachedValue = prefs.map(value => value.value);
-      this.logger.log('Preference values now cached', 'debug');
+      this.logger.debug(`Preference values for ${preference} now cached`);
 
       return true;
     }
     
-    this.logger.log('Preference not set in database', 'debug');
+    this.logger.debug(`Preference ${preference} not set in database`);
     return false;
   }
 
@@ -315,45 +313,45 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
    * @throws {Error}
    */
   public async getPreferenceValues(preference: string): Promise<any> {
-    this.logger.log('Get only the values for a preference', 'debug');
+    this.logger.debug(`Get only the values for a preference ${preference}`);
 
     if (this.config[preference] && typeof this.config[preference].cachedValue !== 'undefined') {
-      this.logger.log('Preference already loaded, so use cached values', 'debug');
+      this.logger.debug(`Preference ${preference} already loaded, so use cached values`);
       return this.config[preference].cachedValue;
     }
 
-    this.logger.log('System preference not cached, so load it from the database', 'debug');
+    this.logger.debug(`System preference ${preference} not cached, so load it from the database`);
     const prefs = await this.getPreference(preference);
 
     if (prefs && prefs.length > 0) {
       return prefs.map(value =>  value.value);
     }
 
-    this.logger.log('System preference is not set in the database, so check if defined in config file', 'debug');
+    this.logger.debug(`System preference ${preference} is not set in the database, so check if defined in config file`);
     await this.initConfigService();
 
     if (this.configService.isSet(preference)) {
-      this.logger.log('System preference set in config file', 'debug');
+      this.logger.debug(`System preference ${preference} set in config file`);
 
       let values = this.configService.get(preference);
       if (!Array.isArray(values)) {
         values = [values];
       }
 
-      this.logger.log('Set values to the cache', 'debug');
+      this.logger.debug(`Set values for preference ${preference} to the cache`);
       if (!this.config[preference]) {
         this.config[preference] = {};
       }
       this.config[preference].cachedValue = values;
       
-      this.logger.log('Default value set to the config file value', 'debug');
+      this.logger.debug(`Default value for preference ${preference} set to the config file value`);
       return values;
     }
     
 
     if (this.config[preference] && typeof this.config[preference].default !== 'undefined') {
-      this.logger.log('Default value is configure, so use this value for the system preference', 'debug');
-      this.logger.log('For performance reasons, cache that value', 'debug');
+      this.logger.debug('Default value is configured, so use this value for the system preference');
+      this.logger.debug('For performance reasons, cache that value');
 
       this.config[preference].cachedValue = this.config[preference].default;
       return this.config[preference].cachedValue;

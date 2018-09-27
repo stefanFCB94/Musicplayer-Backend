@@ -1,195 +1,134 @@
 import 'reflect-metadata';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
-import { ILogger } from '../interfaces/services/ILogger';
-import { IConfigService, IConfigServiceProvider } from '../interfaces/services/IConfigService';
+import * as fs from 'fs-extra';
+
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
+
+import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
+import { ILogger } from '../interfaces/services/ILogger';
+import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+
+import { LogDirectoryNotAvailableError } from '../error/utils/LogDirectoryNotAvailableError';
+import { LogDirectoryNotWritableError } from '../error/utils/LogDirectoryNotWritableError';
+
+import { LogLevel } from '../enums/LogLevel';
+import { EventEmitter } from 'events';
+
 
 /**
  * @class
  * @author Stefan Läufle
  * 
- * Logging service, which should be instanciated in singelton
- * scope, to prevent multiple open file handles.
+ * Logger, which can be used to log messages to the configured
+ * transports channels.
  * 
- * The service uses the winston library for the logging utils.
- * The service must be fully initialized and the uses a single
- * log method.
+ * The service uses the events API to send the messages, which
+ * should be logged. A listener will pick up the messages
+ * and will write them to the configured channels
  * 
- * @requires winston
- * @requires IConfigServiceProvider
+ * @requires events
  */
 
 @injectable()
 export class Logger implements ILogger {
 
-  private configService: IConfigService;
-
-  private keyLogLevel = 'LOGGER.LEVEL';
-  private keyLogDirectory = 'LOGGER.DIRECTORY';
-  private keyFilename = 'LOGGER.FILENAME';
-  private keySingleFile = 'LOGGER.SINGLE_FILE';
-  private keyConsole = 'LOGGER.CONSOLE';
-  private keyRotationFile = 'LOGGER.ROTATION_FILE';
-
-
-  private logLevel = 'warn';
-  private logDirectory = '.';
-  private filename = 'musicserver';
-
-  private useSingleFile = false;
-  private useDailyRotationFile = true;
-  private useConsole = true;
-  
+  private eventEmitter: EventEmitter;
 
   constructor(
-    @inject(TYPES.ConfigServiceProvider) private configProvider: IConfigServiceProvider,
-  ) {}
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Initialize the logger instance.
-   * 
-   * The method initialize the configuration service, creates
-   * all winston transports and configure the winston unit.
-   * 
-   * @returns {Promise<void>} Resolves, when the logger is fully initialized
-   */
-  private async init(): Promise<void> {
-    if (this.configService) { return Promise.resolve(); }
-    this.configService = await this.configProvider();
-
-    // Initalize logger
-    this.readConfig();
-
-    const transports = [];
-
-    if (this.useSingleFile) {
-      transports.push(this.buildTransportSingleFile());
-    }
-
-    if (this.useDailyRotationFile) {
-      transports.push(this.buildTransportDailyRotation());
-    }
-
-    if (this.useConsole) {
-      transports.push(this.buildTransportConsole());
-    }
-
-    winston.configure({
-      transports,
-      level: this.logLevel,
-    });
+    @inject(TYPES.LoggerEventEmitter) eventEmitter: EventEmitter
+  ) {
+    this.eventEmitter = eventEmitter;
   }
 
   /**
    * @private
    * @author Stefan Läufle
    * 
-   * Read all the configuration parameters, which are relevant for
-   * the logging service from the configuration file.
+   * Emmits a log event, which couls be read be the loggingListenerService.
+   * The listener will then wirte the log to the configured channels.
    * 
-   * The method uses the configuration service, which should be
-   * registered in the instance. All the detected parameters
-   * are stored in the instance.
+   * @param {string|Error} msg   The message, which should be logged
+   * @param {string}       level The level the message has
    * 
-   * @returns {void} Doesn't return a value
+   * @returns {Promise<void>} Resolve the proimse, when the message is logged
    */
-  private readConfig(): void {
-    this.logLevel = this.configService.get(this.keyLogLevel) || this.logLevel;
-    this.logDirectory = this.configService.get(this.keyLogDirectory) || this.logDirectory;
-    this.filename = this.configService.get(this.keyFilename) || this.filename;
-
-    if (this.configService.isSet(this.keySingleFile)) {
-      this.useSingleFile = this.configService.get(this.keySingleFile);
-    }
-
-    if (this.configService.isSet(this.keyConsole)) {
-      this.useConsole = this.configService.get(this.keyConsole);
-    }
-
-    if (this.configService.isSet(this.keyRotationFile)) {
-      this.useDailyRotationFile = this.configService.get(this.keyRotationFile);
-    }
+  private async log(msg: string | Error, level: LogLevel): Promise<void> {
+    this.eventEmitter.emit('log', { msg, level });
   }
 
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Creates a transport unit for the winston logger library, which
-   * uses a daily rotaiton file.
-   * 
-   * With the transport element the logs will be writen in files, which
-   * are changing every day. It will generate a file with a daily timestamp.
-   * 
-   * @returns {winston.DailyRotateFileTransportInstance} The created transport instance
-   */
-  private buildTransportDailyRotation(): winston.DailyRotateFileTransportInstance {
-    return new winston.transports.DailyRotateFile({
-      filename: `${this.filename}-%DATE%.log`,
-      datePattern: 'YYYY-MM-DD',
-      dirname: this.logDirectory,
-    });
-  }
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Creates a transport unit for the winston logger library, which
-   * uses a single file for every log at any time.
-   * 
-   * With the transport element the logs will be writen in a single file.
-   * All new logs will be append at the end of the file.
-   * 
-   * @returns {winston.FileTransportInstance} The created transport instance
-   */
-  private buildTransportSingleFile(): winston.FileTransportInstance {
-    return new winston.transports.File({
-      filename: `${this.filename}.log`,
-      dirname: this.logDirectory,
-    });
-  }
-
-  /**
-   * @private
-   * @author Stefan Läufle
-   * 
-   * Creates a transport unit for the winston logger library, which
-   * uses the console for every log.
-   * 
-   * With the transport element, the logs will be writen to the console,
-   * which started the application.
-   * 
-   * @returns {winston.ConsoleTransportInstance} The created transport instance
-   */
-  private buildTransportConsole(): winston.ConsoleTransportInstance {
-    return new winston.transports.Console({
-      colorize: 'all',
-    });
-  }
 
 
   /**
    * @public
-   * @author Stefan Läufle
    * 
-   * Writes the log message to the configured transport units.
-   * The method only writes the messages having at least the level
-   * as the configured log level.
+   * Log a message with the log level error
    * 
-   * @param {string} msg   The message, which should be logged
-   * @param {string} level The level the message has
-   * 
-   * @returns {Promise<void>} Resolve the proimse, when the message is logged
+   * @param {string|Error} msg The log level
+   * @return {Promise<void>}
    */
-  async log(msg: string, level: string = this.logLevel): Promise<void> {
-    await this.init();
-    winston.log(level, msg);
+  public async error(msg: string | Error): Promise<void> {
+    await this.log(msg, LogLevel.ERROR);
+  }
+
+  /**
+   * @public
+   * 
+   * Logs a message with warn level
+   * 
+   * @param {string|Error} msg The message or error to log
+   * @returns {Promis<void>}
+   */
+  public async warn(msg: string | Error): Promise<void> {
+    await this.log(msg, LogLevel.WARN);
+  }
+
+  /**
+   * @public
+   * 
+   * Logs a message or an error with info level
+   * 
+   * @param {string|Error} msg The message or error to log
+   * @returns {Promise<void>}
+   */
+  public async info(msg: string | Error): Promise<void> {
+    await this.log(msg, LogLevel.INFO);
+  }
+
+  /**
+   * @public
+   * 
+   * Logs a message or a error with verbose level
+   * 
+   * @param {string|Error} msg The message or error to log
+   * @returns {Promise<void>}
+   */
+  public async verbose(msg: string | Error): Promise<void> {
+    await this.log(msg, LogLevel.VERBOSE);
+  }
+
+  /**
+   * @public
+   * 
+   * Logs a meesage or error with debug level
+   * 
+   * @param {string|Error} msg The message or error to log
+   * @returns {Promise<void>}
+   */
+  public async debug(msg: string | Error): Promise<void> {
+    await this.log(msg, LogLevel.DEBUG);
+  }
+
+  /**
+   * @public
+   * 
+   * Logs a message or an error with silly level
+   * 
+   * @param {string|Error} msg The message or error to log
+   * @returns {Promise<void>}
+   */
+  public async silly(msg: string | Error): Promise<void> {
+    await this.log(msg, LogLevel.SILLY);
   }
 }

@@ -1,3 +1,5 @@
+import { EventEmitter } from 'events';
+
 import { Container } from 'inversify';
 
 import { TYPES } from './types';
@@ -50,10 +52,18 @@ import { SystemPreferencesDAO } from './db/dao/SystemPreferencesDAO';
 import { ISystemPreferencesService } from './interfaces/services/ISystemPreferencesService';
 import { SystemPreferencesService } from './services/SystemPreferencesService';
 
+import { ILoggerListenerService } from './interfaces/services/ILoggerListenerService';
+import { LoggerListenerService } from './services/LoggerListenerService';
+
 
 
 
 const container = new Container();
+
+
+container.bind<EventEmitter>(TYPES.LoggerEventEmitter)
+  .toConstantValue(new EventEmitter());
+
 
 container.bind<IServer>(TYPES.Server)
   .to(Server).inSingletonScope();
@@ -66,6 +76,9 @@ container.bind<IConfigService>(TYPES.ConfigService)
 
 container.bind<ILogger>(TYPES.Logger)
   .to(Logger).inSingletonScope();
+
+container.bind<ILoggerListenerService>(TYPES.LoggerListenerService)
+  .to(LoggerListenerService).inSingletonScope();
 
 container.bind<IUUIDGenerator>(TYPES.UUIDGenerator)
   .to(UUIDGenerator).inSingletonScope();
@@ -123,6 +136,5 @@ container.bind<IConfigServiceProvider>(TYPES.ConfigServiceProvider)
 
 container.bind<IStorageService>(TYPES.StorageService)
   .to(StorageService).inSingletonScope();
-
 
 export { container };

@@ -30,13 +30,6 @@ import { ILogger } from '../interfaces/services/ILogger';
 @injectable()
 export class ChecksumCalculator extends BaseService implements IChecksumCalculator {
 
-  constructor(
-    @inject(TYPES.Logger) logger: ILogger,
-  ) {
-    super(logger);
-  }
-
-
   /**
    * @private
    * @author Stefan Läufle
@@ -53,7 +46,7 @@ export class ChecksumCalculator extends BaseService implements IChecksumCalculat
    * @throws {Error} If a error occurs
    */
   private readFileFromBuffer(path: string): Promise<Buffer> {
-    this.logger.log(`Read file ${path} from filesystem into buffer`, 'debug');
+    this.logger.debug(`Read file ${path} from filesystem into buffer`);
     return fs.readFile(path);
   }
 
@@ -72,28 +65,28 @@ export class ChecksumCalculator extends BaseService implements IChecksumCalculat
    * @param {Buffer|string} file The file
    * @returns {Promise<string>} The calculated checksum
    * 
+   * @throws {ServiceNotInitializedError}
    * @throws {Error} If a error occurs by calculated the checksum
    */
   async getMD5Checksum(file: Buffer|string): Promise<string> {
-    this.logger.log('Start calculating MD5 checksum', 'debug');
+    this.logger.debug('Start calculating MD5 checksum');
     
     try {
       let buffer: Buffer;
       if (typeof file === 'string') {
-        this.logger.log(`Read MD5 checksum from file ${file}`, 'debug');
+        this.logger.debug(`Read MD5 checksum from file ${file}`);
         buffer = await this.readFileFromBuffer(file);
       } else {
-        this.logger.log('Read MD5 checksum from buffer', 'debug');
+        this.logger.debug('Read MD5 checksum from buffer');
         buffer = file;
       }
 
       const md5 = crypto.createHash('md5').update(buffer).digest('hex');
-      this.logger.log(`Checksum calculated, Result: ${md5}`, 'debug');
+      this.logger.debug(`Checksum calculated, Result: ${md5}`);
 
       return md5;
     } catch (e) {
-      this.logger.log('Error by calculation checksum', 'debug');
-      this.logger.log(e.stack, 'error');
+      this.logger.error(e);
 
       return Promise.reject(e);
     }

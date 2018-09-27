@@ -31,12 +31,12 @@ export async function signup(req: express.Request, res: express.Response) {
   const logger = container.get<ILogger>(TYPES.Logger);
 
   try {
-    const signupAllowed = await authService.isSignupAvailable();
+    const signupAllowed = await authService.getSignupAvailable();
     if (!signupAllowed) {
-      logger.log('Signup tried by user, but that is not allowed', 'debug');
+      logger.debug('Signup tried by user, but that is not allowed');
       
       const err = new SignupNotAvailableError('Signup not allowed by configuration');
-      logger.log(err.stack, 'warn');
+      logger.warn(err);
 
       throw err;
     }

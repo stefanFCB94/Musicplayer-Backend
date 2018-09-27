@@ -33,14 +33,13 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
   private signupPossibleKey = 'SIGNUP.POSSIBLE';
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.PasswordHasher) passwordHasher: IPasswordHasher,
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
     @inject(TYPES.LocalUserDAO) localUserDAO: ILocalUserDAO,
     @inject(TYPES.JWTGenerator) jwtGenerator: IJWTGenerator,
     @inject(TYPES.SystemPreferencesService) systemPrefernces: ISystemPreferencesService
   ) {
-    super(logger, systemPrefernces);
+    super(systemPrefernces);
 
     this.passwordHasher = passwordHasher;
     this.uuidGenerator = uuidGenerator;
@@ -137,32 +136,32 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
     let newUser: LocalUser;
     let jwt: string;
 
-    this.logger.log('Signup of a new user will be started', 'debug');
+    this.logger.debug('Signup of a new user will be started');
 
     try {
-      this.logger.log('Try to find the user with the mail address in the database', 'debug');
+      this.logger.debug(`Try to find the user with the mail address '${data.mail}' in the database`);
       const existingUser = await this.localUserDAO.getUserByMail(data.mail);
 
       if (existingUser) {
-        this.logger.log(`User with mail address ${data.mail} already existing in the database`, 'debug');
+        this.logger.debug(`User with mail address ${data.mail} already existing in the database`,);
 
         const error = new UserAlreadyExistsError(`User with mail address ${data.mail} already exists`);
-        this.logger.log(error.stack, 'warn');
+        this.logger.warn(error);
         throw error;
       }
 
-      this.logger.log('User do not exist in the database, so create a new user', 'debug');
+      this.logger.debug('User do not exist in the database, so create a new user');
     } catch (err) {
-      this.logger.log('Error by querying the database for as user with mail address', 'debug');
+      this.logger.error(err);
       throw err;
     }
 
     try {
-      this.logger.log('Create a new ID for the new user', 'debug');
+      this.logger.debug('Create a new ID for the new user');
       id = await this.uuidGenerator.generateV4();
-      this.logger.log(`New UUID for user generated: ${id}`, 'debug');
+      this.logger.debug(`New UUID for user generated: ${id}`);
     } catch (err) {
-      this.logger.log('UUID could not be generated', 'debug');
+      this.logger.debug('UUID for new user could not be generated');
       throw err;
     }
 
@@ -177,11 +176,11 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
     }
 
     try {
-      this.logger.log('Hash the password for the user', 'debug');
+      this.logger.debug('Hash the password for the user');
       pw = await this.passwordHasher.hash(data.password);
-      this.logger.log('Password successfully hashed', 'debug');
+      this.logger.debug('Password of new user successfully hashed');
     } catch (err) {
-      this.logger.log('Password could not be hashed', 'debug');
+      this.logger.debug('Password of new user could not be hashed');
       throw err;
     }
 
@@ -189,20 +188,20 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
 
 
     try {
-      this.logger.log('Try to insert the user to the database', 'debug');
+      this.logger.debug('Try to insert the new user to the database');
       newUser = await this.localUserDAO.saveOrUpdateUser(user);
-      this.logger.log('User saved to the database', 'debug');
+      this.logger.debug('User successfully saved to the database');
     } catch (err) {
-      this.logger.log('User cannot be saved in the database', 'debug');
+      this.logger.debug('New user cannot be saved in the database');
       throw err;
     }
 
     try {
-      this.logger.log('Try to create a jwt for the newly created user', 'debug');
+      this.logger.debug('Try to create a jwt for the newly created user');
       jwt = await this.jwtGenerator.generateJWT(newUser);
-      this.logger.log('JWT for new user generated', 'debug');
+      this.logger.debug('JWT for new user generated');
     } catch (err) {
-      this.logger.log('JWT could not be generated for new user', 'debug');
+      this.logger.debug('JWT could not be generated for new user');
       throw err;
     }
 
@@ -241,61 +240,61 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
   public async login(mail: string, password: string): Promise<string> {
     if (!mail || typeof mail !== 'string') {
       const error = new RequestParameterNotSetError('mail', 'The mail address must be set to login an user');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
     if (!password || typeof password !== 'string') {
       const error = new RequestParameterNotSetError('password', 'The password must be set to login an user');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
 
     // Try to find the user in the datase
-    this.logger.log('Try to find the user', 'debug');
+    this.logger.debug(`Try to find the user '${mail}' for the login`);
     const user = await this.localUserDAO.getUserByMail(mail);
 
     if (!user) {
       const error = new UserNotExistsError(mail, null, 'User not found');
-      this.logger.log(error.stack, 'warn');
+      this.logger.info(error);
 
       throw error;
     }
-    this.logger.log('User found in the database', 'debug');
+    this.logger.debug(`User '${mail}' to login found in the database`);
 
     // Check if user can log in
-    this.logger.log('Check if user can log in', 'debug');
+    this.logger.debug(`Check if user '${mail}' can log in`);
     if (user.loginPossible !== 1) {
       const error = new UserNotLoginableError(`User with mail address ${mail} can not login`);
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
     // Check if password matches
-    this.logger.log('Check if password matches the password in the database', 'debug');
+    this.logger.debug(`Check if password for user '${mail}' matches the password in the database`);
     const match = await this.passwordHasher.compare(password, user.password);
 
     if (!match) {
       const error = new PasswordNotMatchError('Invalid password');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
-    this.logger.log('Password ok, user will be logged in now', 'debug');
+    this.logger.debug(`Password of user '${mail}' ok, user will be logged in now`);
 
     // Creates the jsonwebtoken for the user
-    this.logger.log('Start creating the jwt for the user', 'debug');
+    this.logger.debug(`Start creating the jwt for the user '${mail}'`);
 
     try {
       const jwt = await this.jwtGenerator.generateJWT(user);
-      this.logger.log('Jsonwebtoken successfully generated', 'debug');
+      this.logger.debug(`Jsonwebtoken for user '${mail}' successfully generated`);
       return jwt;
     } catch (err) {
-      this.logger.log('Jsonwebtoken could not be generated', 'debug');
+      this.logger.debug(`Jsonwebtoken for user '${mail}' could not be generated`);
       throw err;
     }
   }
@@ -321,18 +320,18 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
   public async isLoggedIn(jwt: string): Promise<string> {
     if (!jwt || typeof jwt !== 'string') {
       const error = new RequestParameterNotSetError('jwt', 'Jsonwebtoken not set');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
     try {
       const payload = await this.jwtGenerator.verifyJWT(jwt);
-      this.logger.log('JWT valid, user is logged in', 'debug');
+      this.logger.debug(`JWT for user '${payload.mail}' valid, user is logged in`);
 
       return payload.userId;
     } catch (err) {
-      this.logger.log('JWT not valid', 'debug');
+      this.logger.debug('JWT not valid');
       throw err;
     }
   }
@@ -368,46 +367,46 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
 
     if (!jwt || typeof jwt !== 'string') {
       const error = new RequestParameterNotSetError('jwt', 'JWT, which should be renewd, must be given');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
 
     try { 
-      this.logger.log('Check if given JWT is valid and user is logged in at the moment', 'debug');
+      this.logger.debug('Check if given JWT is valid and user is logged in at the moment');
       userId = await this.isLoggedIn(jwt);
     } catch (err) {
-      this.logger.log('User not logged in, JWT verify failed', 'debug');
+      this.logger.debug('User not logged in, JWT verify failed');
       throw err;
     }
 
     try {
-      this.logger.log('Try to find the logged in user information', 'debug');
+      this.logger.debug(`Try to find the user '${userId}' in the database`);
       user = await this.localUserDAO.getUserById(userId);
     } catch (err) {
-      this.logger.log('Error by querying the database for user', 'debug');
+      this.logger.debug(`Error '${userId}' by querying the database for user`);
       throw err;
     }
 
     if (!user) {
       const error = new UserNotExistsError(null, userId, 'User does not exist anymore');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
     if (!user.loginPossible) {
       const error = new UserNotLoginableError('Useraccount can not login anymore');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
     try {
-      this.logger.log('User found in database, now create new JWT for user', 'debug');
+      this.logger.debug(`User '${userId}' found in database, now create new JWT for user`);
       newJWT = await this.jwtGenerator.generateJWT(user);
     } catch (err) {
-      this.logger.log('JWt could not be generated', 'debug');
+      this.logger.debug(`JWt for user '${userId}' could not be generated`);
       throw err;
     }
 
@@ -447,77 +446,77 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
   public async resetPassword(userId: string, oldPw: string, newPw: string): Promise<void> {
     if (!userId || typeof userId !== 'string') {
       const error = new RequestParameterNotSetError('userId', 'The user id was not passed to the function');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
 
     if (!oldPw || typeof oldPw !== 'string') {
       const error = new RequestParameterNotSetError('oldPw', 'The old password was not passed to the function');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
 
     if (!newPw || typeof newPw !== 'string') {
       const error = new RequestParameterNotSetError('newPw', 'The new password was not passed to the function');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }
 
     let user: LocalUser;
     try {
-      this.logger.log('Try to get the user from the database', 'debug');
+      this.logger.debug(`'Try to get the user '${userId}' from the database`);
       user = await this.localUserDAO.getUserById(userId);
     } catch (err) {
-      this.logger.log('User could not be located in the database', 'debug');
+      this.logger.debug(`User '${userId}' could not be located in the database`);
       throw err;
     }
 
     if (!user) {
       const error = new UserNotExistsError(null, userId, 'The user not exists');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
     let result: boolean;
     try {
-      this.logger.log('Check if old password matches the one in the database', 'debug');
+      this.logger.debug(`Check if old password of user '${user.mail}' matches the one in the database`);
       result = await this.passwordHasher.compare(oldPw, user.password);
     } catch (err) {
-      this.logger.log('Password could not be compared', 'debug');
+      this.logger.debug(`Password of user '${user.mail}' could not be compared`);
       throw err;
     }
       
     if (!result) {
       const error = new PasswordNotMatchError('The old password not matches the saved one');
-      this.logger.log(error.stack, 'warn');
+      this.logger.warn(error);
 
       throw error;
     }
 
     let newPwHash: string;
     try {
-      this.logger.log('Start hashing the new password', 'debug');
+      this.logger.debug(`Start hashing the new password for user '${user.mail}'`);
       newPwHash = await this.passwordHasher.hash(newPw);
     } catch (err) {
-      this.logger.log('New password could not be hashed', 'debug');
+      this.logger.debug(`New password for user '${user.mail}' could not be hashed`);
       throw err;
     }
     
 
     try {
-      this.logger.log('Update the user information', 'debug');
+      this.logger.debug(`Update the user information for user '${user.mail}'`);
       user.password = newPwHash;
 
       await this.localUserDAO.saveOrUpdateUser(user);
     } catch (err) {
-      this.logger.log('User could not be updated', 'debug');
+      this.logger.debug(`User '${user.mail}' could not be updated`);
       throw err;
     }
 
-    this.logger.log('Password successfully updated', 'debug');
+    this.logger.debug(`Password for user '${user.mail}' successfully updated`);
   }
 }

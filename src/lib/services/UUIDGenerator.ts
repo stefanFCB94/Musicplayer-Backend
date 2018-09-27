@@ -32,12 +32,6 @@ import { ILogger } from '../interfaces/services/ILogger';
 @injectable()
 export class UUIDGenerator extends BaseService implements IUUIDGenerator {
 
-  constructor(
-    @inject(TYPES.Logger) logger: ILogger,
-  ) {
-    super(logger);
-  }
-
   
   /**
    * @public
@@ -52,7 +46,7 @@ export class UUIDGenerator extends BaseService implements IUUIDGenerator {
    */
   public generateV4(): string {
     const id = uuid.v4();
-    this.logger.log(`UUID generated: ${id}`, 'debug');
+    this.logger.debug(`UUID generated: ${id}`);
     
     return id;
   }

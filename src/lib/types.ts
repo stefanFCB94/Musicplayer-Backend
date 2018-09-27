@@ -1,10 +1,13 @@
 export const TYPES = {
+  LoggerEventEmitter: Symbol.for('EventEmitter'),
+
   Server: Symbol.for('IServer'),
 
   ChecksumCalculator: Symbol.for('IChecksumCalculator'),
   ConfigService: Symbol.for('IConfigService'),
   ConfigServiceProvider: Symbol.for('IConfigServiceProvider'),
   Logger: Symbol.for('ILogger'),
+  LoggerListenerService: Symbol.for('ILoggerListenerService'),
   UUIDGenerator: Symbol.for('IUUIDGenerator'),
   PasswordHasher: Symbol.for('IPasswordHasher'),
   JWTGenerator: Symbol.for('IJWTGenerator'),

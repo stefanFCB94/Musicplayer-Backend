@@ -1,5 +1,8 @@
 import { ILogger } from '../interfaces/services/ILogger';
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types';
+import { container } from '../inversify.config';
+
 
 /**
  * @class
@@ -19,10 +22,7 @@ export class BaseService {
    * Each base service should has logger instance.
    * This is the injected logger instance
    */
+  @inject(TYPES.Logger)
   protected logger: ILogger;
   
-  constructor(logger: ILogger) {
-    this.logger = logger;
-  }
-
 }

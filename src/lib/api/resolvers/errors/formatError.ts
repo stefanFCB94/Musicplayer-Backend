@@ -13,8 +13,8 @@ export function formatError(error: { originalError: BaseError }) {
   };
 
   const logger = container.get<ILogger>(TYPES.Logger);
-  logger.log('Error on request detected', 'debug');
-  logger.log(JSON.stringify(errorData, null, '\t'), 'error');
+  logger.debug('Error on request detected');
+  logger.error(JSON.stringify(errorData, null, '\t'));
 
   return errorData;
 }

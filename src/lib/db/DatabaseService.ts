@@ -43,10 +43,9 @@ export class DatabaseService extends BaseConfigService implements IDatabaseServi
   private databaseKey = 'DATABASE.DATABASE';
 
   constructor(
-    @inject(TYPES.Logger) logger: ILogger,
     @inject(TYPES.ConfigServiceProvider) configProvider: IConfigServiceProvider,
   ) {
-    super(logger, configProvider);
+    super(configProvider);
   }
 
 
@@ -113,8 +112,8 @@ export class DatabaseService extends BaseConfigService implements IDatabaseServi
     // If a error on the checks appeared, it will not be tried to establish
     // a database connection
     if (error) {
-      this.logger.log('Database connection cannot be established', 'debug');
-      this.logger.log(error.stack, 'error');
+      this.logger.debug('Database connection cannot be established');
+      this.logger.error(error);
 
       return Promise.reject(error);
     }
@@ -133,11 +132,11 @@ export class DatabaseService extends BaseConfigService implements IDatabaseServi
         synchronize: true,
       });
 
-      this.logger.log('Connection to database established', 'info');
+      this.logger.info('Connection to database established');
       return this.connection;
     } catch (e) {
-      this.logger.log('Connection to the database could not be established', 'error');
-      this.logger.log('Error:'  + e.toString(), 'error');
+      this.logger.error('Connection to the database could not be established');
+      this.logger.error(e);
       return Promise.reject(e);
     }
   }
@@ -162,15 +161,15 @@ export class DatabaseService extends BaseConfigService implements IDatabaseServi
    *                 connection occurs
    */
   async closeConnection(): Promise<void> {
-    this.logger.log('Database connection is going to close', 'debug');
+    this.logger.debug('Database connection is going to close');
 
     if (!this.connection) {
-      this.logger.log('Datebase connection was already closed', 'debug');
+      this.logger.debug('Datebase connection was already closed');
       return;
     }
 
     if (!this.connection.isConnected) {
-      this.logger.log('Database connection was not connected anymore', 'debug');
+      this.logger.debug('Database connection was not connected anymore');
       this.connection = null;
       return;
     }
@@ -178,12 +177,12 @@ export class DatabaseService extends BaseConfigService implements IDatabaseServi
     try {
       await this.connection.close();
 
-      this.logger.log('Datebase connection closed', 'info');
+      this.logger.info('Datebase connection closed');
       this.connection = null;
       return;
     } catch (err) {
-      this.logger.log('Error by closing the database connection', 'error');
-      this.logger.log(err.stack, 'debug');
+      this.logger.error('Error by closing the database connection');
+      this.logger.error(err);
       return Promise.reject(err);
     }
   }

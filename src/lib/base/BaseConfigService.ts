@@ -12,10 +12,9 @@ export class BaseConfigService extends BaseService {
   protected configService: IConfigService;
 
   constructor(
-    logger: ILogger,
     configProvider: IConfigServiceProvider,
   ) {
-    super(logger);
+    super();
 
     this.configProvider = configProvider;
   }
@@ -40,19 +39,19 @@ export class BaseConfigService extends BaseService {
 
     // ConfigService is not used before
     // So make sure it is initalized and the config is loaded
-    this.logger.log('Start initialize the configuration service', 'debug');
+    this.logger.debug('Start initialize the configuration service');
 
     try {
       this.configService = await this.configProvider();
 
       // tslint:disable-next-line:max-line-length
-      this.logger.log('Finished to initialize the configuration service', 'debug');
+      this.logger.debug('Finished to initialize the configuration service');
       return;
     } catch (err) {
-      this.logger.log('Configuration service could not be initialized', 'debug');
+      this.logger.error(err);
       
       const error = new ServiceNotInitializedError('IConfigService', 'Config service could not be initalized');
-      this.logger.log(error.stack, 'error');
+      this.logger.error(error);
 
       throw error;
     }

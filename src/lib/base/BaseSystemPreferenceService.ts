@@ -16,8 +16,8 @@ export class BaseSystemPreferenceService extends BaseService {
 
   protected systemPreferenceService: ISystemPreferencesService;
 
-  constructor(logger: ILogger, systemPreferenceService: ISystemPreferencesService) {
-    super(logger);
+  constructor(systemPreferenceService: ISystemPreferencesService) {
+    super();
     this.systemPreferenceService = systemPreferenceService;
   }
 
