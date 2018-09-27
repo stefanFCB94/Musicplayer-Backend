@@ -2,12 +2,12 @@ import * as fs from 'fs-extra';
 import * as crypto from 'crypto';
 
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { BaseService } from '../base/BaseService';
-import { IChecksumCalculator } from '../interfaces/services/IChecksumCalculator';
+import { BaseService } from '../../base/BaseService';
+import { IChecksumCalculator } from '../../interfaces/services/IChecksumCalculator';
 
-import { ILogger } from '../interfaces/services/ILogger';
+import { ILogger } from '../../interfaces/services/ILogger';
 
 /**
  * @class

@@ -5,16 +5,16 @@ import * as fs from 'fs-extra';
 import { EventEmitter } from 'events';
 
 import { inject, injectable } from "inversify";
-import { TYPES } from "../types";
+import { TYPES } from "../../types";
 
-import { ISystemPreferencesService } from "../interfaces/services/ISystemPreferencesService";
-import { ILoggerListenerService } from '../interfaces/services/ILoggerListenerService';
+import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
+import { ILoggerListenerService } from '../../interfaces/services/ILoggerListenerService';
 
-import { LogDirectoryNotAvailableError } from '../error/utils/LogDirectoryNotAvailableError';
-import { LogDirectoryNotWritableError } from '../error/utils/LogDirectoryNotWritableError';
+import { LogDirectoryNotAvailableError } from '../../error/utils/LogDirectoryNotAvailableError';
+import { LogDirectoryNotWritableError } from '../../error/utils/LogDirectoryNotWritableError';
 
-import { LogDataEvent } from '../interfaces/models/LogDataEvent';
-import { LogLevel } from '../enums/LogLevel';
+import { LogDataEvent } from '../../interfaces/models/LogDataEvent';
+import { LogLevel } from '../../enums/LogLevel';
 
 
 /**

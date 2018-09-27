@@ -5,16 +5,16 @@ import { Container } from 'inversify';
 import { TYPES } from './types';
 
 import { IChecksumCalculator } from './interfaces/services/IChecksumCalculator';
-import { ChecksumCalculator } from './services/ChecksumCalculator';
+import { ChecksumCalculator } from './services/utils/ChecksumCalculator';
 
 import { IConfigService, IConfigServiceProvider } from './interfaces/services/IConfigService';
-import { ConfigService } from './services/ConfigService';
+import { ConfigService } from './services/config/ConfigService';
 
 import { ILogger } from './interfaces/services/ILogger';
-import { Logger } from './services/Logger';
+import { Logger } from './services/logging/Logger';
 
 import { IUUIDGenerator } from './interfaces/services/IUUIDGenerator';
-import { UUIDGenerator } from './services/UUIDGenerator';
+import { UUIDGenerator } from './services/utils/UUIDGenerator';
 
 import { IDatabaseService } from './interfaces/db/IDatabaseService';
 import { DatabaseService } from './db/DatabaseService';
@@ -23,37 +23,37 @@ import { ILocalUserDAO } from './interfaces/dao/ILocalUserDAO';
 import { LocalUserDAO } from './db/dao/LocalUserDAO';
 
 import { IPasswordHasher } from './interfaces/services/IPasswordHasher';
-import { PasswordHasher } from './services/PasswordHasher';
+import { PasswordHasher } from './services/auth/PasswordHasher';
 
 import { IJWTGenerator } from './interfaces/services/IJWTGenerator';
-import { JWTGenerator } from './services/JWTGenerator';
+import { JWTGenerator } from './services/auth/JWTGenerator';
 
 import { IAuthentificationService } from './interfaces/services/IAuthentificatonService';
-import { AuthentificationService } from './services/AuthentificationService';
+import { AuthentificationService } from './services/auth/AuthentificationService';
 
 import { ILocalUserService } from './interfaces/services/ILocalUserService';
-import { LocalUserService } from './services/LocalUserService';
+import { LocalUserService } from './services/auth/LocalUserService';
 
 import { IServer } from './interfaces/IServer';
 import { Server } from './server';
 
 import { IStorageService } from './interfaces/services/IStorageService';
-import { StorageService } from './services/StorageService';
+import { StorageService } from './services/filesystem/StorageService';
 
 import { IStorageFileDAO } from './interfaces/dao/IStorageFileDAO';
 import { StorageFileDAO } from './db/dao/StorageFileDAO';
 
 import { IImageProcessingService } from './interfaces/services/IImageProcessingService';
-import { ImageProcessingService } from './services/ImageProcessingService';
+import { ImageProcessingService } from './services/utils/ImageProcessingService';
 
 import { ISystemPreferencesDAO } from './interfaces/dao/ISystemPreferencesDAO';
 import { SystemPreferencesDAO } from './db/dao/SystemPreferencesDAO';
 
 import { ISystemPreferencesService } from './interfaces/services/ISystemPreferencesService';
-import { SystemPreferencesService } from './services/SystemPreferencesService';
+import { SystemPreferencesService } from './services/config/SystemPreferencesService';
 
 import { ILoggerListenerService } from './interfaces/services/ILoggerListenerService';
-import { LoggerListenerService } from './services/LoggerListenerService';
+import { LoggerListenerService } from './services/logging/LoggerListenerService';
 
 
 

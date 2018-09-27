@@ -1,24 +1,24 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
-import { IAuthentificationService,SignupValues, SignupReturn } from '../interfaces/services/IAuthentificatonService';
+import { BaseSystemPreferenceService } from '../../base/BaseSystemPreferenceService';
+import { IAuthentificationService,SignupValues, SignupReturn } from '../../interfaces/services/IAuthentificatonService';
 
-import { LocalUser } from '../db/models/LocalUser';
+import { LocalUser } from '../../db/models/LocalUser';
 
-import { ILogger } from '../interfaces/services/ILogger';
-import { IPasswordHasher } from '../interfaces/services/IPasswordHasher';
-import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
-import { ILocalUserDAO } from '../interfaces/dao/ILocalUserDAO';
-import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
-import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
+import { ILogger } from '../../interfaces/services/ILogger';
+import { IPasswordHasher } from '../../interfaces/services/IPasswordHasher';
+import { IUUIDGenerator } from '../../interfaces/services/IUUIDGenerator';
+import { ILocalUserDAO } from '../../interfaces/dao/ILocalUserDAO';
+import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
+import { IJWTGenerator, JWTPayload } from '../../interfaces/services/IJWTGenerator';
 
-import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
-import { RequestParameterNotSetError } from '../error/request/RequestParameterNotSetError';
-import { UserNotExistsError } from '../error/auth/UserNotExistsError';
-import { PasswordNotMatchError } from '../error/auth/PasswordNotMatchError';
-import { UserNotLoginableError } from '../error/auth/UserNotLoginableError';
-import { UserAlreadyExistsError } from '../error/auth/UserAlreadyExistsError';
+import { ServiceNotInitializedError } from '../../error/ServiceNotInitalizedError';
+import { RequestParameterNotSetError } from '../../error/request/RequestParameterNotSetError';
+import { UserNotExistsError } from '../../error/auth/UserNotExistsError';
+import { PasswordNotMatchError } from '../../error/auth/PasswordNotMatchError';
+import { UserNotLoginableError } from '../../error/auth/UserNotLoginableError';
+import { UserAlreadyExistsError } from '../../error/auth/UserAlreadyExistsError';
 
 
 

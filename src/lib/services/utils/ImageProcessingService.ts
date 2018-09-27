@@ -1,15 +1,15 @@
 import * as sharp from 'sharp';
 
 import { inject } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { ILogger } from '../interfaces/services/ILogger';
-import { IImageProcessingService } from '../interfaces/services/IImageProcessingService';
+import { ILogger } from '../../interfaces/services/ILogger';
+import { IImageProcessingService } from '../../interfaces/services/IImageProcessingService';
 
-import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
-import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+import { BaseSystemPreferenceService } from '../../base/BaseSystemPreferenceService';
+import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
 
-import { ImageProcessingError } from '../error/media/ImageProcessingError';
+import { ImageProcessingError } from '../../error/media/ImageProcessingError';
 
 
 /**

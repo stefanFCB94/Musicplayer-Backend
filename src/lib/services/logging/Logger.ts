@@ -4,16 +4,16 @@ import 'winston-daily-rotate-file';
 import * as fs from 'fs-extra';
 
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
-import { ILogger } from '../interfaces/services/ILogger';
-import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+import { BaseSystemPreferenceService } from '../../base/BaseSystemPreferenceService';
+import { ILogger } from '../../interfaces/services/ILogger';
+import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
 
-import { LogDirectoryNotAvailableError } from '../error/utils/LogDirectoryNotAvailableError';
-import { LogDirectoryNotWritableError } from '../error/utils/LogDirectoryNotWritableError';
+import { LogDirectoryNotAvailableError } from '../../error/utils/LogDirectoryNotAvailableError';
+import { LogDirectoryNotWritableError } from '../../error/utils/LogDirectoryNotWritableError';
 
-import { LogLevel } from '../enums/LogLevel';
+import { LogLevel } from '../../enums/LogLevel';
 import { EventEmitter } from 'events';
 
 

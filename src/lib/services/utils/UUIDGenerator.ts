@@ -1,12 +1,12 @@
 import * as uuid from 'uuid';
 
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { BaseService } from '../base/BaseService';
-import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
+import { BaseService } from '../../base/BaseService';
+import { IUUIDGenerator } from '../../interfaces/services/IUUIDGenerator';
 
-import { ILogger } from '../interfaces/services/ILogger';
+import { ILogger } from '../../interfaces/services/ILogger';
 
 
 /**

@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify';
-import { ILocalUserService } from '../interfaces/services/ILocalUserService';
-import { TYPES } from '../types';
-import { ILocalUserDAO } from '../interfaces/dao/ILocalUserDAO';
-import { LocalUser } from '../db/models/LocalUser';
+import { ILocalUserService } from '../../interfaces/services/ILocalUserService';
+import { TYPES } from '../../types';
+import { ILocalUserDAO } from '../../interfaces/dao/ILocalUserDAO';
+import { LocalUser } from '../../db/models/LocalUser';
 
 
 @injectable()

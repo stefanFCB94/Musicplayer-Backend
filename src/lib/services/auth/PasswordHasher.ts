@@ -1,13 +1,13 @@
 import * as bcrypt from 'bcrypt';
 
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { BaseConfigService } from '../base/BaseConfigService';
-import { IPasswordHasher } from '../interfaces/services/IPasswordHasher';
+import { BaseConfigService } from '../../base/BaseConfigService';
+import { IPasswordHasher } from '../../interfaces/services/IPasswordHasher';
 
-import { ILogger } from '../interfaces/services/ILogger';
-import { IConfigServiceProvider } from '../interfaces/services/IConfigService';
+import { ILogger } from '../../interfaces/services/ILogger';
+import { IConfigServiceProvider } from '../../interfaces/services/IConfigService';
 
 
 /**

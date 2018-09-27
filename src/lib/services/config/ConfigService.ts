@@ -1,9 +1,9 @@
 import * as fs from 'fs-extra';
-import { IConfigService } from '../interfaces/services/IConfigService';
+import { IConfigService } from '../../interfaces/services/IConfigService';
 import { injectable } from 'inversify';
-import { ConfigFileNotFoundError } from '../error/config/ConfigFileNotFoundError';
-import { ConfigFileNotReadableError } from '../error/config/ConfigFileNotReadableError';
-import { ConfigNotLoadedError } from '../error/config/ConfigNotLoadedError';
+import { ConfigFileNotFoundError } from '../../error/config/ConfigFileNotFoundError';
+import { ConfigFileNotReadableError } from '../../error/config/ConfigFileNotReadableError';
+import { ConfigNotLoadedError } from '../../error/config/ConfigNotLoadedError';
 
 /**
  * @class

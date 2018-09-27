@@ -1,21 +1,21 @@
 import * as fs from 'fs-extra';
 import * as mkdirp from 'mkdirp';
 
-import { IStorageService } from '../interfaces/services/IStorageService';
-import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
+import { IStorageService } from '../../interfaces/services/IStorageService';
+import { BaseSystemPreferenceService } from '../../base/BaseSystemPreferenceService';
 
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 import { inject } from 'inversify';
 
-import { ILogger } from '../interfaces/services/ILogger';
-import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+import { ILogger } from '../../interfaces/services/ILogger';
+import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
 
-import { RequiredConfigParameterNotSetError } from '../error/config/RequiredConfigParamterNotSetError';
-import { StorageNotExistsError } from '../error/server/StorageNotExistsError';
-import { StorageNotWritableError } from '../error/server/StorageNotWritableError';
-import { StoragePathNotCreatableError } from '../error/server/StoragePathNotCreateableError';
-import { StorageFileNotExistingError } from '../error/server/StorageFileNotExistingError';
-import { StorageFileNotDeletableError } from '../error/server/StorageFileNotDeletableError';
+import { RequiredConfigParameterNotSetError } from '../../error/config/RequiredConfigParamterNotSetError';
+import { StorageNotExistsError } from '../../error/server/StorageNotExistsError';
+import { StorageNotWritableError } from '../../error/server/StorageNotWritableError';
+import { StoragePathNotCreatableError } from '../../error/server/StoragePathNotCreateableError';
+import { StorageFileNotExistingError } from '../../error/server/StorageFileNotExistingError';
+import { StorageFileNotDeletableError } from '../../error/server/StorageFileNotDeletableError';
 
 
 export class StorageService extends BaseSystemPreferenceService implements IStorageService {

@@ -1,18 +1,18 @@
-import { BaseConfigService } from '../base/BaseConfigService';
+import { BaseConfigService } from '../../base/BaseConfigService';
 
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { ISystemPreferencesDAO } from '../interfaces/dao/ISystemPreferencesDAO';
-import { IUUIDGenerator } from '../interfaces/services/IUUIDGenerator';
-import { ILogger } from '../interfaces/services/ILogger';
-import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+import { ISystemPreferencesDAO } from '../../interfaces/dao/ISystemPreferencesDAO';
+import { IUUIDGenerator } from '../../interfaces/services/IUUIDGenerator';
+import { ILogger } from '../../interfaces/services/ILogger';
+import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
 
-import { InvalidConfigValueError } from '../error/config/InvalidConfigValueError';
+import { InvalidConfigValueError } from '../../error/config/InvalidConfigValueError';
 
-import { SystemPreferences } from '../db/models/SystemPreferences';
-import { SystemPreferencesConfiguration, SystemPreferencesConfigurations } from '../interfaces/models/SystemPreferencesConfiguration';
-import { IConfigServiceProvider } from '../interfaces/services/IConfigService';
+import { SystemPreferences } from '../../db/models/SystemPreferences';
+import { SystemPreferencesConfiguration, SystemPreferencesConfigurations } from '../../interfaces/models/SystemPreferencesConfiguration';
+import { IConfigServiceProvider } from '../../interfaces/services/IConfigService';
 
 
 /**

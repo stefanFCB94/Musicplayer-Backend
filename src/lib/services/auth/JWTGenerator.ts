@@ -1,17 +1,17 @@
 import * as jsonwebtoken from 'jsonwebtoken';
 
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../types';
+import { TYPES } from '../../types';
 
-import { BaseSystemPreferenceService } from '../base/BaseSystemPreferenceService';
-import { IJWTGenerator, JWTPayload } from '../interfaces/services/IJWTGenerator';
-import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+import { BaseSystemPreferenceService } from '../../base/BaseSystemPreferenceService';
+import { IJWTGenerator, JWTPayload } from '../../interfaces/services/IJWTGenerator';
+import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
 
-import { LocalUser } from '../db/models/LocalUser';
-import { ILogger } from '../interfaces/services/ILogger';
+import { LocalUser } from '../../db/models/LocalUser';
+import { ILogger } from '../../interfaces/services/ILogger';
 
-import { ServiceNotInitializedError } from '../error/ServiceNotInitalizedError';
-import { RequestParameterNotSetError } from '../error/request/RequestParameterNotSetError';
+import { ServiceNotInitializedError } from '../../error/ServiceNotInitalizedError';
+import { RequestParameterNotSetError } from '../../error/request/RequestParameterNotSetError';
 
 /**
  * @class
