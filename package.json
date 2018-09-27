@@ -9,7 +9,8 @@
     "start": "npm run compile && node dist/lib/index.js",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js --config nodemon.json",
     "test-nodemon": "node ./node_modules/nodemon/bin/nodemon.js --config nodemon.test.json",
-    "doc": "./node_modules/.bin/typedoc --options typedoc.json src/"
+    "doc": "./node_modules/.bin/typedoc --options typedoc.json src/",
+    "lint": "./node_modules/.bin/tslint --project ."
   },
   "keywords": [],
   "author": "Stefan Läufle",

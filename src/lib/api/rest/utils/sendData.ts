@@ -49,7 +49,7 @@ function convertDates(data: any): any {
     return data.map(d => convertDates(d));
   }
 
-  Object.keys(data).forEach(k => {
+  Object.keys(data).forEach((k) => {
     data[k] = convertDates(data[k]);
   });
 

@@ -4,8 +4,8 @@ import * as fs from 'fs-extra';
 
 import { EventEmitter } from 'events';
 
-import { inject, injectable } from "inversify";
-import { TYPES } from "../../types";
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../../types';
 
 import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
 import { ILoggerListenerService } from '../../interfaces/services/ILoggerListenerService';
@@ -212,7 +212,7 @@ export class LoggerListenerService implements ILoggerListenerService {
     await this.systemPreferenceService.savePreference(this.keyLogLevel, [logLevel]);
 
     winston.configure({
-      level: logLevel
+      level: logLevel,
     });
   }
 
@@ -273,7 +273,7 @@ export class LoggerListenerService implements ILoggerListenerService {
 
     const transports = await this.getTransports();
     winston.configure({
-      transports
+      transports,
     });
   }
 

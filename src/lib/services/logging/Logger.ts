@@ -37,7 +37,7 @@ export class Logger implements ILogger {
   private eventEmitter: EventEmitter;
 
   constructor(
-    @inject(TYPES.LoggerEventEmitter) eventEmitter: EventEmitter
+    @inject(TYPES.LoggerEventEmitter) eventEmitter: EventEmitter,
   ) {
     this.eventEmitter = eventEmitter;
   }

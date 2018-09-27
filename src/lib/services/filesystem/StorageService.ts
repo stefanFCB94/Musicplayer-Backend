@@ -148,7 +148,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
   public async getBaseStorage(): Promise<string> {
     const storage = await this.systemPreferenceService.getPreferenceValues(this.baseStorageKey);
     
-    if (!storage || storage.length === 0){
+    if (!storage || storage.length === 0) {
       return null;
     }
 
@@ -194,7 +194,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
       this.logger.debug(`Move all contents from '${oldPath}' to '${path}'`);
       const content = await fs.readdir(oldPath);
 
-      content.forEach(async element => {
+      content.forEach(async (element) => {
         const source = oldPath + '/' + element;
         const target = path + '/' + element;
 

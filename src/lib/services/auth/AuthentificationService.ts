@@ -37,7 +37,7 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
     @inject(TYPES.LocalUserDAO) localUserDAO: ILocalUserDAO,
     @inject(TYPES.JWTGenerator) jwtGenerator: IJWTGenerator,
-    @inject(TYPES.SystemPreferencesService) systemPrefernces: ISystemPreferencesService
+    @inject(TYPES.SystemPreferencesService) systemPrefernces: ISystemPreferencesService,
   ) {
     super(systemPrefernces);
 
@@ -143,7 +143,7 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
       const existingUser = await this.localUserDAO.getUserByMail(data.mail);
 
       if (existingUser) {
-        this.logger.debug(`User with mail address ${data.mail} already existing in the database`,);
+        this.logger.debug(`User with mail address ${data.mail} already existing in the database`);
 
         const error = new UserAlreadyExistsError(`User with mail address ${data.mail} already exists`);
         this.logger.warn(error);

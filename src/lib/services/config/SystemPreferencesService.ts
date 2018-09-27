@@ -44,7 +44,7 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
   constructor(
     @inject(TYPES.SystemPreferencesDAO) preferenceDAO: ISystemPreferencesDAO,
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
-    @inject(TYPES.ConfigServiceProvider) configServiceProvider: IConfigServiceProvider
+    @inject(TYPES.ConfigServiceProvider) configServiceProvider: IConfigServiceProvider,
   ) {
     super(configServiceProvider);
 
@@ -116,7 +116,7 @@ export class SystemPreferencesService extends BaseConfigService implements ISyst
       return true;
     }
 
-    let result = false
+    let result = false;
     try {
       result = await this.config[preference].checkValueFn(value);
     } catch (err) {

@@ -315,8 +315,8 @@ export class LocalUserDAO extends BaseService implements ILocalUserDAO {
     await this.initRepository();
     
     this.logger.debug('Start query for local users from the databse');
-    this.logger.debug('Filter parameter: ' + where.toString(),);
-    this.logger.debug(`Skip paramter: ${skip}`,);
+    this.logger.debug('Filter parameter: ' + where.toString());
+    this.logger.debug(`Skip paramter: ${skip}`);
     this.logger.debug(`Max items paramter: ${maxItems}`);
 
     try {

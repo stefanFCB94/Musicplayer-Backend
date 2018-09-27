@@ -1,6 +1,6 @@
-import { BaseService } from "./BaseService";
-import { ISystemPreferencesService } from "../interfaces/services/ISystemPreferencesService";
-import { ILogger } from "../interfaces/services/ILogger";
+import { BaseService } from './BaseService';
+import { ISystemPreferencesService } from '../interfaces/services/ISystemPreferencesService';
+import { ILogger } from '../interfaces/services/ILogger';
 
 
 /**
