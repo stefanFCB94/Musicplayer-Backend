@@ -31,9 +31,11 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
   private formatAllowed = ['JPG', 'JPEG', 'PNG'];
 
   constructor(
-    @inject(TYPES.SystemPreferencesService) prefrences: ISystemPreferencesService,
+    @inject(TYPES.SystemPreferencesService) preferences: ISystemPreferencesService,
   ) {
-    super(prefrences);
+    super(preferences);
+
+    this.init();
   }
 
 
