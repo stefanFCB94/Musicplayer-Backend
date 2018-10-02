@@ -27,7 +27,7 @@ The following error response can occur by requesting the configured HTTP port sy
 
 
 ### ServiceNotInitializedError
-> **Condition** : If not all services are full initialized
+> **Condition** : If not all services are fully initialized
 >
 > **Code** : `500 INTERNAL SERVER ERROR`
 
@@ -49,3 +49,4 @@ The following error response can occur by requesting the configured HTTP port sy
     }
   ]
 }
+```
