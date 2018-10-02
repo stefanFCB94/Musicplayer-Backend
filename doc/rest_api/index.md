@@ -41,4 +41,4 @@ In the following section are all available routes listed. Each of the routes ahs
 | [Get HTTP port](./routes/preferences/getHttpPort.md) | GET | /preferences/SERVER.HTTP_PORT | Get the port of the HTTP server |
 | [Get HTTPS port](./routes/preferences/getHttpsPort.md) | GET | /preferences/SERVER.HTTPS_PORT | Get the port of the HTTPS server |
 | [Get HTTPS is used](./routes/preferences/getUseHttps.md) | GET | /preferences/SERVER.HTTPS | Get, if the HTTPS server is used |
-| [Update image format](./routes/preferences/putImageFormat.md) | PUT | /preferences/imageformat | Update the image format |
+| [Update image format](./routes/preferences/putImageFormat.md) | PUT | /preferences/IMAGE.FORMAT | Update the image format |
