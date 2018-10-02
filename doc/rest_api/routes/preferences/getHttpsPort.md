@@ -2,7 +2,7 @@
 
 Get the port, on which the HTTPS server will be served
 
-**URL**: `/preferences/httpsport`
+**URL**: `/preferences/SERVER.HTTPS_PORT`
 
 **Method**: `GET`
 

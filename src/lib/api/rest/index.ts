@@ -21,12 +21,12 @@ export function createApi() {
   router.post('/signup', signup);
 
 
-  router.get('/preferences/imageformat', getImageFormat);
-  router.get('/perferences/httpport', getHttpPort);
-  router.get('/preferences/httpsport', getHttpsPort);
+  router.get('/preferences/IMAGE.FORMAT', getImageFormat);
+  router.get('/preferences/SERVER.HTTP_PORT', getHttpPort);
+  router.get('/preferences/SERVER.HTTPS_PORT', getHttpsPort);
 
   
-  router.put('/preferences/imageformat', putImageFormat);
+  router.put('/preferences/IMAGE.FORMAT', putImageFormat);
   
   
   // If no route matched before, this should be called

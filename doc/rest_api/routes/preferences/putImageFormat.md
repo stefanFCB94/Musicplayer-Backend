@@ -2,7 +2,7 @@
 
 Updates the image format, which should be used, when images are converted.
 
-**URL** : `/preferences/imageformat`
+**URL** : `/preferences/IMAGE.FORMAT`
 
 **Method** : `PUT`
 

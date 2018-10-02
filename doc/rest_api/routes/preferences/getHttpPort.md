@@ -2,7 +2,7 @@
 
 Get the port, on which the HTTP server will be served.
 
-**URL**: `/preferences/httpport`
+**URL**: `/preferences/SERVER.HTTP_PORT`
 
 **Method**: `GET`
 

@@ -2,7 +2,7 @@
 
 Get the image format, currently used for image processing
 
-**URL** : `/preferences/imageformat`
+**URL** : `/preferences/IMAGE.FORMAT`
 
 **Method** : `GET`
 
