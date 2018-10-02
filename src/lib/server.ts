@@ -225,7 +225,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {ServiceNotInitializedError}
    * @throws {Error}
    */
-  public async getGraphqlEndpoint(): Promise<string> {
+  public async getGraphQlEndpoint(): Promise<string> {
     const endpoint = await this.systemPreferenceService.getPreferenceValues(this.graphqlEndpointKey);
 
     if (!endpoint || endpoint.length === 0) {
@@ -247,7 +247,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {ServiceNotInitializedError}
    * @throws {Error}
    */
-  public async getGraphiqlEndpoint(): Promise<string> {
+  public async getGraphiQlEndpoint(): Promise<string> {
     const endpoint = await this.systemPreferenceService.getPreferenceValues(this.graphiqlEndpointKey);
 
     if (!endpoint || endpoint.length === 0) {
@@ -351,7 +351,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * endpoint should be served.
    * Changes take effect after a server restart
    * 
-   * @param {boolean} useGraphQl If the GUI for the GraphQl server is served
+   * @param {boolean} useGraphiQl If the GUI for the GraphQl server is served
    * @returns {Promise<void>}
    * 
    * @throws {ServiceNotInitializedError}
@@ -360,8 +360,8 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {InvalidConfigValueError}
    * @throws {Error}
    */
-  public async setUseGraphiQl(useGraphQl: boolean): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.graphiqlUseKey, [useGraphQl]);
+  public async setUseGraphiQl(useGraphiQl: boolean): Promise<void> {
+    await this.systemPreferenceService.savePreference(this.graphiqlUseKey, [useGraphiQl]);
   }
 
   /**
@@ -589,8 +589,8 @@ export class Server extends BaseSystemPreferenceService implements IServer {
     const useHTTPS = await this.getUseHttps();
     const portHTTP = await this.getHttpPort();
     const useGraphiQl = await this.getUseGraphiQl();
-    const graphqlEndpoint = await this.getGraphqlEndpoint();
-    const graphiqlEndpoint = await this.getGraphiqlEndpoint();
+    const graphqlEndpoint = await this.getGraphQlEndpoint();
+    const graphiqlEndpoint = await this.getGraphiQlEndpoint();
     const restBaseEndpoint = await this.getRestEndpoint();
 
     this.app = express();
