@@ -6,6 +6,7 @@ import { signup } from './routes/signup';
 
 import { getImageFormat } from './routes/preferences/getImageFormat';
 import { getHttpPort } from './routes/preferences/getHttpPort';
+import { getHttpsPort } from './routes/preferences/getHttpsPort';
 
 
 import { putImageFormat } from './routes/preferences/putImageFormat';
@@ -22,6 +23,7 @@ export function createApi() {
 
   router.get('/preferences/imageformat', getImageFormat);
   router.get('/perferences/httpport', getHttpPort);
+  router.get('/preferences/httpsport', getHttpsPort);
 
   
   router.put('/preferences/imageformat', putImageFormat);
