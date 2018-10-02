@@ -2,12 +2,22 @@
 
 To configure the application you have to build a configuration file.
 
-All aspects of the application, which can be modified can be part of the configuration file. The configuration file is the main part of the possible customizations and is neccassary to start the application.
+All application preferences can be configured through a configuration file.
+At least the database connection must be configured through in the configuration file.
+
+All other options can be configured in the file or via the database.
+The configured values in the database have a higher priority than the values from the config file.
+If a value is configured in the database and the configuration file, then the value from the database is used.
 
 Main features / requirements of the configuration file:
 * File is configured in JSON
 * Different configuration files can be loaded for diffent node environment variables
 * A custom configuration file can be loaded with the config paramater on the start of the application
+
+Main features / requirements of the database configuration:
+* Connection to database must be configured in config file
+* Options are configured in the table system_preferences
+* Multiple values can be stored to a preference
 
 
 # Loading different configuration files
@@ -108,3 +118,11 @@ Parameter | Default value | Description
 --- | --- | ---
 STORAGE.PATH | - | The absolute path on the filesystem, where the files of the application should be stored in
 
+
+## Image processing parameters
+
+The following parameters can be used to configure the image processing.
+
+Parameter | Default value | Description
+--- | --- | ---
+IMAGE.FORMAT | JPEG | The format to which the images should be converted
