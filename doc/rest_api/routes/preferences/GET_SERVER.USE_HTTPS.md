@@ -1,8 +1,8 @@
-# Get the path to the private key
+# Get preference, if HTTPS is used
 
-Get the path, where the private key file is stored on the server. The private key is required to serve the HTTPS server.
+Get, if the application is using a HTTPS server.
 
-**URL** : `/preferences/SERVER.PRIVATE_KEY`
+**URL** : `/preferences/SERVER.USE_HTTPS`
 
 **Method** : `GET`
 
@@ -13,36 +13,37 @@ Get the path, where the private key file is stored on the server. The private ke
 
 **Code** : `200 OK`
 
+**Data type** : `boolean`
+
 **Content example**
 
 ```json
 {
-  "data": "/etc/musicplayer/ssl/private.key"
+  "data": true
 }
 ```
 
 
 ## Error response
 
-The following errors can occur by using the route to access the path to the private key.
+All errors, that can appear by using this route.
 
 
 ### ServiceNotInitializedError
-> **Condition** : If not all required services are fully initialized
+> **Condition** : If not all services are fully initialized
 >
 > **Code** : `500 INTERNAL SERVER ERROR`
-
 
 ### Error
 > **Condition** : If a unknown error occurs
->
+> 
 > **Code** : `500 INTERNAL SERVER ERROR`
 
 
-## Error content
+## Error content:
 ```json
 {
-  "errors": [
+  "errors" : [
     {
       "code": 500,
       "type": "ServiceNotInitializedError",

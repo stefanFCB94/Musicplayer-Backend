@@ -4,11 +4,8 @@ import { loginRoute } from './routes/login';
 import { notFoundRoute } from './routes/notFound';
 import { signup } from './routes/signup';
 
-import { getImageFormat } from './routes/preferences/getImageFormat';
-import { getHttpPort } from './routes/preferences/getHttpPort';
-import { getHttpsPort } from './routes/preferences/getHttpsPort';
-import { getUseHttps } from './routes/preferences/getUseHttps';
-import { getPrivateKey } from './routes/preferences/getPrivateKey';
+import { getImageSettings } from './routes/preferences/getImageSettings';
+import { getServerSettings } from './routes/preferences/getServerSettings';
 
 
 import { putImageFormat } from './routes/preferences/putImageFormat';
@@ -23,12 +20,10 @@ export function createApi() {
   router.post('/signup', signup);
 
 
-  router.get('/preferences/IMAGE.FORMAT', getImageFormat);
-  router.get('/preferences/SERVER.HTTP_PORT', getHttpPort);
-  router.get('/preferences/SERVER.HTTPS_PORT', getHttpsPort);
-  router.get('/preferences/SERVER.HTTPS', getUseHttps);
-  router.get('/preferences/SERVER.PRIVATE_KEY', getPrivateKey);
+  router.get('/preferences/:option', getServerSettings);
+  router.get('/preferences/:option', getImageSettings);
   
+
   router.put('/preferences/IMAGE.FORMAT', putImageFormat);
   
   

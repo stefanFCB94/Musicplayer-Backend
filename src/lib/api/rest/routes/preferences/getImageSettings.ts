@@ -7,13 +7,28 @@ import { IImageProcessingService } from '../../../../interfaces/services/IImageP
 import { sendData } from '../../utils/sendData';
 import { sendError } from '../../utils/sendError';
 
-export async function getImageFormat(req: express.Request, res: express.Response) {
+export async function getImageSettings(req: express.Request, res: express.Response, next: express.NextFunction) {
+  
   const imageService = container.get<IImageProcessingService>(TYPES.ImageProcessingService);
+  const option = req.params.option;
 
   try {
-    const format = await imageService.getFormat();
-    res.status(200).json(sendData(format));
+    let data: any;
+
+    switch (option) {
+
+      case 'IMAGE.FORMAT': {
+        data = await imageService.getFormat();
+        break;
+      }
+
+      default: {
+        return next();
+      }
+    }
+
+    return res.status(200).json(sendData(data));
   } catch (error) {
-    res.status(error.code || 500).json(sendError(error));
+    return res.status(error.code || 500).json(sendError(error));
   }
 }

@@ -1,10 +1,11 @@
-# Get image format
+# Get GraphiQL endpoint
 
-Get the image format, currently used for image processing
+Get the URL path, on which the graphical user interface for the GraphQL will be served.
+Option is optional, if the preference SERVER.GRAPHIQL is set to false option is not used.
 
-**URL** : `/preferences/IMAGE.FORMAT`
+**URL**: `/preferences/SERVER.GRAPHIQL_ENDPOINT`
 
-**Method** : `GET`
+**Method**: `GET`
 
 **Auth required** : YES
 
@@ -13,23 +14,25 @@ Get the image format, currently used for image processing
 
 **Code** : `200 OK`
 
+**Data type** : `string`
+
 **Content example**
 
 ```json
 {
-  "data": "JPEG"
+  "data": "/graphiql"
 }
 ```
 
 ## Error Response
 
-The following error response can occur, by using this route
-
+The following errors can occur by requesting the configured GraphiQL endpoint through the REST API
 
 ### ServiceNotInitializedError
 > **Condition** : If not all services are fully initialized
 >
 > **Code** : `500 INTERNAL SERVER ERROR`
+
 
 ### Error
 > **Condition** : If a unknown error occurs

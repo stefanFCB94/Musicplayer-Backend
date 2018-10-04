@@ -54,7 +54,7 @@ Paramter | Default value | Description
 --- | --- | ---
 SERVER.HTTP_PORT | 3000 | The port on which the HTTP server would be available
 SERVER.HTTPS_PORT | 3001 | The port on which the HTTPS server would be available
-SERVER.HTTPS | false | True or false, if HTTPS should be used for th api
+SERVER.USE_HTTPS | false | True or false, if HTTPS should be used for th api
 SERVER.PRIVATE_KEY | - | Only required, if HTTPS is used for the api. Configuration paramter defines the path to the private key file, used for the SSL encryption
 SERVER.CERTIFICATE | - | Only required, if HTTPS is used for the api. Configuration paramter defines the path to the certificate used for the SSL encryption
 SERVER.GRAPHQL_ENDPOINT | /graphql | The URL endpoint, where the graphql api is available

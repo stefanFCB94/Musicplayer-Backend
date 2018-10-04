@@ -1,8 +1,9 @@
-# Get HTTP port
+# Get REST endpoint
 
-Get the port, on which the HTTP server will be served.
+Get the URL path, which is used as the base URL path of the REST endpoint.
+All paths of the REST routes are relative to the configured REST endpoint.
 
-**URL**: `/preferences/SERVER.HTTP_PORT`
+**URL**: `/preferences/SERVER.REST_ENDPOINT`
 
 **Method**: `GET`
 
@@ -13,17 +14,19 @@ Get the port, on which the HTTP server will be served.
 
 **Code** : `200 OK`
 
+**Data type** : `string`
+
 **Content example**
 
 ```json
 {
-  "data": 8080
+  "data": "/rest"
 }
 ```
 
 ## Error Response
 
-The following error response can occur by requesting the configured HTTP port system setting. By using this route, the following errors must be handled.
+The following errors can occure by requesting the REST endpoint, which is used as base path for the REST API routes.
 
 
 ### ServiceNotInitializedError

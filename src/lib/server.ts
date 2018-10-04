@@ -52,7 +52,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
 
   private portHTTPKey = 'SERVER.HTTP_PORT';
   private portHTTPSKey = 'SERVER.HTTPS_PORT';
-  private useHTTPSKey = 'SERVER.HTTPS';
+  private useHTTPSKey = 'SERVER.USE_HTTPS';
   private privateKeyKey = 'SERVER.PRIVATE_KEY';
   private certificateKey = 'SERVER.CERTIFICATE';
   private graphqlEndpointKey = 'SERVER.GRAPHQL_ENDPOINT';

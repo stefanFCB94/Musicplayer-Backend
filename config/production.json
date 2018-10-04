@@ -22,7 +22,7 @@
     "SALT_ROUNDS": 10
   },
   "SERVER": {
-    "HTTPS": true,
+    "USE_HTTPS": true,
     "HTTP_PORT": 80,
     "HTTPS_PORT": 443,
     "PRIVATE_KEY": "./config/ssl/musicserver.key",

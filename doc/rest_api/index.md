@@ -31,15 +31,18 @@ Data from the server will always be send in JSON format.
 
 ## Available routes
 
-In the following section are all available routes listed. Each of the routes ahs its own documentation page, where details about the route are listed.
+In the following section are all available routes listed. Each of the routes has its own documentation page, where details about the route are listed.
+
+### Route groups
+
+| Name | Description |
+| --- | --- |
+| [Preferences](./preferences/index.md) | Get and update preference values |
+
+
+### Other routes
 
 | Name | Method | Route | Description |
 | --- | --- | --- | --- |
 | [Login](./routes/login.md) | POST | /login | Try to login a user and get the JSON web token for further requests |
 | [Signup](./routes/signup.md) | POST | /signup | User self signup route |
-| [Get image format](./routes/preferences/getImageFormat.md) | GET | /preferences/IMAGE.FORMAT | Get the defined image format |
-| [Get HTTP port](./routes/preferences/getHttpPort.md) | GET | /preferences/SERVER.HTTP_PORT | Get the port of the HTTP server |
-| [Get HTTPS port](./routes/preferences/getHttpsPort.md) | GET | /preferences/SERVER.HTTPS_PORT | Get the port of the HTTPS server |
-| [Get HTTPS is used](./routes/preferences/getUseHttps.md) | GET | /preferences/SERVER.HTTPS | Get, if the HTTPS server is used |
-| [Get private key path](./routes/preferences/getPrivateKey.md) | GET | /preferences/SERVER.PRIVATE_KEY | Get the path to the private key on the server |
-| [Update image format](./routes/preferences/putImageFormat.md) | PUT | /preferences/IMAGE.FORMAT | Update the image format |

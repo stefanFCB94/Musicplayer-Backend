@@ -1,17 +1,19 @@
-# Get preference, if HTTPS is used
+# Get if graphical user inferface of GraphQL is activated
 
-Get, if the application is using a HTTPS server.
+Get, if the graphical user interface for the GraphQL API will be served on the server.
 
-**URL** : `/preferences/SERVER.HTTPS`
+**URL**: `/preferences/SERVER.GRAPHIQL_ACTIVE`
 
-**Method** : `GET`
+**Method**: `GET`
 
 **Auth required** : YES
 
 
-## Success response
+## Success Response
 
 **Code** : `200 OK`
+
+**Data type** : `boolean`
 
 **Content example**
 
@@ -21,27 +23,26 @@ Get, if the application is using a HTTPS server.
 }
 ```
 
+## Error Response
 
-## Error response
-
-All errors, that can appear by using this route.
-
+The following errors can occur by requesting, if the graphical user interface of the GraphQL API will be served.
 
 ### ServiceNotInitializedError
 > **Condition** : If not all services are fully initialized
 >
 > **Code** : `500 INTERNAL SERVER ERROR`
 
+
 ### Error
 > **Condition** : If a unknown error occurs
-> 
+>
 > **Code** : `500 INTERNAL SERVER ERROR`
 
 
 ## Error content:
 ```json
 {
-  "errors" : [
+  "errors": [
     {
       "code": 500,
       "type": "ServiceNotInitializedError",

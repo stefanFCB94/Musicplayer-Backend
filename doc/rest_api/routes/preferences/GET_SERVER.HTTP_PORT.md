@@ -1,30 +1,32 @@
-# Get HTTPS port
+# Get HTTP port
 
-Get the port, on which the HTTPS server will be served
+Get the port, on which the HTTP server will be served.
 
-**URL**: `/preferences/SERVER.HTTPS_PORT`
+**URL**: `/preferences/SERVER.HTTP_PORT`
 
 **Method**: `GET`
 
 **Auth required** : YES
 
 
-## Success response
+## Success Response
 
 **Code** : `200 OK`
+
+**Data type** : `number`
 
 **Content example**
 
 ```json
 {
-  "data": 8433
+  "data": 8080
 }
 ```
 
+## Error Response
 
-## Error response
+The following error response can occur by requesting the configured HTTP port system setting. By using this route, the following errors must be handled.
 
-The following error response can occur by using this route. All errors should be handled by the client.
 
 ### ServiceNotInitializedError
 > **Condition** : If not all services are fully initialized
@@ -36,7 +38,6 @@ The following error response can occur by using this route. All errors should be
 > **Condition** : If a unknown error occurs
 >
 > **Code** : `500 INTERNAL SERVER ERROR`
-
 
 
 ## Error content:
