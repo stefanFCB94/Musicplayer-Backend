@@ -11,6 +11,8 @@ import { ISystemPreferencesService } from '../../interfaces/services/ISystemPref
 
 import { ImageProcessingError } from '../../error/media/ImageProcessingError';
 
+import { ImagePreferencesEnum } from '../../enums/preferences/ImagePreferencesEnum';
+
 
 /**
  * @class
@@ -25,10 +27,6 @@ import { ImageProcessingError } from '../../error/media/ImageProcessingError';
  * @extends BaseSystemPreferenceService
  */
 export class ImageProcessingService extends BaseSystemPreferenceService implements IImageProcessingService {
-
-  private formatKey = 'IMAGES.FORMAT';
-  private formatDefault = 'JPEG';
-  private formatAllowed = ['JPG', 'JPEG', 'PNG'];
 
   constructor(
     @inject(TYPES.SystemPreferencesService) preferences: ISystemPreferencesService,
@@ -48,8 +46,8 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
    * preferences.
    */
   private init() {
-    this.systemPreferenceService.setAllowedValues(this.formatKey, this.formatAllowed);
-    this.systemPreferenceService.setDefaultValue(this.formatKey, [this.formatDefault]);
+    this.systemPreferenceService.setAllowedValues(ImagePreferencesEnum.FORMAT, ['JPG', 'JPEG', 'PNG']);
+    this.systemPreferenceService.setDefaultValue(ImagePreferencesEnum.FORMAT, ['JPEG']);
   }
 
 
@@ -70,7 +68,7 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
    * @throws {Error}
    */
   public async getFormat(): Promise<string> {
-    const format = await this.systemPreferenceService.getPreferenceValues(this.formatKey);
+    const format = await this.systemPreferenceService.getPreferenceValues(ImagePreferencesEnum.FORMAT);
 
     if (!format || format.length === 0) {
       return null;
@@ -98,7 +96,7 @@ export class ImageProcessingService extends BaseSystemPreferenceService implemen
    * @throws {Error}
    */
   public async setFormat(format: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.formatKey, [format]);
+    await this.systemPreferenceService.savePreference(ImagePreferencesEnum.FORMAT, [format]);
   }
 
 

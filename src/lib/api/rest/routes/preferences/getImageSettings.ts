@@ -4,8 +4,11 @@ import { container } from '../../../../inversify.config';
 import { TYPES } from '../../../../types';
 
 import { IImageProcessingService } from '../../../../interfaces/services/IImageProcessingService';
+import { ImagePreferencesEnum } from '../../../../enums/preferences/ImagePreferencesEnum';
+
 import { sendData } from '../../utils/sendData';
 import { sendError } from '../../utils/sendError';
+
 
 export async function getImageSettings(req: express.Request, res: express.Response, next: express.NextFunction) {
   
@@ -17,7 +20,7 @@ export async function getImageSettings(req: express.Request, res: express.Respon
 
     switch (option) {
 
-      case 'IMAGE.FORMAT': {
+      case ImagePreferencesEnum.FORMAT: {
         data = await imageService.getFormat();
         break;
       }
