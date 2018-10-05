@@ -20,6 +20,8 @@ import { PasswordNotMatchError } from '../../error/auth/PasswordNotMatchError';
 import { UserNotLoginableError } from '../../error/auth/UserNotLoginableError';
 import { UserAlreadyExistsError } from '../../error/auth/UserAlreadyExistsError';
 
+import { AuthPreferencesEnum } from '../../enums/preferences/AuthPreferencesEnum';
+
 
 
 @injectable()
@@ -30,8 +32,7 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
   protected localUserDAO: ILocalUserDAO;
   protected jwtGenerator: IJWTGenerator;
 
-  private signupPossibleKey = 'SIGNUP.POSSIBLE';
-
+  
   constructor(
     @inject(TYPES.PasswordHasher) passwordHasher: IPasswordHasher,
     @inject(TYPES.UUIDGenerator) uuidGenerator: IUUIDGenerator,
@@ -46,8 +47,8 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
     this.localUserDAO = localUserDAO;
     this.jwtGenerator = jwtGenerator;
 
-    this.systemPreferenceService.setAllowedValues(this.signupPossibleKey, [true, false]);
-    this.systemPreferenceService.setDefaultValue(this.signupPossibleKey, [false]);
+    this.systemPreferenceService.setAllowedValues(AuthPreferencesEnum.SINGUP_POSSIBLE, [true, false]);
+    this.systemPreferenceService.setDefaultValue(AuthPreferencesEnum.SINGUP_POSSIBLE, [false]);
   }
 
   /**
@@ -68,7 +69,7 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
    * @throws {Error}
    */
   public async getSignupAvailable(): Promise<boolean> {
-    const available = await this.systemPreferenceService.getPreferenceValues(this.signupPossibleKey);
+    const available = await this.systemPreferenceService.getPreferenceValues(AuthPreferencesEnum.SINGUP_POSSIBLE);
 
     if (available || available.length > 0) {
       return available[0];
@@ -96,7 +97,7 @@ export class AuthentificationService extends BaseSystemPreferenceService impleme
    * @throws {Error}
    */
   public async setSignupAvailable(signupPossible: boolean): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.signupPossibleKey, [signupPossible]);
+    await this.systemPreferenceService.savePreference(AuthPreferencesEnum.SINGUP_POSSIBLE, [signupPossible]);
   }
 
 

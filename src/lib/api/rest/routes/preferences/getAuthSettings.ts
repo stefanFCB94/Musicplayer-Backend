@@ -8,6 +8,8 @@ import { TYPES } from '../../../../types';
 import { sendError } from '../../utils/sendError';
 import { sendData } from '../../utils/sendData';
 
+import { AuthPreferencesEnum } from '../../../../enums/preferences/AuthPreferencesEnum';
+
 export async function getAuthSettings(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authService = container.get<IAuthentificationService>(TYPES.AuthentificationService);
   const option = req.params.option;
@@ -17,7 +19,7 @@ export async function getAuthSettings(req: express.Request, res: express.Respons
 
     switch (option) {
 
-      case 'SIGNUP.POSSIBLE': {
+      case AuthPreferencesEnum.SINGUP_POSSIBLE: {
         data = await authService.getSignupAvailable();
         break;
       }
