@@ -18,6 +18,10 @@ All options, that can be requested, created or updated are listed below with a s
 | [Get GraphiQL is used](./GET_SERVER.GRAPHIQL_ACTIVE.md) | GET | /preferences/SERVER.GRAPHIQL_ACTIVE |
 | [Get REST endpoint](./GET_SERVER.REST_ENDPOINT.md) | GET | /preferences/SERVER.REST_ENDPOINT |
 | [Get image format](./GET_IMAGE.FORMAT.md) | GET | /preferences/IMAGE.FORMAT |
+| [Get signup possible](./GET_SIGNUP.POSSIBLE.md) | GET | /preferences/SIGNUP.POSSIBLE |
+| [Get JWT algorithm](./GET_SECURITY.JWT.ALGORITHM.md) | GET | /preferences/SECURITY.JWT.ALGORITHM |
+| [Get JWT lifetime](./GET_SECURITY.JWT.EXPIRES.md) | GET | /preferences/SECURITY.JWT.EXPIRES |
+| [Get JWT secret encryption key](./GET_SECURITY.JWT.SECRET.md) | GET | /preferences/SECURITY.JWT.SECRET |
 
 
 # Update preference values

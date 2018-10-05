@@ -37,7 +37,7 @@ In the following section are all available routes listed. Each of the routes has
 
 | Name | Description |
 | --- | --- |
-| [Preferences](./preferences/index.md) | Get and update preference values |
+| [Preferences](./routes/preferences/index.md) | Get and update preference values |
 
 
 ### Other routes

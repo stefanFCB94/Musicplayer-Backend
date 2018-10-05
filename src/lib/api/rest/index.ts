@@ -6,6 +6,7 @@ import { signup } from './routes/signup';
 
 import { getImageSettings } from './routes/preferences/getImageSettings';
 import { getServerSettings } from './routes/preferences/getServerSettings';
+import { getAuthSetting } from './routes/preferences/getAuthSettings';
 
 
 import { putImageFormat } from './routes/preferences/putImageFormat';
@@ -22,7 +23,7 @@ export function createApi() {
 
   router.get('/preferences/:option', getServerSettings);
   router.get('/preferences/:option', getImageSettings);
-  
+  router.get('/preferences/:option', getAuthSetting);  
 
   router.put('/preferences/IMAGE.FORMAT', putImageFormat);
   
