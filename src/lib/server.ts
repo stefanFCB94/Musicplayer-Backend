@@ -18,6 +18,8 @@ import { importSchema } from 'graphql-import';
 import { makeExecutableSchema } from 'graphql-tools';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 
+import { ServerPreferencesEnum } from './enums/preferences/ServerPreferencesEnum';
+
 import { resolvers } from './api/resolvers/resolvers';
 import { formatError } from './api/resolvers/errors/formatError';
 
@@ -50,38 +52,28 @@ export class Server extends BaseSystemPreferenceService implements IServer {
   private httpServer: http.Server;
   private httpsServer: https.Server;
 
-  private portHTTPKey = 'SERVER.HTTP_PORT';
-  private portHTTPSKey = 'SERVER.HTTPS_PORT';
-  private useHTTPSKey = 'SERVER.USE_HTTPS';
-  private privateKeyKey = 'SERVER.PRIVATE_KEY';
-  private certificateKey = 'SERVER.CERTIFICATE';
-  private graphqlEndpointKey = 'SERVER.GRAPHQL_ENDPOINT';
-  private graphiqlEndpointKey = 'SERVER.GRAPHIQL_ENDPOINT';
-  private graphiqlUseKey = 'SERVER.GRAPHIQL_ACTIVE';
-  private restBaseEndpointKey = 'SERVER.REST_ENDPOINT';
-
 
   constructor(
     @inject(TYPES.SystemPreferencesService) systemPreferenceService: ISystemPreferencesService,
   ) {
     super(systemPreferenceService);
 
-    this.systemPreferenceService.setDefaultValue(this.portHTTPKey, [3000]);
-    this.systemPreferenceService.setDefaultValue(this.portHTTPSKey, [3001]);
-    this.systemPreferenceService.setDefaultValue(this.useHTTPSKey, [false]);
-    this.systemPreferenceService.setDefaultValue(this.graphqlEndpointKey, ['/graphql']);
-    this.systemPreferenceService.setDefaultValue(this.graphiqlEndpointKey, ['/graphiql']);
-    this.systemPreferenceService.setDefaultValue(this.graphiqlUseKey, [true]);
-    this.systemPreferenceService.setDefaultValue(this.restBaseEndpointKey, ['/rest']);
+    this.systemPreferenceService.setDefaultValue(ServerPreferencesEnum.HTTP_PORT, [3000]);
+    this.systemPreferenceService.setDefaultValue(ServerPreferencesEnum.HTTPS_PORT, [3001]);
+    this.systemPreferenceService.setDefaultValue(ServerPreferencesEnum.USE_HTTPS, [false]);
+    this.systemPreferenceService.setDefaultValue(ServerPreferencesEnum.GRAPHQL_ENDPOINT, ['/graphql']);
+    this.systemPreferenceService.setDefaultValue(ServerPreferencesEnum.GRAPHIQL_ENDPOINT, ['/graphiql']);
+    this.systemPreferenceService.setDefaultValue(ServerPreferencesEnum.USE_GRAPHIQL, [true]);
+    this.systemPreferenceService.setDefaultValue(ServerPreferencesEnum.REST_ENDPOINT, ['/rest']);
 
-    this.systemPreferenceService.setAllowedValues(this.useHTTPSKey, [true, false]);
-    this.systemPreferenceService.setAllowedValues(this.graphiqlUseKey, [true, false]);
+    this.systemPreferenceService.setAllowedValues(ServerPreferencesEnum.USE_HTTPS, [true, false]);
+    this.systemPreferenceService.setAllowedValues(ServerPreferencesEnum.USE_GRAPHIQL, [true, false]);
 
-    this.systemPreferenceService.setCheckFunction(this.portHTTPKey, this.isValidPort);
-    this.systemPreferenceService.setCheckFunction(this.portHTTPSKey, this.isValidPort);
-    this.systemPreferenceService.setCheckFunction(this.graphqlEndpointKey, this.isValidEndpoint);
-    this.systemPreferenceService.setCheckFunction(this.graphiqlEndpointKey, this.isValidEndpoint);
-    this.systemPreferenceService.setCheckFunction(this.restBaseEndpointKey, this.isValidEndpoint);
+    this.systemPreferenceService.setCheckFunction(ServerPreferencesEnum.HTTP_PORT, this.isValidPort);
+    this.systemPreferenceService.setCheckFunction(ServerPreferencesEnum.HTTPS_PORT, this.isValidPort);
+    this.systemPreferenceService.setCheckFunction(ServerPreferencesEnum.GRAPHQL_ENDPOINT, this.isValidEndpoint);
+    this.systemPreferenceService.setCheckFunction(ServerPreferencesEnum.GRAPHIQL_ENDPOINT, this.isValidEndpoint);
+    this.systemPreferenceService.setCheckFunction(ServerPreferencesEnum.REST_ENDPOINT, this.isValidEndpoint);
   }
 
 
@@ -142,7 +134,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getHttpPort(): Promise<number> {
-    const port = await this.systemPreferenceService.getPreferenceValues(this.portHTTPKey);
+    const port = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.HTTP_PORT);
 
     if (!port || port.length === null) {
       return null;
@@ -163,7 +155,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getHttpsPort(): Promise<number> {
-    const port = await this.systemPreferenceService.getPreferenceValues(this.portHTTPSKey);
+    const port = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.HTTPS_PORT);
 
     if (!port || port.length === 0) {
       return null;
@@ -184,7 +176,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getUseHttps(): Promise<boolean> {
-    const useHTTPS = await this.systemPreferenceService.getPreferenceValues(this.useHTTPSKey);
+    const useHTTPS = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.USE_HTTPS);
 
     if (!useHTTPS || useHTTPS.length === 0) {
       return null;
@@ -205,7 +197,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getUseGraphiQl(): Promise<boolean> {
-    const useGraphiql = await this.systemPreferenceService.getPreferenceValues(this.graphiqlUseKey);
+    const useGraphiql = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.USE_GRAPHIQL);
 
     if (!useGraphiql || useGraphiql.length === 0) {
       return null;
@@ -226,7 +218,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getGraphQlEndpoint(): Promise<string> {
-    const endpoint = await this.systemPreferenceService.getPreferenceValues(this.graphqlEndpointKey);
+    const endpoint = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.GRAPHQL_ENDPOINT);
 
     if (!endpoint || endpoint.length === 0) {
       return null;
@@ -248,7 +240,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getGraphiQlEndpoint(): Promise<string> {
-    const endpoint = await this.systemPreferenceService.getPreferenceValues(this.graphiqlEndpointKey);
+    const endpoint = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.GRAPHIQL_ENDPOINT);
 
     if (!endpoint || endpoint.length === 0) {
       return null;
@@ -269,7 +261,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getRestEndpoint(): Promise<string> {
-    const endpoint = await this.systemPreferenceService.getPreferenceValues(this.restBaseEndpointKey);
+    const endpoint = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.REST_ENDPOINT);
     
     if (!endpoint || endpoint.length === 0) {
       return null;
@@ -291,7 +283,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error} 
    */
   public async getCertificatePath(): Promise<string> {
-    const path = await this.systemPreferenceService.getPreferenceValues(this.certificateKey);
+    const path = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.CERTIFICATE);
 
     if (!path || path.length === 0) {
       return null;
@@ -313,7 +305,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async getPrivateKeyPath(): Promise<string> {
-    const path = await this.systemPreferenceService.getPreferenceValues(this.privateKeyKey);
+    const path = await this.systemPreferenceService.getPreferenceValues(ServerPreferencesEnum.PRIVATE_KEY);
 
     if (!path || path.length === 0) {
       return null;
@@ -340,7 +332,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async setUseHttps(useHTTPS: boolean): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.useHTTPSKey, [useHTTPS]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.USE_HTTPS, [useHTTPS]);
   }
 
   /**
@@ -361,7 +353,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async setUseGraphiQl(useGraphiQl: boolean): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.graphiqlUseKey, [useGraphiQl]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.USE_GRAPHIQL, [useGraphiQl]);
   }
 
   /**
@@ -380,7 +372,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error} 
    */
   public async setHttpPort(port: number): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.portHTTPKey, [port]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.HTTP_PORT, [port]);
   }
 
   /**
@@ -400,7 +392,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async setHttpsPort(port: number): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.portHTTPSKey, [port]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.HTTPS_PORT, [port]);
   }
 
   /**
@@ -420,7 +412,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async setGraphQlEndpoint(endpoint: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.graphqlEndpointKey, [endpoint]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.GRAPHQL_ENDPOINT, [endpoint]);
   }
 
   /**
@@ -441,7 +433,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error} 
    */
   public async setGraphiQlEndpoint(endpoint: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.graphiqlEndpointKey, [endpoint]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.GRAPHIQL_ENDPOINT, [endpoint]);
   }
 
   /**
@@ -461,7 +453,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
    * @throws {Error}
    */
   public async setRestEndpoint(endpoint: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.restBaseEndpointKey, [endpoint]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.REST_ENDPOINT, [endpoint]);
   }
 
   /**
@@ -513,7 +505,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
       throw error;
     }
 
-    await this.systemPreferenceService.savePreference(this.certificateKey, [path]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.CERTIFICATE, [path]);
   }
 
   /**
@@ -566,7 +558,7 @@ export class Server extends BaseSystemPreferenceService implements IServer {
       throw error;
     }
 
-    await this.systemPreferenceService.savePreference(this.privateKeyKey, [path]);
+    await this.systemPreferenceService.savePreference(ServerPreferencesEnum.PRIVATE_KEY, [path]);
   }
 
 
@@ -608,14 +600,14 @@ export class Server extends BaseSystemPreferenceService implements IServer {
 
       const certPath = await this.getCertificatePath();
       if (!certPath) {
-        const error = new RequiredConfigParameterNotSetError(this.certificateKey, 'Certificate for HTTPS server is not defined');
+        const error = new RequiredConfigParameterNotSetError(ServerPreferencesEnum.CERTIFICATE, 'Certificate for HTTPS server is not defined');
         this.logger.error(error);
         throw error;
       }
       
       const privateKeyPath = await this.getPrivateKeyPath();
       if (!privateKeyPath) {
-        const error = new RequiredConfigParameterNotSetError(this.privateKeyKey, 'Private key for HTTPS server is not defined');
+        const error = new RequiredConfigParameterNotSetError(ServerPreferencesEnum.PRIVATE_KEY, 'Private key for HTTPS server is not defined');
         this.logger.error(error);
         throw error;
       }

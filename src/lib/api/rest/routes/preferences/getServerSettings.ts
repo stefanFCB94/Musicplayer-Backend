@@ -1,9 +1,13 @@
 import * as express from 'express';
+
+import { container } from '../../../../inversify.config';
+import { TYPES } from '../../../../types';
+
 import { sendError } from '../../utils/sendError';
 import { sendData } from '../../utils/sendData';
-import { container } from '../../../../inversify.config';
+
 import { IServer } from '../../../../interfaces/IServer';
-import { TYPES } from '../../../../types';
+import { ServerPreferencesEnum } from '../../../../enums/preferences/ServerPreferencesEnum';
 
 export async function getServerSettings(req: express.Request, res: express.Response, next: express.NextFunction) {
   
@@ -14,47 +18,47 @@ export async function getServerSettings(req: express.Request, res: express.Respo
     let data: any;
     switch (option) {
 
-      case 'SERVER.HTTP_PORT': {
+      case ServerPreferencesEnum.HTTP_PORT: {
         data = await server.getHttpPort();
         break;
       }
 
-      case 'SERVER.HTTPS_PORT': {
+      case ServerPreferencesEnum.HTTPS_PORT: {
         data = await server.getHttpsPort();
         break;
       }
 
-      case 'SERVER.USE_HTTPS': {
+      case ServerPreferencesEnum.USE_HTTPS: {
         data = await server.getUseHttps();
         break;
       }
 
-      case 'SERVER.PRIVATE_KEY': {
+      case ServerPreferencesEnum.PRIVATE_KEY: {
         data = await server.getPrivateKeyPath();
         break;
       }
 
-      case 'SERVER.CERTIFICATE': {
+      case ServerPreferencesEnum.CERTIFICATE: {
         data = await server.getCertificatePath();
         break;
       }
 
-      case 'SERVER.GRAPHQL_ENDPOINT': {
+      case ServerPreferencesEnum.GRAPHQL_ENDPOINT: {
         data = await server.getGraphQlEndpoint();
         break;
       }
 
-      case 'SERVER.GRAPHIQL_ENDPOINT': {
+      case ServerPreferencesEnum.GRAPHIQL_ENDPOINT: {
         data = await server.getGraphiQlEndpoint();
         break;
       }
 
-      case 'SERVER.GRAPHIQL_ACTIVE': {
+      case ServerPreferencesEnum.USE_GRAPHIQL: {
         data = await server.getUseGraphiQl();
         break;
       }
 
-      case 'SERVER.REST_ENDPOINT': {
+      case ServerPreferencesEnum.REST_ENDPOINT: {
         data = await server.getRestEndpoint();
         break;
       }
