@@ -9,9 +9,10 @@ import { getServerSettings } from './routes/preferences/getServerSettings';
 import { getAuthSettings } from './routes/preferences/getAuthSettings';
 import { getSecuritySettings } from './routes/preferences/getSecuritySettings';
 import { getStorageSettings } from './routes/preferences/getStorageSettings';
-
+import { getLoggingSettings } from './routes/preferences/getLoggingSettings';
 
 import { putImageFormat } from './routes/preferences/putImageFormat';
+
 
 
 
@@ -28,6 +29,7 @@ export function createApi() {
   router.get('/preferences/:option', getAuthSettings);
   router.get('/preferences/:option', getSecuritySettings);
   router.get('/preferences/:option', getStorageSettings);
+  router.get('/preferences/:option', getLoggingSettings);
 
   router.put('/preferences/IMAGE.FORMAT', putImageFormat);
   

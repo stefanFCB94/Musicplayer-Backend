@@ -15,6 +15,7 @@ import { LogDirectoryNotWritableError } from '../../error/utils/LogDirectoryNotW
 
 import { LogDataEvent } from '../../interfaces/models/LogDataEvent';
 import { LogLevel } from '../../enums/LogLevel';
+import { LoggingPreferencesEnum } from '../../enums/preferences/LoggingPreferencesEnum';
 
 
 /**
@@ -43,13 +44,6 @@ export class LoggerListenerService implements ILoggerListenerService {
   private systemPreferenceService: ISystemPreferencesService;
   private loggerEventEmitter: EventEmitter;
 
-  private keyLogLevel = 'LOGGER.LEVEL';
-  private keyLogDirectory = 'LOGGER.DIRECTORY';
-  private keyFilename = 'LOGGER.FILENAME';
-  private keySingleFile = 'LOGGER.SINGLE_FILE';
-  private keyConsole = 'LOGGER.CONSOLE';
-  private keyRotationFile = 'LOGGER.ROTATION_FILE';
-
 
   constructor(
     @inject(TYPES.SystemPreferencesService) systemPreferenceService: ISystemPreferencesService,
@@ -58,17 +52,17 @@ export class LoggerListenerService implements ILoggerListenerService {
     this.systemPreferenceService = systemPreferenceService;
     this.loggerEventEmitter = loggerEventEmitter;
 
-    this.systemPreferenceService.setAllowedValues(this.keyLogLevel, [LogLevel.ERROR, LogLevel.INFO, LogLevel.INFO, LogLevel.VERBOSE, LogLevel.DEBUG, LogLevel.VERBOSE]);
-    this.systemPreferenceService.setAllowedValues(this.keyConsole, [true, false]);
-    this.systemPreferenceService.setAllowedValues(this.keyRotationFile, [true, false]);
-    this.systemPreferenceService.setAllowedValues(this.keySingleFile, [true, false]);
+    this.systemPreferenceService.setAllowedValues(LoggingPreferencesEnum.LEVEL, [LogLevel.ERROR, LogLevel.INFO, LogLevel.INFO, LogLevel.VERBOSE, LogLevel.DEBUG, LogLevel.VERBOSE]);
+    this.systemPreferenceService.setAllowedValues(LoggingPreferencesEnum.USE_CONSOLE, [true, false]);
+    this.systemPreferenceService.setAllowedValues(LoggingPreferencesEnum.USE_ROTATION_FILE, [true, false]);
+    this.systemPreferenceService.setAllowedValues(LoggingPreferencesEnum.USE_SINGLE_FILE, [true, false]);
 
-    this.systemPreferenceService.setDefaultValue(this.keyLogLevel, ['warn']);
-    this.systemPreferenceService.setDefaultValue(this.keyLogDirectory, ['.']);
-    this.systemPreferenceService.setDefaultValue(this.keyFilename, ['musicserver']);
-    this.systemPreferenceService.setDefaultValue(this.keyConsole, [true]);
-    this.systemPreferenceService.setDefaultValue(this.keySingleFile, [false]);
-    this.systemPreferenceService.setDefaultValue(this.keyRotationFile, [true]);
+    this.systemPreferenceService.setDefaultValue(LoggingPreferencesEnum.LEVEL, ['warn']);
+    this.systemPreferenceService.setDefaultValue(LoggingPreferencesEnum.DIRECTORY, ['.']);
+    this.systemPreferenceService.setDefaultValue(LoggingPreferencesEnum.FILENAME, ['musicserver']);
+    this.systemPreferenceService.setDefaultValue(LoggingPreferencesEnum.USE_CONSOLE, [true]);
+    this.systemPreferenceService.setDefaultValue(LoggingPreferencesEnum.USE_SINGLE_FILE, [false]);
+    this.systemPreferenceService.setDefaultValue(LoggingPreferencesEnum.USE_ROTATION_FILE, [true]);
   }
 
   
@@ -83,7 +77,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async getLogLevel(): Promise<string> {
-    const level = await this.systemPreferenceService.getPreferenceValues(this.keyLogLevel);
+    const level = await this.systemPreferenceService.getPreferenceValues(LoggingPreferencesEnum.LEVEL);
 
     if (level && level.length > 0) {
       return level[0];
@@ -104,7 +98,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async getLogDirectory(): Promise<string> {
-    const values = await this.systemPreferenceService.getPreferenceValues(this.keyLogDirectory);
+    const values = await this.systemPreferenceService.getPreferenceValues(LoggingPreferencesEnum.DIRECTORY);
 
     if (values && values.length > 0) {
       return values[0];
@@ -125,7 +119,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async getLogFilename(): Promise<string> {
-    const values = await this.systemPreferenceService.getPreferenceValues(this.keyFilename);
+    const values = await this.systemPreferenceService.getPreferenceValues(LoggingPreferencesEnum.FILENAME);
 
     if (values && values.length > 0) {
       return values[0];
@@ -145,7 +139,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async getLogUseSingleFile(): Promise<boolean> {
-    const values = await this.systemPreferenceService.getPreferenceValues(this.keySingleFile);
+    const values = await this.systemPreferenceService.getPreferenceValues(LoggingPreferencesEnum.USE_SINGLE_FILE);
 
     if (values && values.length > 0) {
       return values[0];
@@ -165,7 +159,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async getLogUseDailyRotationFile(): Promise<boolean> {
-    const values = await this.systemPreferenceService.getPreferenceValues(this.keyRotationFile);
+    const values = await this.systemPreferenceService.getPreferenceValues(LoggingPreferencesEnum.USE_ROTATION_FILE);
 
     if (values && values.length > 0) {
       return values[0];
@@ -185,7 +179,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async getLogUseConsole(): Promise<boolean> {
-    const values = await this.systemPreferenceService.getPreferenceValues(this.keyConsole);
+    const values = await this.systemPreferenceService.getPreferenceValues(LoggingPreferencesEnum.USE_CONSOLE);
 
     if (values && values.length > 0) {
       return values[0];
@@ -209,7 +203,7 @@ export class LoggerListenerService implements ILoggerListenerService {
   
    */
   public async setLogLevel(logLevel: LogLevel): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.keyLogLevel, [logLevel]);
+    await this.systemPreferenceService.savePreference(LoggingPreferencesEnum.LEVEL, [logLevel]);
 
     winston.configure({
       level: logLevel,
@@ -253,7 +247,7 @@ export class LoggerListenerService implements ILoggerListenerService {
       }
     }
 
-    await this.systemPreferenceService.savePreference(this.keyLogDirectory, [directory]);
+    await this.systemPreferenceService.savePreference(LoggingPreferencesEnum.DIRECTORY, [directory]);
   }
 
   /**
@@ -269,7 +263,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async setLogFilename(filename: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.keyFilename, [filename]);
+    await this.systemPreferenceService.savePreference(LoggingPreferencesEnum.FILENAME, [filename]);
 
     const transports = await this.getTransports();
     winston.configure({
@@ -292,7 +286,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async setLogUseSingleFile(useSingleFile: boolean): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.keySingleFile, [useSingleFile]);
+    await this.systemPreferenceService.savePreference(LoggingPreferencesEnum.USE_SINGLE_FILE, [useSingleFile]);
 
     const transports = await this.getTransports();
     winston.configure({ transports });
@@ -313,7 +307,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error} 
    */
   public async setLogUseDailyRotationFile(useDailyRotationFile: boolean): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.keyRotationFile, [useDailyRotationFile]);
+    await this.systemPreferenceService.savePreference(LoggingPreferencesEnum.USE_ROTATION_FILE, [useDailyRotationFile]);
     
     const transports = await this.getTransports();
     winston.configure({ transports });
@@ -334,7 +328,7 @@ export class LoggerListenerService implements ILoggerListenerService {
    * @throws {Error}
    */
   public async setLogUseConsole(useConsole: boolean): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.keyConsole, [useConsole]);
+    await this.systemPreferenceService.savePreference(LoggingPreferencesEnum.USE_CONSOLE, [useConsole]);
     
     const transports = await this.getTransports();
     winston.configure({ transports });

@@ -23,7 +23,12 @@ All options, that can be requested, created or updated are listed below with a s
 | [Get JWT lifetime](./GET_SECURITY.JWT.EXPIRES.md) | GET | /preferences/SECURITY.JWT.EXPIRES |
 | [Get JWT secret encryption key](./GET_SECURITY.JWT.SECRET.md) | GET | /preferences/SECURITY.JWT.SECRET |
 | [Get storage path](./GET_STORAGE.PATH.md) | GET | /preferences/STORAGE.PATH |
-
+| [Get log level](./GET_LOGGER.LEVEL.md) | GET | /preferences/LOGGER.LEVEL |
+| [Get log directory](./GET_LOGGER.DIRETORY.md) | GET | /preferences/LOGGER.DIRECTORY |
+| [Get log filename](./GET_LOGGER.FILENAME.md) | GET | /preferences/LOGGER.FILENAME |
+| [Get log console used](./GET_LOGGER.USE_CONSOLE.md) | GET | /preferences/LOGGER.USE_CONSOLE |
+| [Get log single file used](./GET_LOGGER.USE_SINGLE_FILE.md) | GET | /preferences/LOGGER.USE_SINGLE_FILE |
+| [Get log rotation file used](./GET_LOGGER.USE_ROTATION_FILE.md) | GET | /preferences/LOGGER.USE_ROTATION_FILE |
 
 # Update preference values
 

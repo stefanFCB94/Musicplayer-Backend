@@ -3,9 +3,9 @@
     "LEVEL": "debug",
     "DIRECTORY": ".",
     "FILENAME": "musicserver",
-    "SINGLE_FILE": false,
-    "ROTATION_FILE": false,
-    "CONSOLE": true
+    "USE_SINGLE_FILE": false,
+    "USE_ROTATION_FILE": false,
+    "USE_CONSOLE": true
   },
   "DATABASE": {
     "TYPE": "mysql",
