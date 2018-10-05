@@ -13,6 +13,8 @@ import { ILogger } from '../../interfaces/services/ILogger';
 import { ServiceNotInitializedError } from '../../error/ServiceNotInitalizedError';
 import { RequestParameterNotSetError } from '../../error/request/RequestParameterNotSetError';
 
+import { SecurityPreferencesEnum } from '../../enums/preferences/SecurityPreferencesEnum';
+
 /**
  * @class
  * @author Stefan Läufle
@@ -34,17 +36,6 @@ import { RequestParameterNotSetError } from '../../error/request/RequestParamete
 @injectable()
 export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGenerator {
   
-  private algorithmDefault: string = 'HS256';
-  private algorithmKey: string = 'SECURITY.JWT.ALGORITHM';
-  private algorithmValues: string[] = ['HS256'];
-
-  private expiresInDefault: string = '30d';
-  private expiresInKey: string = 'SECURITY.JWT.EXPIRES';
-  
-  private secretKeyDefault: string = '549r<*?G{PdUjLF~';
-  private secretPassphraseKey: string = 'SECURITY.JWT.SECRET';
-
-
   constructor(
     @inject(TYPES.SystemPreferencesService) systemPreferences: ISystemPreferencesService,
   ) {
@@ -65,15 +56,15 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
    */
   private init(): void {
     // Set allowed values for the specific system preferences
-    this.systemPreferenceService.setAllowedValues(this.algorithmKey, this.algorithmValues);
+    this.systemPreferenceService.setAllowedValues(SecurityPreferencesEnum.JWT_ALGORITHM, ['HS256']);
 
     // Set check functions for specific system preferences
-    this.systemPreferenceService.setCheckFunction(this.expiresInKey, this.isExpiresInValueValid);
+    this.systemPreferenceService.setCheckFunction(SecurityPreferencesEnum.JWT_EXPIRES_IN, this.isExpiresInValueValid);
 
     // Set default values for the specific system preferences
-    this.systemPreferenceService.setDefaultValue(this.algorithmKey, [this.algorithmDefault]);
-    this.systemPreferenceService.setDefaultValue(this.expiresInKey, [this.expiresInDefault]);
-    this.systemPreferenceService.setDefaultValue(this.secretPassphraseKey, [this.secretKeyDefault]);
+    this.systemPreferenceService.setDefaultValue(SecurityPreferencesEnum.JWT_ALGORITHM, ['HS256']);
+    this.systemPreferenceService.setDefaultValue(SecurityPreferencesEnum.JWT_EXPIRES_IN, ['30d']);
+    this.systemPreferenceService.setDefaultValue(SecurityPreferencesEnum.JWT_SECRET_KEY, ['549r<*?G{PdUjLF~']);
   }
 
   /**
@@ -122,7 +113,7 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
    * @throws {Error}
    */
   public async setAlgorithm(algorithm: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.algorithmKey, [algorithm]);
+    await this.systemPreferenceService.savePreference(SecurityPreferencesEnum.JWT_ALGORITHM, [algorithm]);
   }
 
   /**
@@ -146,7 +137,7 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
 
    */
   public async setExpiresIn(expiresIn: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.expiresInKey, [expiresIn]);
+    await this.systemPreferenceService.savePreference(SecurityPreferencesEnum.JWT_EXPIRES_IN, [expiresIn]);
   }
 
   /**
@@ -168,7 +159,7 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
  
    */
   public async setSecretKey(secretKey: string): Promise<void> {
-    await this.systemPreferenceService.savePreference(this.secretPassphraseKey, [secretKey]);
+    await this.systemPreferenceService.savePreference(SecurityPreferencesEnum.JWT_SECRET_KEY, [secretKey]);
   }
 
 
@@ -185,7 +176,7 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
    * @throws {Error}
    */
   public async getAlgorithm(): Promise<string> {
-    const algorithm = await this.systemPreferenceService.getPreferenceValues(this.algorithmKey);
+    const algorithm = await this.systemPreferenceService.getPreferenceValues(SecurityPreferencesEnum.JWT_ALGORITHM);
     
     if (!algorithm || algorithm.length === 0) {
       return null;
@@ -207,7 +198,7 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
    * @throws {Error}
    */
   public async getExpiresIn(): Promise<string> {
-    const expiresIn = await this.systemPreferenceService.getPreferenceValues(this.expiresInKey);
+    const expiresIn = await this.systemPreferenceService.getPreferenceValues(SecurityPreferencesEnum.JWT_EXPIRES_IN);
 
     if (!expiresIn || expiresIn.length === 0) {
       return null;
@@ -229,7 +220,7 @@ export class JWTGenerator extends BaseSystemPreferenceService implements IJWTGen
    * @throws {Error}
    */
   public async getSecretKey(): Promise<string> {
-    const secretKey = await this.systemPreferenceService.getPreferenceValues(this.secretPassphraseKey);
+    const secretKey = await this.systemPreferenceService.getPreferenceValues(SecurityPreferencesEnum.JWT_SECRET_KEY);
 
     if (!secretKey || secretKey.length === 0) {
       return null;

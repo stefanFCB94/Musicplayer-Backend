@@ -4,6 +4,8 @@ import { container } from '../../../../inversify.config';
 import { TYPES } from '../../../../types';
 
 import { IJWTGenerator } from '../../../../interfaces/services/IJWTGenerator';
+import { SecurityPreferencesEnum } from '../../../../enums/preferences/SecurityPreferencesEnum';
+
 import { sendData } from '../../utils/sendData';
 import { sendError } from '../../utils/sendError';
 
@@ -15,17 +17,17 @@ export async function getSecuritySettings(req: express.Request, res: express.Res
 
   try {
     switch (option) {
-      case 'SECURITY.JWT.ALGORITHM': {
+      case SecurityPreferencesEnum.JWT_ALGORITHM: {
         data = await jwtGenerator.getAlgorithm();
         break;
       }
 
-      case 'SECURITY.JWT.EXPIRES': {
+      case SecurityPreferencesEnum.JWT_EXPIRES_IN: {
         data = await jwtGenerator.getExpiresIn();
         break;
       }
 
-      case 'SECURITY.JWT.SECRET': {
+      case SecurityPreferencesEnum.JWT_SECRET_KEY: {
         data = await jwtGenerator.getSecretKey();
         break;
       }
