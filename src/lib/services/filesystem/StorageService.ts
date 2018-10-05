@@ -17,10 +17,10 @@ import { StoragePathNotCreatableError } from '../../error/server/StoragePathNotC
 import { StorageFileNotExistingError } from '../../error/server/StorageFileNotExistingError';
 import { StorageFileNotDeletableError } from '../../error/server/StorageFileNotDeletableError';
 
+import { StoragePreferenceEnum } from '../../enums/preferences/StoragePreferenceEnum';
+
 
 export class StorageService extends BaseSystemPreferenceService implements IStorageService {
-
-  private baseStorageKey: string = 'STORAGE.PATH';
 
 
   constructor(
@@ -146,7 +146,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
    * @throws {Error}
    */
   public async getBaseStorage(): Promise<string> {
-    const storage = await this.systemPreferenceService.getPreferenceValues(this.baseStorageKey);
+    const storage = await this.systemPreferenceService.getPreferenceValues(StoragePreferenceEnum.STORAGE_PATH);
     
     if (!storage || storage.length === 0) {
       return null;
@@ -185,7 +185,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     await this.isWritable(path);
 
     const oldPath = await this.getBaseStorage();
-    await this.systemPreferenceService.savePreference(this.baseStorageKey, [path]);
+    await this.systemPreferenceService.savePreference(StoragePreferenceEnum.STORAGE_PATH, [path]);
 
     // If option moveContent is set to a true or is not defined value
     // the service tries to move all contents from the old storage to
@@ -232,7 +232,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
   public async saveFile(path: string, filename: string, file: Buffer): Promise<string> {
     const baseStorage = await this.getBaseStorage();
     if (!baseStorage) {
-      const error = new RequiredConfigParameterNotSetError(this.baseStorageKey, 'Storage must be defined');
+      const error = new RequiredConfigParameterNotSetError(StoragePreferenceEnum.STORAGE_PATH, 'Storage must be defined');
       this.logger.error('File could not be saved. Storage not defined');
       this.logger.error(error);
 
@@ -296,7 +296,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
     
     const baseStorage = await this.getBaseStorage();
     if (!baseStorage) {
-      const error = new RequiredConfigParameterNotSetError(this.baseStorageKey, 'Storage must be defined to delete file');
+      const error = new RequiredConfigParameterNotSetError(StoragePreferenceEnum.STORAGE_PATH, 'Storage must be defined to delete file');
       this.logger.error('To delete file, the storage must be defined');
       this.logger.error(error);
 
@@ -345,7 +345,7 @@ export class StorageService extends BaseSystemPreferenceService implements IStor
   public async exists(path: string): Promise<boolean> {
     const baseStorage = await this.getBaseStorage();
     if (!baseStorage) {
-      const error = new RequiredConfigParameterNotSetError(this.baseStorageKey, 'Storage not defined');
+      const error = new RequiredConfigParameterNotSetError(StoragePreferenceEnum.STORAGE_PATH, 'Storage not defined');
       this.logger.error(error);
 
       throw error;

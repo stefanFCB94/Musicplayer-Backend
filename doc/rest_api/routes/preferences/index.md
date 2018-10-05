@@ -22,6 +22,7 @@ All options, that can be requested, created or updated are listed below with a s
 | [Get JWT algorithm](./GET_SECURITY.JWT.ALGORITHM.md) | GET | /preferences/SECURITY.JWT.ALGORITHM |
 | [Get JWT lifetime](./GET_SECURITY.JWT.EXPIRES.md) | GET | /preferences/SECURITY.JWT.EXPIRES |
 | [Get JWT secret encryption key](./GET_SECURITY.JWT.SECRET.md) | GET | /preferences/SECURITY.JWT.SECRET |
+| [Get storage path](./GET_STORAGE.PATH.md) | GET | /preferences/STORAGE.PATH |
 
 
 # Update preference values
