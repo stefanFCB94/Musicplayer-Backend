@@ -6,7 +6,7 @@ promiseShim.shim();
 const Jasmine = require('jasmine');
 const jasmine = new Jasmine();
 jasmine.loadConfig({
-  spec_dir: 'dist/test',
+  spec_dir: 'dist-test',
   spec_files: [ '**/*.[sS]pec.js' ],
   helpers: [],
   random: false,

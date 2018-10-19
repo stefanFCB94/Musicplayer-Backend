@@ -4,9 +4,10 @@
   "description": "The monolith for the musicserver backend",
   "main": "dist/index.js",
   "scripts": {
-    "compile": "rm -rf ./dist && ./node_modules/.bin/tsc -p tsconfig.json && cp -r ./src/lib/api/schema ./dist/lib/api/schema",
-    "test": "npm run compile && ./jasmine.js",
-    "start": "npm run compile && node dist/lib/index.js",
+    "compile": "rm -rf ./dist && ./node_modules/.bin/tsc -p src/tsconfig.app.json && cp -r ./src/lib/api/schema ./dist/api/schema",
+    "compile:test": "rm -rf ./dist-test && ./node_modules/.bin/tsc -p src/tsconfig.spec.json && cp -r ./src/lib/api/schema ./dist-test/lib/api/schema",
+    "test": "npm run compile:test && ./jasmine.js",
+    "start": "npm run compile && node dist/index.js",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js --config nodemon.json",
     "test-nodemon": "node ./node_modules/nodemon/bin/nodemon.js --config nodemon.test.json",
     "doc": "./node_modules/.bin/typedoc --options typedoc.json src/",
