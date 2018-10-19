@@ -6,6 +6,6 @@ The following picture shows the database schema:
 
 ## Documentation of all database tables
 
-* [Local_User](./local_user.md)
-* [Storage_File]('./storage_file.md)
-* [System Preferences]('./system_preferences.md)
+* [Local_User](./tables/local_user.md)
+* [Storage_File]('./tables/storage_file.md)
+* [System Preferences]('./tables/system_preferences.md)
