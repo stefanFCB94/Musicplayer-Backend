@@ -18,6 +18,7 @@ export const TYPES = {
   ImageProcessingService: Symbol.for('IImageProcessingService'),
   SystemPreferencesService: Symbol.for('ISystemPreferencesService'),
   LibraryReaderService: Symbol.for('ILibraryReaderService'),
+  DirectoryReaderService: Symbol.for('IDirectoryReaderService'),
 
   // Database DAO
   LocalUserDAO: Symbol.for('ILocalUserDAO'),

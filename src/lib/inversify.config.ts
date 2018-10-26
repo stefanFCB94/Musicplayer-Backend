@@ -61,6 +61,9 @@ import { LibraryFileDAO } from './db/dao/LibraryFileDAO';
 import { ILibraryReaderService } from './interfaces/services/ILibraryReaderService';
 import { LibraryReaderService } from './services/filesystem/LibraryReaderService';
 
+import { IDirectoryReaderService } from './interfaces/services/IDirectoryReaderService';
+import { DirectoryReaderService } from './services/filesystem/DirectoryReaderService';
+
 
 
 
@@ -112,6 +115,9 @@ container.bind<ISystemPreferencesService>(TYPES.SystemPreferencesService)
 
 container.bind<ILibraryReaderService>(TYPES.LibraryReaderService)
   .to(LibraryReaderService).inSingletonScope();
+
+container.bind<IDirectoryReaderService>(TYPES.DirectoryReaderService)
+  .to(DirectoryReaderService).inRequestScope();
 
 
 // Database DAOs
