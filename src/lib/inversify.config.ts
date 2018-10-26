@@ -55,6 +55,9 @@ import { SystemPreferencesService } from './services/config/SystemPreferencesSer
 import { ILoggerListenerService } from './interfaces/services/ILoggerListenerService';
 import { LoggerListenerService } from './services/logging/LoggerListenerService';
 
+import { ILibraryFileDAO } from './interfaces/dao/ILibraryFileDAO';
+import { LibraryFileDAO } from './db/dao/LibraryFileDAO';
+
 
 
 
@@ -114,6 +117,9 @@ container.bind<IStorageFileDAO>(TYPES.StorageFileDAO)
 
 container.bind<ISystemPreferencesDAO>(TYPES.SystemPreferencesDAO)
   .to(SystemPreferencesDAO).inSingletonScope();
+
+container.bind<ILibraryFileDAO>(TYPES.LibraryFileDAO)
+  .to(LibraryFileDAO).inSingletonScope();
 
 
 // Providers

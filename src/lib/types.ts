@@ -22,4 +22,5 @@ export const TYPES = {
   LocalUserDAO: Symbol.for('ILocalUserDAO'),
   StorageFileDAO: Symbol.for('IStorageFileDAO'),
   SystemPreferencesDAO: Symbol.for('ISystemPreferencesDAO'),
+  LibraryFileDAO: Symbol.for('ILibraryFileDAO'),
 };
