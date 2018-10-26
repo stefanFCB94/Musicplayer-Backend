@@ -16,6 +16,9 @@ import { LibraryPathNotExistingError } from '../../error/library/LibraryPathNotE
 import { LibraryPathNotADirectoryError } from '../../error/library/LibraryPathNotADirectoryError';
 import { LibraryPathNotReadableError } from '../../error/library/LibraryPathNotReadableError';
 import { LibraryPathNotConfiguredError } from '../../error/library/LibraryPathNotConfiguredError';
+import { LibraryPathAlreadyConfiguredError } from '../../error/library/LibraryPathAlreadyConfiguredError';
+import { SupportedMimeTypeAlreadyConfiguredError } from '../../error/library/SupportedMimeTypeAlreadyConfiguredError';
+import { SupportedMimeTypeNotConfiguredError } from '../../error/library/SupportedMimeTypeNotConfiguredError';
 
 
 @injectable()
@@ -27,6 +30,8 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
     @inject(TYPES.LibraryFileDAO) private libraryFileDAO: ILibraryFileDAO,
   ) {
     super(systemPreferenceService);
+
+    this.systemPreferenceService.setDefaultValue(LibraryPreferencesEnum.MIME_TYPES, ['audio/mp3', 'audio/mp4', 'audio/x-flac', 'audio/x-m4a', 'audio/x-aac']);
   }
 
 
@@ -198,15 +203,20 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
     this.logger.debug('Library paths should be set');
     this.logger.debug(`It should be set ${paths.length} library paths`);
 
+    this.logger.debug('First remove possible duplicated entries');
+    const uniquePaths = paths.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
+
     this.logger.debug('Check, if each of the paths is existing');
-    paths.forEach(async (path) => {
+    uniquePaths.forEach(async (path) => {
       await this.isLibraryPathValid(path);
     });
 
     this.logger.debug('All library paths are valid');
     this.logger.debug('Now add the library paths to the system preferences');
 
-    await this.systemPreferenceService.savePreference(LibraryPreferencesEnum.PATHS, paths);
+    await this.systemPreferenceService.savePreference(LibraryPreferencesEnum.PATHS, uniquePaths);
   }
 
   /**
@@ -224,6 +234,7 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
    * @throws {LibraryPathNotExistingError}
    * @throws {LibraryPathNotADirectoryError}
    * @throws {LibraryPathNotReadableError}
+   * @throws {LibraryPathAlreadyConfiguredError}
    * @throws {ServiceNotInitializedError}
    * @throws {ParameterOutOfBoundsError}
    * @throws {InvalidConfigValueError}
@@ -238,6 +249,15 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
     this.logger.debug('New library path is valid');
 
     const paths = await this.systemPreferenceService.getPreferenceValues(LibraryPreferencesEnum.PATHS);
+    
+    if (paths.indexOf(path) !== -1) {
+      this.logger.debug(`Library path '${path}' already defined`);
+      
+      const error = new LibraryPathAlreadyConfiguredError(path, 'Library path already exists');
+      this.logger.warn(error);
+      throw error;
+    }
+
     paths.push(path);
 
     await this.systemPreferenceService.savePreference(LibraryPreferencesEnum.PATHS, paths);
@@ -283,6 +303,145 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
 
     await this.systemPreferenceService.savePreference(LibraryPreferencesEnum.PATHS, newPaths);
     this.logger.debug(`Library path '${path}' successfully deleted`);
+  }
+
+
+
+  /**
+   * @public
+   * @async
+   * 
+   * Get the mime types, which are supported by the library reader.
+   * Files with other mime types are not supported and will not be added
+   * to the application.
+   * 
+   * @returns {Promise<string>} The configured mime types
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
+   */
+  public async getSupportedMimeTypes(): Promise<string[]> {
+    this.logger.debug('Get the configured supported mime types for the library files');
+
+    const mimeTypes = await this.systemPreferenceService.getPreferenceValues(LibraryPreferencesEnum.MIME_TYPES);
+    this.logger.debug(`Supported mime types successfully requested, in total ${mimeTypes.length} configured`);
+
+    return mimeTypes;
+  }
+
+  /**
+   * @public
+   * @async
+   * 
+   * Set the supported mime types for the library reader of the
+   * application server.
+   * 
+   * The method will overwirte every mime types that are configured
+   * before.
+   * 
+   * @param {stirng[]} types The new suppoted mime types
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {InvalidConfigValueError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {Error}
+   */
+  public async setSupportedMimeTypes(types: string[]): Promise<void> {
+    this.logger.debug(`Set the ${types.length} mime types as supported mime types`);
+
+    this.logger.debug('First remove possible duplicated entries');
+    const uniqueTypes = types.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
+
+    await this.systemPreferenceService.savePreference(LibraryPreferencesEnum.MIME_TYPES, uniqueTypes);
+    this.logger.debug('Supported mime types successfully set');
+  }
+
+  /**
+   * @public
+   * @async
+   * 
+   * Add a supported mime type to the configured values.
+   * 
+   * Method checks, if value is alfready defined. In that
+   * case an error is thrown.
+   * 
+   * @param {string} type The mime type to add
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {SupportedMimeTypeAlreadyConfiguredError}
+   * @throws {InvalidConfigValueError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {Error}
+   */
+  public async addSupportedMimeType(type: string): Promise<void> {
+    this.logger.debug(`Try to add mime type '${type}' to the supported mime types`);
+
+    const types = await this.systemPreferenceService.getPreferenceValues(LibraryPreferencesEnum.MIME_TYPES);
+    this.logger.debug('Already defined mime types successfully requested');
+
+    if (types.indexOf(type) !== -1) {
+      this.logger.debug('Mime type to add already defined');
+
+      const error = new SupportedMimeTypeAlreadyConfiguredError(type, 'Mime type already defined');
+      this.logger.warn(error);
+      throw error;
+    }
+
+    this.logger.debug('Mime type not defined previously, so add mime type');
+    types.push(type);
+
+    await this.systemPreferenceService.savePreference(LibraryPreferencesEnum.MIME_TYPES, types);
+    this.logger.debug(`Mime type '${type}' successfully added`);
+  }
+
+  /**
+   * @public
+   * @async
+   * 
+   * Reomve a mime type from the supported mime types.
+   * 
+   * The method tries to delete the mime type from the values
+   * of the system prefrence service. If value is not configured
+   * an error is thrown.
+   * 
+   * @param {string} type The mime type to be delete
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {SupportedMimeTypeNotConfiguredError}
+   * @throws {ParameterOutOfBoundsError}
+   * @throws {InvalidConfigValueError}
+   * @throws {RequiredParameterNotSet}
+   * @throws {Error}
+   */
+  public async removeSupportedMimeType(type: string): Promise<void> {
+    this.logger.debug(`Remove mime type '${type}' form the configured preference values`);
+
+    const values = await this.systemPreferenceService.getPreferenceValues(LibraryPreferencesEnum.MIME_TYPES);
+    this.logger.debug('CUrrently configured values read successfully from the preference service');
+
+    if (values.indexOf(type) === -1) {
+      this.logger.debug(`Mime type '${type}' cannot be removed, because it is not configured`);
+
+      const error = new SupportedMimeTypeNotConfiguredError(type, 'Mime type not configured');
+      this.logger.warn(error);
+      throw error;
+    }
+
+    this.logger.debug('Mime type is at the moment configure, so remove it');
+    const newTypes = values.filter(value => value !== type);
+
+    await this.systemPreferenceService.savePreference(LibraryPreferencesEnum.MIME_TYPES, newTypes);
+    this.logger.debug(`Mime type '${type}' successfully removed from the configured values`);
   }
 
 
