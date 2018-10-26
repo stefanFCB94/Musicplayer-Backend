@@ -58,6 +58,9 @@ import { LoggerListenerService } from './services/logging/LoggerListenerService'
 import { ILibraryFileDAO } from './interfaces/dao/ILibraryFileDAO';
 import { LibraryFileDAO } from './db/dao/LibraryFileDAO';
 
+import { ILibraryReaderService } from './interfaces/services/ILibraryReaderService';
+import { LibraryReaderService } from './services/filesystem/LibraryReaderService';
+
 
 
 
@@ -106,6 +109,9 @@ container.bind<IImageProcessingService>(TYPES.ImageProcessingService)
 
 container.bind<ISystemPreferencesService>(TYPES.SystemPreferencesService)
   .to(SystemPreferencesService).inSingletonScope();
+
+container.bind<ILibraryReaderService>(TYPES.LibraryReaderService)
+  .to(LibraryReaderService).inSingletonScope();
 
 
 // Database DAOs
