@@ -37,7 +37,7 @@ export class DirectoryReaderService extends BaseService implements IDirectoryRea
    * @throws {Error}
    */
   public async readDirectory(path2Read: string): Promise<FileInformation[]> {
-    this.logger.debug(`Read all files recursivly of the directory '${path2Read}'`);
+    this.logger.debug(`Read all information of the path '${path2Read}'`);
 
     let files: FileInformation[] = [];
     
@@ -47,15 +47,13 @@ export class DirectoryReaderService extends BaseService implements IDirectoryRea
       this.logger.debug(`'${path2Read}' is a directory, so read content of the directory`);
       const content = await fs.readdir(path2Read);
 
-      content.forEach(async (c) => {
-        const subdirContent = await this.readDirectory(path.join(path2Read, c));
+      for (let i = 0; i < content.length; i++) {
+        const subdirContent = await this.readDirectory(path.join(path2Read, content[i]));
         files = files.concat(subdirContent);
-      });
+      }
 
       this.logger.debug(`'${path2Read}' successfully recursivly read`);
       return files;
-
-
     }
     
     if (stats.isFile()) {

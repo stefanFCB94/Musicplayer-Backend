@@ -6,9 +6,11 @@ import { TYPES } from '../../types';
 import { BaseSystemPreferenceService } from '../../base/BaseSystemPreferenceService';
 import { ILibraryReaderService } from '../../interfaces/services/ILibraryReaderService';
 
+import { FileInformation } from '../../interfaces/models/FileInformation';
 
 import { ILibraryFileDAO } from '../../interfaces/dao/ILibraryFileDAO';
 import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
+import { IDirectoryReaderService } from '../../interfaces/services/IDirectoryReaderService';
 
 import { LibraryPreferencesEnum } from '../../enums/preferences/LibraryPreferencesEnum';
 
@@ -28,10 +30,11 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
   constructor(
     @inject(TYPES.SystemPreferencesService) systemPreferenceService: ISystemPreferencesService,
     @inject(TYPES.LibraryFileDAO) private libraryFileDAO: ILibraryFileDAO,
+    @inject(TYPES.DirectoryReaderService) private directoryReader: IDirectoryReaderService,
   ) {
     super(systemPreferenceService);
 
-    this.systemPreferenceService.setDefaultValue(LibraryPreferencesEnum.MIME_TYPES, ['audio/mp3', 'audio/mp4', 'audio/x-flac', 'audio/x-m4a', 'audio/x-aac']);
+    this.systemPreferenceService.setDefaultValue(LibraryPreferencesEnum.MIME_TYPES, ['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/x-flac', 'audio/x-m4a', 'audio/x-aac']);
   }
 
 
@@ -445,4 +448,38 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
   }
 
 
+  /**
+   * @public
+   * @async
+   * 
+   * Get all files in the library paths.
+   * 
+   * Method gets alle the configured library paths and
+   * returns all files, which are saved in that paths and
+   * their subdirectories.
+   * 
+   * For each found file the full path, the file size and
+   * the mime type of the file is returned
+   * 
+   * @returns {Promise<FileInformation[]>}
+   * 
+   * @throws {Error}
+   */
+  public async getAllFilesInLibraryPaths(): Promise<FileInformation[]> {
+    const paths = await this.getLibraryPaths();
+    const mimeTypes = await this.getSupportedMimeTypes();
+
+    const files: FileInformation[] = [];
+
+    for (let i = 0; i < paths.length; i++) {
+      this.logger.debug(`Scan for files in directory '${paths[i]}`);
+
+      let temp = await this.directoryReader.readDirectory(paths[i]);
+      temp = temp.filter(file => mimeTypes.indexOf(file.mime) > -1);
+
+      files.push(...temp);
+    }
+
+    return files;
+  }
 }
