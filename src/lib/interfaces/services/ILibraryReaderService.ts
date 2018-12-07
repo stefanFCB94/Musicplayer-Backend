@@ -7,5 +7,10 @@ export interface ILibraryReaderService {
   addLibraryPath(path: string): Promise<void>;
   removeLibraryPath(path: string): Promise<void>;
 
+  getSupportedMimeTypes(): Promise<string[]>;
+  setSupportedMimeTypes(types: string[]): Promise<void>;
+  addSupportedMimeTypes(type: string): Promise<void>;
+  removeSupportedMimeType(type: string): Promise<void>;
+
   getAllFilesInLibraryPaths(): Promise<FileInformation[]>;
 }
