@@ -28,21 +28,4 @@ async function start() {
   }
 }
 
-// start();
-
-async function test() {
-  await initEventListener();
-  
-  const reader = container.get<ILibraryReaderService>(TYPES.LibraryReaderService);
-  await reader.setLibraryPaths([
-    'C:/Users/stefan/Documents/Musicplayer/Library/Test 1',
-    'C:/Users/stefan/Documents/Musicplayer/Library/Test 2',
-  ]);
-
-  const files = await reader.getAllFilesInLibraryPaths();
-  console.log(files);
-
-  process.exit(0);
-}
-
-test();
+start();
