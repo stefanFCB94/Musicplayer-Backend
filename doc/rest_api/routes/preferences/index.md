@@ -29,6 +29,8 @@ All options, that can be requested, created or updated are listed below with a s
 | [Get log console used](./GET_LOGGER.USE_CONSOLE.md) | GET | /preferences/LOGGER.USE_CONSOLE |
 | [Get log single file used](./GET_LOGGER.USE_SINGLE_FILE.md) | GET | /preferences/LOGGER.USE_SINGLE_FILE |
 | [Get log rotation file used](./GET_LOGGER.USE_ROTATION_FILE.md) | GET | /preferences/LOGGER.USE_ROTATION_FILE |
+| [Get library paths](./GET_LIBRARY.PATHS.md) | GET | /prefrences/LIBRARY.PATHS |
+| [Get supported mime types](./GET_LIBRARY.SUPPORTED_MIME_TYPES.md) | GET | /preferences/LIBRARY.SUPPORTED_MIME_TYPES |
 
 # Update preference values
 
