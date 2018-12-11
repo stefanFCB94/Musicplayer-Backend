@@ -23,6 +23,8 @@ import { LibraryPathNotConfiguredError } from '../../error/library/LibraryPathNo
 import { LibraryPathAlreadyConfiguredError } from '../../error/library/LibraryPathAlreadyConfiguredError';
 import { SupportedMimeTypeAlreadyConfiguredError } from '../../error/library/SupportedMimeTypeAlreadyConfiguredError';
 import { SupportedMimeTypeNotConfiguredError } from '../../error/library/SupportedMimeTypeNotConfiguredError';
+import { LibraryFileChangeOperation } from '../../enums/LibraryFileChangeOperation';
+import { LibraryFileChangeInformation } from '../../interfaces/models/LibraryFileChangeInformation';
 
 
 @injectable()
@@ -468,7 +470,7 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
    * 
    * @throws {Error}
    */
-  public async getAllFilesInLibraryPaths(): Promise<FileInformation[]> {
+  private async getAllFilesInLibraryPaths(): Promise<FileInformation[]> {
     const paths = await this.getLibraryPaths();
     const mimeTypes = await this.getSupportedMimeTypes();
 
@@ -498,7 +500,7 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
    * @throws {ServiceNotInitializedError}
    * @throws {Error}
    */
-  public async getHashToFiles(files: FileInformation[]): Promise<FileChecksumInformation[]> {
+  private async getHashToFiles(files: FileInformation[]): Promise<FileChecksumInformation[]> {
     const ret: FileChecksumInformation[] = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -511,6 +513,58 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
       ret.push({ ...file, checksum });
     }
     
+    return ret;
+  }
+
+  public async scanLibraryPaths(): Promise<LibraryFileChangeInformation[]> {
+    this.logger.debug('Get all files in the directories with the MD5 hashes');
+    const files = await this.getAllFilesInLibraryPaths();
+    const hashedFiles = await this.getHashToFiles(files);
+
+    this.logger.debug('Get all saved files from the database');
+    const libraryFiles = await this.libraryFileDAO.getAllFiles();
+
+
+    this.logger.debug('Now detect for each found file the operation, which has to be made');
+    const foundFiles: LibraryFileChangeInformation[] = hashedFiles.map((file) => {
+      // Get the stored information by path or MD5 checkusm to detect operation
+      const fileByPath = libraryFiles.filter(lf => lf.path === file.path)[0];
+      const fileByHash = libraryFiles.filter(lf => lf.checksum === file.checksum)[0];
+
+      let operation: LibraryFileChangeOperation;
+
+      if (fileByPath && fileByHash && fileByPath === fileByHash) {
+        this.logger.debug(`File untouched: ${file.path}`);
+        operation = LibraryFileChangeOperation.NONE;
+      } else if (fileByPath && !fileByHash) {
+        this.logger.debug(`File updated: ${file.path}`);
+        operation = LibraryFileChangeOperation.UPDATED;
+      } else if (!fileByPath && fileByHash) {
+        this.logger.debug(`File moved: ${file.path}`);
+        operation = LibraryFileChangeOperation.MOVED;
+      } else if (!fileByPath && !fileByHash) {
+        this.logger.debug(`File created: ${file.path}`);
+        operation = LibraryFileChangeOperation.CREATED;
+      } else {
+        this.logger.warn(`Unspported operation, file was moved to a path that already exists: ${file.path}`);
+        operation = LibraryFileChangeOperation.UNSUPPORTED;
+      }
+
+      return { file, operation };
+    });
+
+    this.logger.debug('Found files processed, now check, which files were deleted');
+
+    const deleted: LibraryFileChangeInformation[] = libraryFiles.filter((file) => {
+      const foundFile = hashedFiles.filter(hf => hf.checksum === file.checksum || hf.path === file.path);
+      return foundFile.length === 0;
+    }).map((file) => {
+      return { operation: LibraryFileChangeOperation.DELETED, library_file: file };
+    });
+
+    const ret = [...foundFiles, ...deleted];
+    this.logger.debug(`Scanning finished. Found file and operations: ${ret.length}`);
+
     return ret;
   }
 }

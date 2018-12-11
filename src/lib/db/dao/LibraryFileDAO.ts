@@ -317,4 +317,37 @@ export class LibraryFileDAO extends BaseService implements ILibraryFileDAO {
       throw err;
     }
   }
+
+  /**
+   * @public
+   * @async
+   * 
+   * Get all library file information, which are stored in the database.
+   * 
+   * The function will return all stored information about the library
+   * files. Do not use this function to get the library files for the user
+   * For that use a function with pagination support.
+   * 
+   * @returns {Promise<LibraryFile[]>} All library files
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
+   */
+  public async getAllFiles(): Promise<LibraryFile[]> {
+    await this.initRespository();
+
+    this.logger.debug('Start querying all file information');
+
+    try {
+      const files = await this.fileRepository.find();
+      this.logger.debug(`Query finished. Found results: ${files.length}`);
+
+      return files;
+    } catch (err) {
+      this.logger.debug('An unsupported error occured by deleting library file');
+      this.logger.error(err);
+
+      throw err;
+    }
+  }
 }
