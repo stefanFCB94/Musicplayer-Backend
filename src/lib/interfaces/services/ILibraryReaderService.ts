@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import { FileInformation } from '../models/FileInformation';
+import { FileChecksumInformation } from '../models/FileChecksumInformation';
 
 export interface ILibraryReaderService {
   getLibraryPaths(): Promise<string[]>;
@@ -13,4 +14,5 @@ export interface ILibraryReaderService {
   removeSupportedMimeType(type: string): Promise<void>;
 
   getAllFilesInLibraryPaths(): Promise<FileInformation[]>;
+  getHashToFiles(files: FileInformation[]): Promise<FileChecksumInformation[]>;
 }

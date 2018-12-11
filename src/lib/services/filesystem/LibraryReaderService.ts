@@ -7,10 +7,12 @@ import { BaseSystemPreferenceService } from '../../base/BaseSystemPreferenceServ
 import { ILibraryReaderService } from '../../interfaces/services/ILibraryReaderService';
 
 import { FileInformation } from '../../interfaces/models/FileInformation';
+import { FileChecksumInformation } from '../../interfaces/models/FileChecksumInformation';
 
 import { ILibraryFileDAO } from '../../interfaces/dao/ILibraryFileDAO';
 import { ISystemPreferencesService } from '../../interfaces/services/ISystemPreferencesService';
 import { IDirectoryReaderService } from '../../interfaces/services/IDirectoryReaderService';
+import { IChecksumCalculator } from '../../interfaces/services/IChecksumCalculator';
 
 import { LibraryPreferencesEnum } from '../../enums/preferences/LibraryPreferencesEnum';
 
@@ -31,6 +33,7 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
     @inject(TYPES.SystemPreferencesService) systemPreferenceService: ISystemPreferencesService,
     @inject(TYPES.LibraryFileDAO) private libraryFileDAO: ILibraryFileDAO,
     @inject(TYPES.DirectoryReaderService) private directoryReader: IDirectoryReaderService,
+    @inject(TYPES.ChecksumCalculator) private checksumCalculator: IChecksumCalculator,
   ) {
     super(systemPreferenceService);
 
@@ -481,5 +484,33 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
     }
 
     return files;
+  }
+
+  /**
+   * @public
+   * @async
+   * 
+   * Calculate a the MD5 checksum for each file in paramter.
+   * 
+   * @param {FileInformation[]} files The file, for which the checksum should be calculated
+   * @returns {FileChecksumInformation[]}
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
+   */
+  public async getHashToFiles(files: FileInformation[]): Promise<FileChecksumInformation[]> {
+    const ret: FileChecksumInformation[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      this.logger.debug(`Calculate checksum to file '${file.path}'`);
+      const checksum = await this.checksumCalculator.getMD5Checksum(file.path);
+      this.logger.debug(`Calculated checksum: ${checksum}`);
+
+      ret.push({ ...file, checksum });
+    }
+    
+    return ret;
   }
 }
