@@ -118,9 +118,9 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
    */
   private async isLibraryPathReadable(path: string): Promise<boolean> {
     if (process.platform !== 'win32') {
-      const hasRead = await fs.access(path, fs.constants.R_OK);
-
-      if (!hasRead) {
+      try {
+        await fs.access(path, fs.constants.R_OK);
+      } catch (err) {
         const error = new LibraryPathNotReadableError(path, 'Library path is not readable');
         this.logger.warn(error);
         throw error;
