@@ -776,8 +776,9 @@ export class Server extends BaseSystemPreferenceService implements IServer {
 
         const redirectApp = express();
         redirectApp.all('*', (req, res) => {
-          const url = `https://${req.headers.host}:${httpsPort}${req.url}`;
-          res.redirect(url, 307);
+          const host = req.headers.host.split(':')[0];
+          const url = `https://${host}:${httpsPort}${req.url}`;
+          res.redirect(307, url);
         });
 
         this.httpServer = http.createServer(redirectApp);
