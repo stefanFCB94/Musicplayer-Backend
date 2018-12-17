@@ -454,7 +454,7 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
 
 
   /**
-   * @public
+   * @private
    * @async
    * 
    * Get all files in the library paths.
@@ -489,7 +489,7 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
   }
 
   /**
-   * @public
+   * @private
    * @async
    * 
    * Calculate a the MD5 checksum for each file in paramter.
@@ -516,6 +516,25 @@ export class LibraryReaderService extends BaseSystemPreferenceService implements
     return ret;
   }
 
+  /**
+   * @public
+   * @async
+   * 
+   * Scan all configured library paths and get all media files in them.
+   * Get to each found file the operation, which should be made.
+   * 
+   * Possible operations:
+   *  - NONE: File hasn't changed since last index run, no operation neccassyry
+   *  - UPDATED: File is in the same path, but data has changed, reindex
+   *  - MOVED: File was moved in the filesystem, change path to file in index
+   *  - CREATED: File was addes since the last index, add to index
+   *  - UNSUPPORTED: File was moved and has overriten a other file, should not happen
+   * 
+   * @returns {Promise<LibraryFileChangeInformation[]>} The found files in the library path with operation
+   * 
+   * @throws {ServiceNotInitializedError}
+   * @throws {Error}
+   */
   public async scanLibraryPaths(): Promise<LibraryFileChangeInformation[]> {
     this.logger.debug('Get all files in the directories with the MD5 hashes');
     const files = await this.getAllFilesInLibraryPaths();
