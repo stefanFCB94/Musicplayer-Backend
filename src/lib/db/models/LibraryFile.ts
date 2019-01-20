@@ -1,5 +1,6 @@
 import { MyBaseEntity } from './BaseEntity';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToOne } from 'typeorm';
+import { TitleFile } from './TitleFile';
 
 @Entity()
 export class LibraryFile extends MyBaseEntity {
@@ -37,6 +38,10 @@ export class LibraryFile extends MyBaseEntity {
     comment: 'The filesize of the libary file in bytes',
   })
   filesize: number;
+
+
+  @OneToOne(type => TitleFile, file => file.file)
+  titleFile: TitleFile;
 
   constructor() { super(); }
 
