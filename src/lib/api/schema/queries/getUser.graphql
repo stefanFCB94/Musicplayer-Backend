@@ -1,5 +1,0 @@
-# import LocalUser from "../types/LocalUser.graphql"
-
-type Query {
-  getUser(id: UUID!): LocalUser
-}

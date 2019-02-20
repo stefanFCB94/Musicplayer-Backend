@@ -1,3 +1,0 @@
-# import Query.* from "./queries/getUser.graphql"
-# import Query.* from "./queries/getUserByMail.graphql"
-

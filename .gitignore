@@ -1,5 +1,6 @@
 dist
 dist-test
+data
 node_modules
 doc/generated
 config/ssl/*

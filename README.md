@@ -9,10 +9,7 @@ A programm, which has the basic functionalities for a music management system.
 
 
 ### Already implemented features:
-- REST and GraphQL API
-- Basic services for logging and storing of preferences
-- User registration and authentification through JWT
-
+- Nothing
 
 ### Planned functionality includes:
 - Manage a complete music library
@@ -22,8 +19,7 @@ A programm, which has the basic functionalities for a music management system.
 - Load images for artists
 - Synchronize music library to Android devices
 - Chromecast and Airplay support
-
-
-# System requirements
-- NodeJS >= 9.9
-- Supported database: MySQL, PostgreSQL, SQLite
+- REST and GraphQL API
+- Basic services for logging and storing of preferences
+- User registration and authentification through JWT
+- Microservice environment for easy scaling and deployment
