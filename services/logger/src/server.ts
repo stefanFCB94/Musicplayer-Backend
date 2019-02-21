@@ -34,11 +34,10 @@ export class Server {
 
 
   constructor() {
-    this.useHttps = config.get('USE_HTTPS') || false;
-    
+    this.httpPort = 80;
+    this.httpsPort = 443;
 
-    this.httpPort = config.get('LOGGER.HTTP_PORT') || 8080;
-    this.httpsPort = config.get('LOGGER.HTTPS_PORT') || 8443;
+    this.useHttps = config.get('USE_HTTPS') || false;
 
     this.certificate = config.get('CERTIFICATE_PATH');
     this.privateKey = config.get('PRIVATE_KEY_PATH');

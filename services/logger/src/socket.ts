@@ -33,11 +33,10 @@ export class Socket {
 
 
   constructor() {
-    this.useHttps = config.get('USE_HTTPS') || false;
+    this.httpPort = 8080;
+    this.httpsPort = 8443;
 
-
-    this.httpPort = config.get('LOGGER.SOCKET.HTTP_PORT');
-    this.httpsPort = config.get('LOGGER.SOCKET.HTTPS_PORT');
+    this.useHttps = config.get('USE_HTTPS') || true;
 
     this.certificate = config.get('CERTIFICATE_PATH');
     this.privateKey = config.get('PRIVATE_KEY_PATH');
