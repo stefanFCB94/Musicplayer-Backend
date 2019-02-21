@@ -1,6 +1,6 @@
 import { ResponseError } from './ResponseError';
 
 export interface ResponseType {
-  data: any,
-  errors: ResponseError[] 
+  data: any;
+  errors: ResponseError[];
 }

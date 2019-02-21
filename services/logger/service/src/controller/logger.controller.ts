@@ -42,7 +42,7 @@ export class LoggerController {
       await this.loggerService.log(service, request, message, level);
 
       res.status(204).send();
-    } catch(err) {
+    } catch (err) {
       res.status(500).json(get_error_data(err));
     }
   }
@@ -84,5 +84,5 @@ export class LoggerController {
       res.status(500).json(get_error_data(err));
     }
   }
-  
+
 }

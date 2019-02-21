@@ -130,7 +130,7 @@ export class Server {
     });
 
     this.httpServer = http.createServer(redirectApp);
-    
+
     return new Promise<void>((resolve) => {
       this.httpServer.listen(this.httpPort, () => {
         console.log(`Server started on port ${this.httpPort}`);

@@ -32,18 +32,18 @@ export class LogLevelService {
   }
 
   async upsertLogLevel(service: string, logLevel: string): Promise<LogLevel> {
-    if (!service) { 
-      throw new RequiredParameterNotSetError(`Paramter 'service' not set`);
-    }    
+    if (!service) {
+      throw new RequiredParameterNotSetError("Paramter 'service' not set");
+    }
     if (service.length > 128) {
-      throw new ParamterTooLongError(`Paramter 'service' can only be 128 characters long`);
+      throw new ParamterTooLongError("Paramter 'service' can only be 128 characters long");
     }
 
     if (!logLevel) {
-      throw new RequiredParameterNotSetError(`Parameter 'logLevel' not set`);
+      throw new RequiredParameterNotSetError("Parameter 'logLevel' not set");
     }
     if (['error', 'warn', 'info', 'verbose', 'debug', 'silly'].indexOf(logLevel) < 0) {
-      throw new InvalidParamterValueError(`Invalid paramter for attribute 'logLevel' passed`);
+      throw new InvalidParamterValueError("Invalid paramter for attribute 'logLevel' passed");
     }
 
 
@@ -52,20 +52,20 @@ export class LogLevelService {
     const entity = new LogLevel();
     entity.service = service;
     entity.level = logLevel;
-    
+
     return repo.save(entity);
   }
 
   async deleteLogLevel(service: string): Promise<LogLevel> {
     const repo = this.database.getConnection().getRepository(LogLevel);
-    
+
     const entity = await repo.findOne({ service });
     if (!entity) {
       throw new EntityNotFoundError(`Log level for service '${service}' not found`);
     }
 
     const ret = { ...entity };
-    
+
     await repo.remove(entity);
     return ret;
   }

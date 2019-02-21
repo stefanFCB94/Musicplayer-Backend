@@ -39,7 +39,7 @@ export class WatcherService {
 
     tail.on('line', (data) => {
       callback(data);
-    })
+    });
 
 
     const id = uuid.v4();
@@ -61,7 +61,7 @@ export class WatcherService {
     if (!this.listeners[listenerId]) {
       throw new WatcherNotFoundError(`Watcher for with the id '${listenerId}' not found`);
     }
-    
+
     // Unwatch file and delete the watcher from the registry
     this.listeners[listenerId].unwatch();
     delete this.listeners[listenerId];

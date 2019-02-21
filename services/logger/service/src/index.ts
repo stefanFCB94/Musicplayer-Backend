@@ -21,7 +21,7 @@ async function startServer() {
 process.on('SIGINT', async () => {
   await server.stop();
   await websocket.stopWebsocket();
-  
+
   setTimeout(() => process.exit(0), 1000);
 });
 

@@ -20,7 +20,7 @@ export class LoggerService {
     this.serviceLoggers = {};
   }
 
-  
+
   async createRequestLogger(request: string) {
     const logLevelData = await this.logLevelService.getLogLevel('__REQUEST__');
     const level = logLevelData ? logLevelData.level : 'warn';
@@ -35,29 +35,29 @@ export class LoggerService {
       winston.format.timestamp(),
       winston.format.printf(({ timestamp, level, message, metadata }) => {
         return `[${timestamp}] - [${metadata.service}] - [${level}]: ${message}`;
-      })
+      }),
     );
 
     const fileTransport = new winston.transports.File({
       filename: `${request}.log`,
-      dirname: LOG_PATH_REQUESTS
+      dirname: LOG_PATH_REQUESTS,
     });
 
     const logger = winston.createLogger({
       format,
       level,
-      transports: [ fileTransport ]
+      transports: [fileTransport],
     });
 
     if (process.env.NODE_ENV !== 'production') {
       const consoleTransport = new winston.transports.Console();
-      logger.transports = [ ...logger.transports, consoleTransport ];
+      logger.transports = [...logger.transports, consoleTransport];
     }
 
 
     this.requestLoggers[request] = logger;
 
-    logger.log('info', `Request log file created`, { request, service: 'logger-service' });
+    logger.log('info', 'Request log file created', { request, service: 'logger-service' });
     return logger;
   }
 
@@ -84,23 +84,23 @@ export class LoggerService {
       winston.format.timestamp(),
       winston.format.printf(({ timestamp, level, message, metadata }) => {
         return `[${timestamp}] - [${metadata.request}] - [${level}]: ${message}`;
-      })
+      }),
     );
 
     const fileTransport = new winston.transports.File({
       filename: `${service}.log`,
-      dirname: LOG_PATH_SERVICES
+      dirname: LOG_PATH_SERVICES,
     });
 
     const logger = winston.createLogger({
       format,
       level,
-      transports: [ fileTransport ]
+      transports: [fileTransport],
     });
 
     if (process.env.NODE_ENV !== 'production') {
       const consoleTransport = new winston.transports.Console();
-      logger.transports = [ ...logger.transports, consoleTransport ];
+      logger.transports = [...logger.transports, consoleTransport];
     }
 
     this.serviceLoggers[service] = logger;
@@ -120,7 +120,7 @@ export class LoggerService {
 
   updateLogLevel(service: string, logLevel: string) {
     if (service === '__REQUEST__') {
-      Object.keys(this.requestLoggers).forEach(key => {
+      Object.keys(this.requestLoggers).forEach((key) => {
         this.requestLoggers[key].level = logLevel;
       });
     } else {

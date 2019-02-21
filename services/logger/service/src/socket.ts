@@ -18,7 +18,7 @@ export class Socket {
 
   private app: express.Application;
   private server: http.Server | https.Server;
-  
+
   private wss: enableWs.Instance;
   private pingInterval: NodeJS.Timeout;
 
@@ -62,7 +62,7 @@ export class Socket {
       const key = await fs.readFile(this.privateKey);
       const cert = await fs.readFile(this.certificate);
       const options: https.ServerOptions = { key, cert };
-  
+
       this.server =  https.createServer(options, this.app);
     } else {
       this.server = http.createServer(this.app);
@@ -73,16 +73,16 @@ export class Socket {
     await this.startServiceWebsocket();
     await this.startRequestWebsocket();
     await this.startPingInterval();
-    
-    
+
+
     this.server.listen(this.httpsPort, () => {
-      console.log('Websocket ist listening on port ' + this.httpsPort);
+      console.log(`Websocket ist listening on port ${this.httpsPort}`);
     });
   }
 
 
   private async startServiceWebsocket() {
-     this.wss.app.ws('/service/(:service)', async (ws: ExtWebSocket, req) => {
+    this.wss.app.ws('/service/(:service)', async (ws: ExtWebSocket, req) => {
       try {
         const id = await this.watcherService.createServiceWatcher(req.params.service, (line: string) => {
           ws.send(line);
@@ -133,7 +133,7 @@ export class Socket {
         client.isAlive = false;
         client.ping(null, false);
       });
-    }, 10000);
+    },                              10000);
   }
 
 

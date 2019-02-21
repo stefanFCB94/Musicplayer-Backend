@@ -14,7 +14,7 @@ export class DatabaseService {
 
 
   async connect(): Promise<void> {
-    
+
     const host: string = config.get('DB.HOST');
     const port: number = config.get('DB.PORT');
 
@@ -23,7 +23,8 @@ export class DatabaseService {
     const database: string = config.get('LOGGER.DB.DATABASE');
 
     try {
-      
+
+      const dir = __dirname;
       this.connection = await createConnection({
         host,
         port,
@@ -32,7 +33,7 @@ export class DatabaseService {
         database,
         type: 'postgres',
         entities: [
-          __dirname + '/models/*.js',
+          `${dir}/models/*.js`,
         ],
         synchronize: true,
       });
