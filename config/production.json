@@ -1,37 +1,19 @@
 {
+  "USE_HTTPS": true,
+  "CERTIFICATE_PATH": "./config/ssl/musicserver.crt",
+  "PRIVATE_KEY_PATH": "./config/ssl/musicserver.key",
+  
+  "DB": {
+    "HOST": "db",
+    "PORT": 5432
+  },
+
   "LOGGER": {
-    "LEVEL": "debug",
-    "DIRECTORY": ".",
-    "FILENAME": "musicserver",
-    "USE_SINGLE_FILE": false,
-    "USE_ROTATION_FILE": false,
-    "USE_CONSOLE": true
-  },
-  "DATABASE": {
-    "TYPE": "mysql",
-    "HOST": "localhost",
-    "PORT": 3306,
-    "USERNAME": "musicserver",
-    "PASSWORD": "music1!",
-    "DATABASE": "musicserver"
-  },
-  "SIGNUP": {
-    "POSSIBLE": true
-  },
-  "SECURITY": {
-    "SALT_ROUNDS": 10
-  },
-  "SERVER": {
-    "USE_HTTPS": true,
-    "HTTP_PORT": 8080,
-    "HTTPS_PORT": 8443,
-    "PRIVATE_KEY": "./config/ssl/musicserver.key",
-    "CERTIFICATE": "./config/ssl/musicserver.crt"
-  },
-  "STORAGE": {
-    "PATH": "C:\\Users\\stefan\\Documents\\Musicplayer\\Storage"
-  },
-  "IMAGES": {
-    "FORMAT": "PNG"
+    "HOST": "logger",
+    "DB": {
+      "USERNAME": "logger",
+      "PASSWORD": "0JjV5(G26,^{a&L8",
+      "DATABASE": "logger" 
+    }
   }
 }
