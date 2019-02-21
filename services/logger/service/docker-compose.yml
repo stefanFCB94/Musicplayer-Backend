@@ -19,7 +19,7 @@ services:
     image: node:11-alpine
     volumes: 
       - .:/usr/src/service
-      - ../../config:/usr/src/service/config
+      - ../../../config:/usr/src/service/config
       - ./data/logs:/usr/src/service/logs
     working_dir: /usr/src/service
     command: npm run dev
