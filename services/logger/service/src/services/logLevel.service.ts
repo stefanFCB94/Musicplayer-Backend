@@ -1,9 +1,9 @@
 import { DatabaseService } from '../database/database.service';
 import { LogLevel } from '../database/models/LogLevel';
 import { EntityNotFoundError } from '../errors/EntityNotFound.error';
-import { ParamterTooLongError } from '../errors/ParameterTooLong.error';
+import { ParameterTooLongError } from '../errors/ParameterTooLong.error';
 import { RequiredParameterNotSetError } from '../errors/RequiredParamterNotSet.error';
-import { InvalidParamterValueError } from '../errors/InvalidParamterValue.error';
+import { InvalidParameterValueError } from '../errors/InvalidParameterValue.error';
 
 
 export class LogLevelService {
@@ -26,7 +26,7 @@ export class LogLevelService {
 
   async getLogLevels(): Promise<LogLevel[]> {
     const repo = this.database.getConnection().getRepository(LogLevel);
-    const logLevels = await repo.find();
+    const logLevels = await repo.find({ order: { service: 'ASC' } });
 
     return logLevels;
   }
@@ -36,14 +36,14 @@ export class LogLevelService {
       throw new RequiredParameterNotSetError("Paramter 'service' not set");
     }
     if (service.length > 128) {
-      throw new ParamterTooLongError("Paramter 'service' can only be 128 characters long");
+      throw new ParameterTooLongError("Paramter 'service' can only be 128 characters long");
     }
 
     if (!logLevel) {
       throw new RequiredParameterNotSetError("Parameter 'logLevel' not set");
     }
     if (['error', 'warn', 'info', 'verbose', 'debug', 'silly'].indexOf(logLevel) < 0) {
-      throw new InvalidParamterValueError("Invalid paramter for attribute 'logLevel' passed");
+      throw new InvalidParameterValueError("Invalid paramter for attribute 'logLevel' passed");
     }
 
 

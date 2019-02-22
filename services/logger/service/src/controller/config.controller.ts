@@ -5,8 +5,8 @@ import { EntityNotFoundError } from '../errors/EntityNotFound.error';
 import { get_error_data } from '../utils/get_error_data';
 import { get_success_data } from '../utils/get_success_data';
 import { UnsupportedError } from '../errors/Unsupported.error';
-import { InvalidParamterValueError } from '../errors/InvalidParamterValue.error';
-import { ParamterTooLongError } from '../errors/ParameterTooLong.error';
+import { InvalidParameterValueError } from '../errors/InvalidParameterValue.error';
+import { ParameterTooLongError } from '../errors/ParameterTooLong.error';
 import { RequiredParameterNotSetError } from '../errors/RequiredParamterNotSet.error';
 
 
@@ -80,12 +80,12 @@ export class ConfigController {
 
     } catch (err) {
 
-      if (err instanceof InvalidParamterValueError) {
+      if (err instanceof InvalidParameterValueError) {
         res.status(400).json(get_error_data(err));
         return;
       }
 
-      if (err instanceof ParamterTooLongError) {
+      if (err instanceof ParameterTooLongError) {
         res.status(400).json(get_error_data(err));
         return;
       }

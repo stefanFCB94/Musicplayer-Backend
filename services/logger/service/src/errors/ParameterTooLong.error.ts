@@ -1,1 +1,1 @@
-export class ParamterTooLongError extends Error {}
+export class ParameterTooLongError extends Error {}
