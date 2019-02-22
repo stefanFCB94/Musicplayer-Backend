@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  
+  base-appl:
+    image: node:11-alpine
+    volumes: 
+      - ../service:/usr/src/service
+    working_dir: /usr/src/service
+    command: npm run dev
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+      - 8443:8443
+
+  install-appl:
+    extends:
+      service: base-appl
+    command: npm install
+
+
+
+
+  base-test:
+    image: node:11-alpine
+    volumes:
+      - .:/usr/src/service
+    working_dir: /usr/src/service
+    command: npm test
+
+
+  install-test:
+    extends:
+      service: base-test
+    command: npm install

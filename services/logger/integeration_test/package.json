@@ -1,0 +1,36 @@
+{
+  "name": "logger_integration-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for the logger microservice",
+  "main": "dist/index.js",
+  "scripts": {
+    "compile": "rm -rf ./dist && ./node_modules/.bin/tsc -p ./tsconfig.json",
+    "test": "npm run compile && mocha dist/**/*.js"
+  },
+  "keywords": [
+    "logger",
+    "microservice",
+    "integration test"
+  ],
+  "author": "Stefan Läufle",
+  "license": "MIT",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "config": "^3.0.1",
+    "mocha": "^6.0.1",
+    "pg": "^7.8.1",
+    "reflect-metadata": "^0.1.13",
+    "supertest": "^3.4.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/config": "0.0.34",
+    "@types/mocha": "^5.2.6",
+    "@types/pg": "^7.4.13",
+    "@types/supertest": "^2.0.7",
+    "nodemon": "^1.18.10",
+    "tslint": "^5.12.1",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.3.3"
+  }
+}
