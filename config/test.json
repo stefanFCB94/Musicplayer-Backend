@@ -1,0 +1,19 @@
+{
+  "USE_HTTPS": true,
+  "CERTIFICATE_PATH": "./config/ssl/musicserver.crt",
+  "PRIVATE_KEY_PATH": "./config/ssl/musicserver.key",
+  
+  "DB": {
+    "HOST": "db",
+    "PORT": 5432
+  },
+
+  "LOGGER": {
+    "HOST": "logger",
+    "DB": {
+      "USERNAME": "logger",
+      "PASSWORD": "0JjV5(G26,^{a&L8",
+      "DATABASE": "logger" 
+    }
+  }
+}
