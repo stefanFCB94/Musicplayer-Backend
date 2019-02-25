@@ -3,7 +3,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 import * as config from 'config';
 import * as request from 'supertest';
 import { expect } from 'chai';
-import { describe, before, afterEach } from 'mocha';
+import { describe, before, afterEach, beforeEach, after } from 'mocha';
 import { Client } from 'pg';
 
 

@@ -43,17 +43,17 @@ export class LoggerService {
       dirname: LOG_PATH_REQUESTS,
     });
 
+    let transports: any = [fileTransport];
+    if (process.env.NODE_ENV !== 'production') {
+      const consoleTransport = new winston.transports.Console();
+      transports = [...transports, consoleTransport];
+    }
+
     const logger = winston.createLogger({
       format,
       level,
-      transports: [fileTransport],
+      transports,
     });
-
-    if (process.env.NODE_ENV !== 'production') {
-      const consoleTransport = new winston.transports.Console();
-      logger.transports = [...logger.transports, consoleTransport];
-    }
-
 
     this.requestLoggers[request] = logger;
 
@@ -92,16 +92,17 @@ export class LoggerService {
       dirname: LOG_PATH_SERVICES,
     });
 
+    let transports: any = [fileTransport];
+    if (process.env.NODE_ENV !== 'production') {
+      const consoleTransport = new winston.transports.Console();
+      transports = [...transports, consoleTransport];
+    }
+
     const logger = winston.createLogger({
       format,
       level,
-      transports: [fileTransport],
+      transports,
     });
-
-    if (process.env.NODE_ENV !== 'production') {
-      const consoleTransport = new winston.transports.Console();
-      logger.transports = [...logger.transports, consoleTransport];
-    }
 
     this.serviceLoggers[service] = logger;
 
