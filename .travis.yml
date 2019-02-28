@@ -1,5 +1,13 @@
 language: node_js
-node_js:
-  - "node"
 env:
   - NODE_ENV=test
+
+branches:
+  only:
+    -microservices
+
+services:
+  - docker
+
+script:
+  - ./services/logger/integration_test/test.sh
