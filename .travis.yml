@@ -11,6 +11,8 @@ services:
 
 before_script:
   - sudo /etc/init.d/postgresql stop
+  - mkdir ./config/ssl
+  - openssl req -new -x509 -newkey rsa:4096 -keyout ./config/ssl/musicserver.key -out ./config/ssl/musicserver.crt -days 365 -subj "/C=DE/ST=Bavaria/L=Test/O=Teste/OU=DE/CN=www.example.com" -nodes
 
 script:
   - cd ./services/logger/integration_test && bash ./test.sh
