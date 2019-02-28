@@ -13,4 +13,4 @@ before_script:
   - sudo /etc/init.d/postgresql stop
 
 script:
-  - cd ./services/logger/integration_test && bash ./gittest.sh
+  - cd ./services/logger/integration_test && bash ./test.sh
