@@ -10,4 +10,4 @@ services:
   - docker
 
 script:
-  - ./services/logger/integration_test/test.sh
+  - cd ./services/logger/integration_test && bash ./test.sh
