@@ -1,0 +1,499 @@
+openapi: 3.0.2
+
+info:
+  title: Logger microservice API
+  description: API for the logger microservice for the musicserver application
+  version: 1.0.0
+
+
+paths:
+  /v1/config/levels/service:
+    get:
+      summary: Get configured log levels
+      description: API route, which returns the configuration for the log levels for each service
+      tags:
+        - config
+        - logLevel
+
+      responses:
+        '200':
+          description: A JSON array of log level configurations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogLevelResponse'
+
+
+        '500':
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+    post:
+      summary: Create new log level configuration
+      description: Create a new log level configuration, if configuration already exists, the log level configuration will be updated
+      tags:
+        - config
+        - logLevel
+
+      requestBody:
+        description: The configuration for the new log level
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogLevelPostBody'
+      
+      responses:
+        200:
+          description: Log level configuration successfully inserted or updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogLevelResponse'
+          
+        400:
+          description: If an error with the post data has occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogLevelRequestBodyErrorResponse'
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedError'
+
+
+  /v1/config/levels/service/{serviceName}:
+    put:
+      summary: Create or update log level configuration
+      description: Creates or update a log level configuration
+      tags:
+        - config
+        - logLevel
+
+      parameters:
+        - in: path
+          name: serviceName
+          schema:
+            type: string
+          required: true
+          description: The name of the service
+
+      requestBody:
+        description: The configuration for the new or updated log level
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogLevelPostBody'
+
+      responses:
+        200:
+          description: Log level configuration successfully inserted or updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogLevelResponse'
+
+        400:
+          description: If an error with the post data has occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogLevelRequestBodyErrorResponse'
+            
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+    get:
+      summary: Get specific log level configuration
+      description: Get the saved log level configuration for a specific service
+      tags:
+        - config
+        - logLevel
+
+      parameters:
+        - in: path
+          name: serviceName
+          schema:
+            type: string
+          required: true
+          description: The name of the service
+
+      responses:
+        200:
+          description: The log level configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogLevelResponse'
+        
+        404:
+          description: Log level configuration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityNotFoundErrorResponse'
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+    delete:
+      summary: Delete specific log level configuration
+      description: Delete the configured log level for a specific service
+      tags:
+        - config
+        - logLevel
+
+      parameters:
+        - in: path
+          name: serviceName
+          schema:
+            type: string
+          required: true
+          description: The name of the service
+
+      responses:
+        200:
+          description: The deleted log level
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogLevelResponse'
+              
+        404:
+          description: Log level configuration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+
+  /v1/service/{serviceName}/logger:
+    post:
+      summary: Create log file for service
+      description: Create a log file for the specific service
+      tags:
+        - service-logs
+
+      parameters:
+        - in: path
+          name: serviceName
+          schema:
+            type: string
+          required: true
+          description: The name of the service
+
+      responses:
+        204:
+          description: If the log file was successfully created
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+    delete:
+      summary: Closes log file for service
+      description: Close the log file for the specific service
+      tags:
+        - service-logs
+
+      parameters:
+        - in: path
+          name: serviceName
+          schema:
+            type: string
+          required: true
+          description: The name of the service
+
+      responses:
+        204:
+          description: If the log file was successfully closed
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+  
+
+  /v1/request/{requestId}/logger:
+    post:
+      summary: Create log file for request
+      description: Create a log file for a specific request
+      tags:
+        - request-logs
+
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+          description: The request number
+
+      responses:
+        204:
+          description: If the log file for the request was successfully created
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+    delete:
+      summary: Closes log file for request
+      description: Closes log file for a specific request
+      tags:
+        - request-logs
+
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+          description: The request number
+
+      responses:
+        204:
+          description: If the log file wass successully closed
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+
+  /v1/logs:
+    post:
+      summary: Create log entry
+      description: Create a log entry for the request and service
+      tags:
+        - service-logs
+        - request-logs
+
+      requestBody:
+        description: The information about the log entry
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogEntryPostBody'
+
+      responses:
+        204:
+          description: If the log entry was successfully created
+
+        500:
+          description: Unsupported error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsupportedErrorResponse'
+
+
+
+components:
+  schemas:
+
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+
+    UnsupportedError:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["UnsupportedError"]
+        message:
+          type: string
+
+    InvalidParameterValueError:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["InvalidParameterValueError"]
+        message:
+          type: string
+    
+    ParameterTooLongError:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["ParameterTooLongError"]
+        message:
+          type: string
+
+    RequiredParameterNotSetError:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["RequiredParameterNotSetError"]
+        message:
+          type: string
+
+    EntityNotFoundError:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["EntityNotFoundError"]
+        message:
+          type: string
+
+
+
+    UnsupportedErrorResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          nullable: true
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnsupportedError'
+
+    LogLevelRequestBodyErrorResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          nullable: true
+        errors:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/InvalidParameterValueError'
+              - $ref: '#/components/schemas/ParameterTooLongError'
+              - $ref: '#/components/schemas/RequiredParameterNotSetError'
+
+    EntityNotFoundErrorResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          nullable: true
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityNotFoundError'
+    
+
+
+    LogLevelsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogLevel'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+
+    LogLevelResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LogLevel'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+
+
+    LogLevel:
+      type: object
+      properties:
+        service:
+          type: string
+        level:
+          type: string
+          enum:
+            - error
+            - warn
+            - info
+            - verbose
+            - debug
+            - silly
+        updated:
+          type: string
+          format: date-time
+        created:
+          type: string
+          format: date-time
+
+    LogLevelPostBody:
+      type: object
+      properties:
+        service:
+          type: string
+        level:
+          type: string
+          enum:
+            - error
+            - warn
+            - info
+            - verbose
+            - debug
+            - silly
+
+
+    LogEntryPostBody:
+      type: object
+      properties:
+        service:
+          type: string
+        request:
+          type: integer
+        message:
+          type: string
+        level:
+          type: string
+          enum:
+            - error
+            - warn
+            - info
+            - verbose
+            - debug
+            - silly
