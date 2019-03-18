@@ -11,17 +11,17 @@ services:
 
 before_script:
   - sudo /etc/init.d/postgresql stop
-  - mkdir ./config/ssl
+  - mkdir $TRAVIS_BUILD_DIR/config/ssl
   - openssl req -new -x509 -newkey rsa:4096 -keyout ./config/ssl/musicserver.key -out ./config/ssl/musicserver.crt -days 365 -subj "/C=DE/ST=Bavaria/L=Test/O=Teste/OU=DE/CN=www.example.com" -nodes
 
 script:
-  - cd ./services/logger/integration_test && bash ./test.sh
+  - cd $TRAVIS_BUILD_DIR/services/logger/integration_test && bash ./test.sh
 
 deploy:
   provider: script
   skip_cleanup: true
   script:
-    - ./docker_build.sh
-    - ./docker_push.sh
+    - $TRAVIS_BUILD_DIR/docker_build.sh
+    - $TRAVIS_BUILD_DIR/docker_push.sh
   on:
     branch: microservices
