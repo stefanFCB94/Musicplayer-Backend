@@ -16,3 +16,9 @@ before_script:
 
 script:
   - cd ./services/logger/integration_test && bash ./test.sh
+
+deploy:
+  provider: script
+  script:
+    - ./docker_build.sh
+    - ./docker_push.sh
