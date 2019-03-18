@@ -17,11 +17,13 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR/services/logger/integration_test && bash ./test.sh
 
+
+before_deploy:
+  - cd $TRAVIS_BUILD_DIR
+
 deploy:
   provider: script
   skip_cleanup: true
-  script:
-    - cd $TRAVIS_BUILD_DIR && ./docker_build.sh
-    - cd $TRAVIS_BUILD_DIR && ./docker_push.sh
+  script: bash docker_build.sh
   on:
     branch: microservices
