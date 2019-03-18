@@ -1,0 +1,23 @@
+version: '2'
+
+services:
+  
+  base:
+    image: node:11-alpine
+    volumes: 
+      - .:/usr/src/service
+    working_dir: /usr/src/service
+    command: npm run dev
+    ports:
+      - 5005:80
+      - 5006:443
+
+  install:
+    extends:
+      service: base
+    command: npm install
+
+  build:
+    extends:
+      service: base
+    command: npm run compile

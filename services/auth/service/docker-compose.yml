@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  
+  db:
+    image: postgres:11.1-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 0JjV5(G26,^{a&L8
+      POSTGRES_USER: logger
+      POSTGRES_DB: logger
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+
+  dev:
+    image: node:11-alpine
+    volumes: 
+      - .:/usr/src/service
+      - ../../../config:/usr/src/service/config
+    working_dir: /usr/src/service
+    command: npm run dev
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - "db"
