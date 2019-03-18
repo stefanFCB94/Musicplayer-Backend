@@ -21,7 +21,7 @@ deploy:
   provider: script
   skip_cleanup: true
   script:
-    - $TRAVIS_BUILD_DIR/docker_build.sh
-    - $TRAVIS_BUILD_DIR/docker_push.sh
+    - cd $TRAVIS_BUILD_DIR && ./docker_build.sh
+    - cd $TRAVIS_BUILD_DIR && ./docker_push.sh
   on:
     branch: microservices
