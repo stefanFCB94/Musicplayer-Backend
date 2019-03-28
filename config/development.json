@@ -17,8 +17,11 @@
     }
   },
   "AUTH": {
-    "HOST": "auth",
-    "HTTP_PORT": 8080,
-    "HTTPS_PORT": 8443
+    "SERVICE_NAME": "auth",
+    "DB": {
+      "USERNAME": "auth",
+      "PASSWORD": "wG>R8/syQ#]u8mYc",
+      "DATABASE": "auth"
+    }
   }
 }

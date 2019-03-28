@@ -7,23 +7,41 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: 0JjV5(G26,^{a&L8
-      POSTGRES_USER: logger
-      POSTGRES_DB: logger
+      POSTGRES_USER: musicplayer
     volumes:
+      - ./db_init:/docker-entrypoint-initdb.d
       - ./data/db:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
+
+  logger:
+    image: stefanfcb94/musicplayer:logger
+    volumes:
+      - ./data/logs:/opt/service/logs
+      - ../../../config:/opt/service/config
+    environment:
+      NODE_ENV: development
+    ports:
+      - 8443:8443
+      - 8080:8080
+      - 5000:443
+      - 5001:80
+    depends_on:
+      - "db"
 
   dev:
     image: node:11-alpine
     volumes: 
       - .:/usr/src/service
       - ../../../config:/usr/src/service/config
+    environment:
+      NODE_ENV: development
     working_dir: /usr/src/service
     command: npm run dev
     ports:
       - 80:80
       - 443:443
     depends_on:
+      - "logger"
       - "db"
