@@ -1,6 +1,6 @@
 import { Logger } from './Logger.service';
 import { DatabaseService } from '../database/database.service';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import { Client } from '../database/models/Client';
 import { RequiredParameterNotPresentError } from '../errors/RequiredParameterNotPresent.error';
 import { LogLevel } from '../enums/LogLevel';
@@ -163,23 +163,26 @@ export class ClientService {
       throw error;
     }
 
+    let result: DeleteResult;
+
     try {
       this.logger.log(reqId, 'Try to delete client from database', LogLevel.DEBUG);
 
       const repository = this.db.getConnection().getRepository(Client);
-      const result = await repository.delete({ id: clientId });
-
-      if (result.affected === 0) {
-        const error = new ClientNotFoundError(`Client ${clientId} not found in the database`);
-        this.logger.log(reqId, error.stack, LogLevel.WARN);
-        throw error;
-      }
-
-      this.logger.log(reqId, `Client ${clientId} successfully deleted`, LogLevel.DEBUG);
+      result = await repository.delete({ id: clientId });
     } catch (err) {
       this.logger.log(reqId, err.stack, LogLevel.ERROR);
       throw new ClientNotDeleteableError(`Client ${clientId} could not be deleted`);
     }
+
+
+    if (result.affected === 0) {
+      const error = new ClientNotFoundError(`Client ${clientId} not found in the database`);
+      this.logger.log(reqId, error.stack, LogLevel.WARN);
+      throw error;
+    }
+
+    this.logger.log(reqId, `Client ${clientId} successfully deleted`, LogLevel.DEBUG);
   }
 
 }
