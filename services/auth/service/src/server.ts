@@ -9,6 +9,8 @@ import * as fs from 'fs-extra';
 
 import { Logger } from './services/Logger.service';
 import { LogLevel } from './enums/LogLevel';
+import { ClientsController } from './controller/clients.controller';
+import { DatabaseService } from './database/database.service';
 
 
 export class Server {
@@ -25,6 +27,7 @@ export class Server {
 
 
   private logger: Logger;
+  private database: DatabaseService;
 
   constructor(logger: Logger) {
     this.httpPort = 80;
@@ -42,6 +45,11 @@ export class Server {
   public async init() {
     this.logger.log('__AUTH-START__', 'Start to initialize all services for server', LogLevel.DEBUG);
 
+    if (!this.database) {
+      this.database = new DatabaseService(this.logger);
+      await this.database.connect();
+      this.logger.log('__AUTH-START__', 'Database service initialized', LogLevel.DEBUG);
+    }
 
     this.logger.log('__AUTH-START__', 'Initializing of all services of the server finished', LogLevel.DEBUG);
   }
@@ -55,7 +63,8 @@ export class Server {
     this.app.use(compression());
     this.app.use(helmet());
 
-    this.initializeApi();
+    await this.init();
+    await this.initializeApi();
     this.logger.log('__AUTH-START__', 'Start server...', LogLevel.DEBUG);
 
 
@@ -71,13 +80,21 @@ export class Server {
   public async stop() {
     this.logger.log('__AUTH-STOP__', 'Stopping server...', LogLevel.DEBUG);
 
+    await this.database.disconnect();
+
     await this.stopHttp();
     await this.stopHttps();
   }
 
 
-  private initializeApi() {
+  private async initializeApi() {
     this.logger.log('__AUTH-START__', 'Start to initialize routes of the server', LogLevel.DEBUG);
+
+    // CLient routes
+    const clientRoutes = new ClientsController(this.logger, this.database);
+    await clientRoutes.init();
+    this.app.use('/v1', clientRoutes.getRouter());
+    this.logger.log('__AUTH-START__', 'Client route successfull initialized', LogLevel.DEBUG);
 
     this.logger.log('__AUTH-START__', 'Routes of the server successfully initialized', LogLevel.DEBUG);
   }
